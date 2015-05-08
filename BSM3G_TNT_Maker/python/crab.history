@@ -1,0 +1,107 @@
+150413_195041: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150413_195407: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit 1-20 -c NTuples_Data2015
+150413_201457: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Data2015
+150413_202455: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Data2015
+150413_203816: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Data2015
+150413_212827: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Data2015
+150413_213020: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -kill -c NTuples_Data2015/
+150413_213034: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -kill all -c NTuples_Data2015/
+150413_213840: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150413_213927: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150413_214025: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150413_214854: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150413_214929: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit -c NTuples_Data2015_v2
+150413_230038: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Data2015_v2/
+150413_230156: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -kill all -c NTuples_Data2015_v2/
+150413_230934: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150413_231053: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150413_231213: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150413_231236: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit -c NTuples_Data2015
+150414_065312: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Data2015
+150414_065836: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -getoutput -c NTuples_Data2015
+150414_070707: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150414_070752: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit -c NTuples_Data2015_v2
+150414_081225: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Data2015_v2
+150414_081400: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150414_081515: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150414_081711: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150414_081745: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150414_081843: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150414_082238: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Data2015_v2
+150414_082313: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -getoutput -c NTuples_Data2015_v2
+150414_131233: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Data2015_v2
+150414_131322: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -getoutput -c NTuples_Data2015_v2
+150414_134305: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150414_134352: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150414_134457: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150414_134526: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit -c NTuples_Data2015
+150414_153247: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Data2015
+150414_153443: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -getoutput -c NTuples_Data2015
+150414_153456: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Data2015
+150414_153517: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -kill all -c NTuples_Data2015
+150414_153934: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150414_154107: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit -c NTuples_Data2015_v2
+150414_162130: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_mc.cfg
+150414_162246: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_mc.cfg
+150414_162415: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_mc.cfg
+150414_162739: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_mc.cfg
+150414_163211: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit 1-500 -c NTuples_Test
+150414_164120: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150414_164229: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Data2015_v2/
+150414_172044: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Data2015_v2/
+150414_172151: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Test
+150414_172217: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -getoutput -c NTuples_Test
+150414_173358: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Test
+150414_173422: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -getoutput -c NTuples_Test
+150414_173458: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -kill all -c NTuples_Test
+150414_174414: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_mc_DYtoMuMu.cfg
+150414_174617: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_mc_DYtoMuMu.cfg
+150414_174657: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit 1-500 -c NTuples_DYtoMuMu
+150414_174756: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit 500-504 -c NTuples_DYtoMuMu
+150414_175112: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_mc_DYtoLL.cfg
+150414_175226: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit 1-500 -c NTuples_DYtoLL
+150414_175335: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit 500-505 -c NTuples_DYtoLL
+150414_175404: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_DYtoMuMu
+150414_175922: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_mc_Wjets.cfg
+150414_180109: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_mc_Wjets.cfg
+150414_180235: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit 1-500 -c NTuples_Wjets
+150414_180324: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit 500-504 -c NTuples_Wjets
+150414_180526: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_mc_TTWJets.cfg
+150414_180828: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit 1-500 -c NTuples_TTWJets
+150414_180940: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit 500-504 -c NTuples_TTWJets
+150414_181026: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_DYtoMuMu
+150415_075646: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_DYtoMuMu
+150415_075809: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -getoutput -c NTuples_DYtoMuMu
+150415_080734: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_DYtoMuMu
+150415_080948: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Wjets
+150415_081014: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -getoutput -c NTuples_Wjets
+150415_082433: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Wjets
+150415_082520: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_TTWJets
+150415_082550: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -getoutput -c NTuples_TTWJets
+150415_082643: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_TTWJets
+150415_082728: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_DYtoLL/
+150415_082804: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -getoutput -c NTuples_DYtoLL/
+150415_084404: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Data2015_v2
+150415_084454: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -getoutput -c NTuples_Data2015_v2
+150416_174544: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150416_174824: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150416_175008: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150416_175204: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150416_175406: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150416_175458: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150416_175756: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150416_180131: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_mc_DYtoMuMu.cfg
+150416_180221: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit 1-500 -c NTuples_DYtoMuMu
+150416_180445: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit 500-504 -c NTuples_DYtoMuMu
+150416_180626: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_mc_Wjets.cfg
+150416_181112: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit 1-500 -c NTuples_Wjets/
+150416_181228: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit 500-504 -c NTuples_Wjets/
+150416_181536: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_mc_TTWJets.cfg
+150416_181733: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit 1-500 -c NTuples_TTWJets
+150417_101622: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150417_101802: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create -cfg crab_data.cfg
+150417_124210: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_DYtoMuMu
+150417_130634: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -getoutput -c NTuples_DYtoMuMu
+150417_133850: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -getoutput -c NTuples_Wjets
+150417_133903: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c NTuples_Wjets
+150417_134123: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -getoutput -c NTuples_Wjets

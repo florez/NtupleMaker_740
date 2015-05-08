@@ -1,0 +1,32 @@
+####################################################
+
+Code developed by: Andres Florez and Amandeep Kalsi
+
+###################################################
+
+The recepie is set to install the code at LPC. 
+Thertefore, to install the code elsewere, you'd need 
+to make the necessary changes.
+
+In order to use the code you need to follow carefully these steps:
+
+1. You need to work at the SLC6 area.
+
+2. set the CMSSW release: cmsrel CMSSW_7_2_0
+
+3. cd CMSSW_7_2_0/src
+
+4. cmsenv
+
+5. Install and compile the code to use the PAT-electron ID:
+
+  5.1 git cms-merge-topic ikrav:egm_id_phys14
+  5.2 scram b -j 10
+
+6. Get the NTupleMaker code and compile it:
+  
+  6.1 git clone https://github.com/florez/NtupleMaker
+  6.2 scram b -j 10
+
+7. In the python directory, there is file called miniAOD.py.  
+   7.1 You can run it with CMSSW (make sure it runs in a valid PHY14 miniOAD)

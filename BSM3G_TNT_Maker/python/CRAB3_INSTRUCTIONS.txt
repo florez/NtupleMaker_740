@@ -1,0 +1,4 @@
+source /cvmfs/cms.cern.ch/crab3/crab.csh
+crab2cfgTOcrab3py crab3_data.cfg
+crab submit -c crabConfig.py
+crab status -d <DIRECTORY>
