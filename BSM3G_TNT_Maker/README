@@ -26,7 +26,8 @@ In order to use the code you need to follow carefully these steps:
 6. Get the NTupleMaker code and compile it:
   
   6.1 git clone https://github.com/florez/NtupleMaker_740
-  6.2 scram b -j 10
+  6.2 mv NtupleMaker_740 NtupleMaker
+  6.3 scram b -j 10
 
 7. In the python directory, there is file called miniAOD.py.  
    7.1 You can run it with CMSSW (make sure it runs in a valid PHY14 miniOAD)
