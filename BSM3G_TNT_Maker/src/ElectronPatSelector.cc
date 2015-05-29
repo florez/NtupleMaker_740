@@ -62,12 +62,14 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent){
     bool isPassLoose  = (*loose_id_decisions)[ elPtr ];
     bool isPassMedium = (*medium_id_decisions)[ elPtr ];
     bool isPassTight  = (*tight_id_decisions)[ elPtr ];
-    
+    bool isHEEPId     = (*heep_id_decisions)[ elPtr ];
+ 
     passVetoId_.push_back( isPassVeto );
     passLooseId_.push_back( isPassLoose );
     passMediumId_.push_back( isPassMedium );
     passTightId_.push_back( isPassTight );
-    
+    passHEEPId_.push_back( isHEEPId );   
+ 
     patElectron_d0.push_back( (-1) * el->gsfTrack()->dxy(firstGoodVertex->position() ) );
     patElectron_dz.push_back( el->gsfTrack()->dz( firstGoodVertex->position() ) );
     expectedMissingInnerHits.push_back(el->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) );
@@ -97,6 +99,7 @@ void ElectronPatSelector::SetBranches(){
   AddBranch(&passLooseId_             ,"patElectron_isPassLoose");
   AddBranch(&passMediumId_            ,"patElectron_isPassMedium");
   AddBranch(&passTightId_             ,"patElectron_isPassTight");
+  AddBranch(&passHEEPId_              ,"patElectron_isPassHEEPId");
   AddBranch(&patElectron_d0           ,"patElectron_d0");
   AddBranch(&patElectron_dz           ,"patElectron_dz");
   AddBranch(&expectedMissingInnerHits ,"patElectron_expectedMissingInnerHits");
@@ -119,6 +122,7 @@ void ElectronPatSelector::Clear(){
   passLooseId_.clear();
   passMediumId_.clear();
   passTightId_.clear();  
+  passHEEPId_.clear();
   patElectron_d0.clear();
   patElectron_dz.clear();
   expectedMissingInnerHits.clear();

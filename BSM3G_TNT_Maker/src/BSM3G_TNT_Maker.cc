@@ -9,6 +9,7 @@ BSM3G_TNT_Maker::BSM3G_TNT_Maker(const edm::ParameterSet& iConfig):
   //now do what ever initialization is needed
 {
   debug_                   = iConfig.getParameter<bool>("debug_");
+  _filltriggerinfo         = iConfig.getParameter<bool>("filltriggerinfo");
   _fillmuoninfo            = iConfig.getParameter<bool>("fillmuoninfo");
   _fillelectronpatinfo     = iConfig.getParameter<bool>("fillelectronpatinfo");
   _filltauinfo             = iConfig.getParameter<bool>("filltauinfo");
@@ -19,8 +20,8 @@ BSM3G_TNT_Maker::BSM3G_TNT_Maker(const edm::ParameterSet& iConfig):
   _fillphotoninfo          = iConfig.getParameter<bool>("fillphotoninfo");
   edm::Service<TFileService> fs;
   tree_ = fs->make<TTree>("BOOM","BOOM");
-  
-  
+
+  if( _filltriggerinfo)      trselector     = new TriggerSelector("miniAOD", tree_, debug_, iConfig);
   if( _fillmuoninfo)         muselector     = new MuonSelector("miniAOD", tree_, debug_, iConfig);
   if( _fillelectronpatinfo)  elpatselector  = new ElectronPatSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
   if( _filltauinfo)          tauselector    = new TauSelector("miniAOD", tree_, debug_, iConfig);
@@ -34,10 +35,8 @@ BSM3G_TNT_Maker::BSM3G_TNT_Maker(const edm::ParameterSet& iConfig):
 
 BSM3G_TNT_Maker::~BSM3G_TNT_Maker()
 {
-  
   // do anything here that needs to be done at desctruction time
   // (e.g. close files, deallocate resources etc.)
-  
 }
 
 
@@ -53,7 +52,8 @@ BSM3G_TNT_Maker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   using namespace edm;
   using namespace pat;
   using namespace reco;
-  
+
+  if( _filltriggerinfo)      trselector->Fill(iEvent);
   if( _fillmuoninfo)         muselector->Fill(iEvent);
   if( _fillelectronpatinfo)  elpatselector->Fill(iEvent); 
   if( _filltauinfo)          tauselector->Fill(iEvent); 
@@ -75,7 +75,6 @@ BSM3G_TNT_Maker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 #endif
 }
 
-
 // ------------ method called once each job just before starting event loop  ------------
 void 
 BSM3G_TNT_Maker::beginJob()
@@ -91,12 +90,12 @@ BSM3G_TNT_Maker::endJob()
 }
 
 // ------------ method called when starting to processes a run  ------------
-/*
-  void 
-  BSM3G_TNT_Maker::beginRun(edm::Run const&, edm::EventSetup const&)
+
+void
+BSM3G_TNT_Maker::beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup)
   {
+    if( _filltriggerinfo) trselector->startTrigger(iSetup, iRun);
   }
-*/
 
 // ------------ method called when ending the processing of a run  ------------
 /*

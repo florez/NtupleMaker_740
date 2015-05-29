@@ -89,7 +89,7 @@ void GenParticleSelector::SetBranches(){
   AddBranch(&Gen_vy               ,"Gen_vy");
   AddBranch(&Gen_vz               ,"Gen_vz");
   AddBranch(&Gen_charge           ,"Gen_charge");
-  AddBranch(&Gen_numDaught        ,"en_numDaught");
+  AddBranch(&Gen_numDaught        ,"Gen_numDaught");
   AddBranch(&Gen_numMother        ,"Gen_numMother");
   AddBranch(&Gen_BmotherIndices   ,"Gen_BmotherIndices");
   AddBranch(&Gen_BdaughtIndices   ,"Gen_BdaughtIndices");

@@ -18,6 +18,8 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Framework/interface/EventSetup.h"
+#include "NtupleMaker/BSM3G_TNT_Maker/interface/TriggerSelector.h"
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/MuonSelector.h"
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/TauSelector.h"
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/JetSelector.h"
@@ -26,6 +28,11 @@
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/METSelector.h"
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/ElectronPatSelector.h"
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/PhotonSelector.h"
+#include "baseTree.h"
+#include <TBranch.h>
+#include <TTree.h>
+#include <TFile.h>
+#include <vector>
 
 #ifdef __MAKECINT__
 #pragma link C++ class std::vector<std::vector<int> >+;
@@ -46,21 +53,20 @@ public:
   ~BSM3G_TNT_Maker();
   
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
-  
-  
+ 
 private:
   virtual void beginJob() override;
+  virtual void beginRun(edm::Run const &, edm::EventSetup const&);
   virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
   virtual void endJob() override;
-  void clearvectors();
-  
   // ----------member data ---------------------------
   
   TFile* file;
   TTree* tree_;
   const size_t MaxN;
   bool debug_;
-  
+ 
+  bool _filltriggerinfo; 
   bool _fillmuoninfo;
   bool _fillelectronpatinfo;
   bool _filltauinfo;
@@ -69,7 +75,8 @@ private:
   bool _fillPVinfo;
   bool _fillMETinfo;
   bool _fillphotoninfo;
-  
+
+  TriggerSelector     *trselector;
   MuonSelector        *muselector;
   TauSelector         *tauselector;
   JetSelector         *jetselector;

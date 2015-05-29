@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <TRandom3.h>
-#include <TBranch.h>                                                                    
 #include <TClonesArray.h>
 
 // user include files
@@ -33,29 +32,16 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
-#include "DataFormats/PatCandidates/interface/Electron.h"
-#include "DataFormats/PatCandidates/interface/Tau.h"
-#include "DataFormats/PatCandidates/interface/Photon.h"
-#include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "CommonTools/Utils/interface/TFileDirectory.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
-#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
-#include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "FWCore/Common/interface/TriggerNames.h"
-#include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
-#include "DataFormats/HLTReco/interface/TriggerObject.h"
-#include "DataFormats/HLTReco/interface/TriggerEvent.h"
-#include "DataFormats/HLTReco/interface/TriggerEventWithRefs.h"
-#include "DataFormats/HLTReco/interface/TriggerTypeDefs.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
@@ -88,8 +74,7 @@ private:
   vector <double> Muon_pt ,Muon_eta,Muon_phi, Muon_dz, Muon_energy, Muon_iso;
   vector <double> Muon_isoCharged, Muon_isoNeutralHadron , Muon_isoPhoton, Muon_isoPU;
   vector <double> Muon_charge, Muon_chi2, Muon_p, Muon_matchedStat, Muon_dxy, Muon_validHits, Muon_validHitsInner, Muon_TLayers; 
-  
-  vector <bool> Muon_tight, Muon_soft, Muon_pf ;   
+  vector <bool> Muon_loose, Muon_tight, Muon_soft, Muon_isHighPt, Muon_pf ;   
 
   // super tiny ntuple?
   bool _super_TNT;

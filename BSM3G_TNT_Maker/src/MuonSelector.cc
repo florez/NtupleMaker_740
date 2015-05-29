@@ -39,7 +39,7 @@ void MuonSelector::Fill(const edm::Event& iEvent){
   if (firstGoodVertex == vtx_h->end()) return;
   
   for(edm::View<pat::Muon>::const_iterator mu = muon_h->begin(); mu != muon_h->end(); mu++){
-    if (mu->pt() < _Muon_pt_min || !mu->isLooseMuon()) continue;
+    if (mu->pt() < _Muon_pt_min) continue;
     if (fabs(mu->eta()) > _Muon_eta_max) continue;  
     
     reco::TrackRef gtk = mu->globalTrack();
@@ -74,9 +74,10 @@ void MuonSelector::Fill(const edm::Event& iEvent){
       Muon_isoPhoton.push_back((mu->pfIsolationR04().sumPhotonEt));
       Muon_isoPU.push_back((mu->pfIsolationR04().sumPUPt));
     }
-
+    Muon_loose.push_back(mu->isLooseMuon());
     Muon_tight.push_back(mu->isTightMuon(*firstGoodVertex));
     Muon_soft.push_back(mu->isSoftMuon(*firstGoodVertex));
+    Muon_isHighPt.push_back(mu->isHighPtMuon(*firstGoodVertex));
     Muon_pf.push_back(mu->isPFMuon());   
     Muon_energy.push_back(mu->energy());
     Muon_isoSum.push_back((mu->trackIso() + mu->ecalIso() + mu->hcalIso()));
@@ -99,7 +100,9 @@ void MuonSelector::SetBranches(){
   AddBranch(&Muon_energy            ,"Muon_energy");
   AddBranch(&Muon_charge            ,"Muon_charge");
   AddBranch(&Muon_tight             ,"Muon_tight");
+  AddBranch(&Muon_loose             ,"Muon_loose");
   AddBranch(&Muon_soft              ,"Muon_soft");
+  AddBranch(&Muon_isHighPt          ,"Muon_isHighPt");
   AddBranch(&Muon_pf                ,"Muon_pf");
   AddBranch(&Muon_isoCharged        ,"Muon_isoCharged");
   AddBranch(&Muon_isoSum            ,"Muon_isoSum");
@@ -127,8 +130,10 @@ void MuonSelector::Clear(){
   Muon_energy.clear();
   Muon_dz.clear();
   Muon_tight.clear();
+  Muon_loose.clear();
   Muon_soft.clear();
   Muon_pf.clear();   
+  Muon_isHighPt.clear();
   Muon_isoCharged.clear();
   Muon_isoNeutralHadron.clear();
   Muon_isoPhoton.clear();
