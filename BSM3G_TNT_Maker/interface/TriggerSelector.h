@@ -31,6 +31,9 @@
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
+#include "DataFormats/PatCandidates/interface/TriggerPath.h"
+#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
+#include "DataFormats/PatCandidates/interface/TriggerAlgorithm.h"
 #include <TTree.h>
 #include <string>
 #include <vector>
@@ -49,7 +52,7 @@ class TriggerSelector : public baseTree{
   TriggerSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg);
   ~TriggerSelector();
   virtual void startTrigger (edm::EventSetup const& , edm::Run const &);
-  void Fill(const edm::Event& iEvent);
+  void Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   void SetBranches();
   void Clear();
 

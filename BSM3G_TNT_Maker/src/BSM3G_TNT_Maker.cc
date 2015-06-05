@@ -53,7 +53,7 @@ BSM3G_TNT_Maker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   using namespace pat;
   using namespace reco;
 
-  if( _filltriggerinfo)      trselector->Fill(iEvent);
+  if( _filltriggerinfo)      trselector->Fill(iEvent, iSetup);
   if( _fillmuoninfo)         muselector->Fill(iEvent);
   if( _fillelectronpatinfo)  elpatselector->Fill(iEvent); 
   if( _filltauinfo)          tauselector->Fill(iEvent); 
