@@ -19,8 +19,9 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
       #'/store/data/Run2012D/DoubleMuParked/AOD/22Jan2013-v1/20000/002E1374-5F84-E211-83C4-20CF305616D0.root',
       #'/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/0432E62A-7A6C-E411-87BB-002590DB92A8.root',
-      '/store/relval/CMSSW_7_4_0/DoubleMu/MINIAOD/GR_R_74_V10A_RelVal_zMu2011A-v1/00000/2835BE8D-9FDA-E411-BD9B-002590593878.root',
+      #'/store/relval/CMSSW_7_4_0/DoubleMu/MINIAOD/GR_R_74_V10A_RelVal_zMu2011A-v1/00000/2835BE8D-9FDA-E411-BD9B-002590593878.root',
       #'/store/relval/CMSSW_7_4_0_pre8_ROOT6/SingleElectron/MINIAOD/GR_R_74_V8A_RelVal_wEl2012D-v1/00000/02C2F4FB-27BF-E411-899E-0025905A48B2.root',
+      'file:mini_AODSIM.root'
     )
 )
 
