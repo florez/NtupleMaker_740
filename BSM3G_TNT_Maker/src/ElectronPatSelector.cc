@@ -81,6 +81,7 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent){
     isoChargedHadrons_.push_back( pfIso.sumChargedHadronPt );
     isoNeutralHadrons_.push_back( pfIso.sumNeutralHadronEt );
     isoPhotons_.push_back( pfIso.sumPhotonEt );
+    isoPU_.push_back( pfIso.sumPUPt );
     
     elcoun++;
   }
@@ -107,6 +108,7 @@ void ElectronPatSelector::SetBranches(){
   AddBranch(&isoChargedHadrons_       ,"patElectron_isoChargedHadrons");
   AddBranch(&isoNeutralHadrons_       ,"patElectron_isoNeutralHadrons");
   AddBranch(&isoPhotons_              ,"patElectron_isoPhotons");
+  AddBranch(&isoPU_                   ,"patElectron_isoPU");
   
   if(debug_)    std::cout<<"set branches"<<std::endl;
 }
@@ -130,4 +132,5 @@ void ElectronPatSelector::Clear(){
   isoChargedHadrons_.clear();
   isoNeutralHadrons_.clear();
   isoPhotons_.clear();
+  isoPU_.clear();
 }

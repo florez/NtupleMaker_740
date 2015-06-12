@@ -82,9 +82,11 @@ public:
   JetSelector(){};
   
   vector <double> Jet_pt, Jet_eta, Jet_phi,Jet_energy,  Jet_bDiscriminator,  Jet_mass, JetParton, JetjetId;
-  vector <double> JetIDPU, Jetpass_pileupJetId, Jet_neutralHadEnergy, Jet_neutralEmEmEnergy; 
-  vector <double> Jet_chargedHadronEnergy, Jet_chargedEmEnergy, Jet_muonEnergy; 
+  vector <double> Jet_pileupId, JetIDPU, Jetpass_pileupJetId, Jet_neutralHadEnergyFraction, Jet_neutralEmEmEnergyFraction; 
+  vector <double> Jet_chargedHadronEnergyFraction, Jet_chargedEmEnergyFraction, Jet_muonEnergyFraction; 
   vector <double> Jet_electronEnergy,Jet_photonEnergy, UncorrJet_pt; 
+  vector <int> Jet_numberOfConstituents;
+  vector <int> Jet_chargedMultiplicity;
 
   bool _super_TNT;
   // Jet cuts

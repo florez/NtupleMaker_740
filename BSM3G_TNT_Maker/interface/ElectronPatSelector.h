@@ -79,7 +79,7 @@ public:
   // ----------member data ---------------------------
   
   vector<double> patElectron_pt , patElectron_eta, patElectron_phi, patElectron_energy, patElectron_charge;
-  vector<double> patElectron_d0, patElectron_dz, isoChargedHadrons_, isoNeutralHadrons_, isoPhotons_;
+  vector<double> patElectron_d0, patElectron_dz, isoChargedHadrons_, isoNeutralHadrons_, isoPhotons_, isoPU_;
   vector<int> passVetoId_, passLooseId_, passMediumId_, passTightId_, passHEEPId_, passConversionVeto_, expectedMissingInnerHits;
   
   // confit variables
