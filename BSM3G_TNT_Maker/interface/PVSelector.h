@@ -102,16 +102,19 @@ class PVSelector : public baseTree{
   ~PVSelector();
   void Fill(const edm::Event& iEvent);
   void SetBranches();
-
+  void Clear();
 
  private:
   PVSelector(){};
   edm::InputTag pileUpLabel_;
-
+  edm::InputTag _beamSpot;
 
   //variables which would become branches
   int nBestVtx;
   int ootnpuVertices,npuVertices, npuVerticesm1, npuVerticesp1;
+  vector<float> pvertex_x, pvertex_y, pvertex_z;
+  vector<float> pvertex_xError, pvertex_yError, pvertex_zError;
+  vector<float> beamSpot_x0, beamSpot_y0, beamSpot_z0;
   float trueInteractions;
 
   // Primary vertex cuts

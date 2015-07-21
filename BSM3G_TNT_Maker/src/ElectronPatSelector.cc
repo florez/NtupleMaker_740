@@ -10,7 +10,8 @@ ElectronPatSelector::ElectronPatSelector(std::string name, TTree* tree, bool deb
 {
   
   SetBranches();
-  _vertexInputTag          = iConfig.getParameter<edm::InputTag>("vertices");
+  _vertexInputTag        = iConfig.getParameter<edm::InputTag>("vertices");
+  _beamSpot              = iConfig.getParameter<edm::InputTag>("beamSpot");
   _patElectronToken      = iConfig.getParameter<edm::InputTag>("patElectrons");
   _patElectron_pt_min    = iConfig.getParameter<double>("patElectron_pt_min");
   _patElectron_eta_max   = iConfig.getParameter<double>("patElectron_eta_max");
@@ -44,6 +45,23 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent){
   iEvent.getByToken(electronTightIdMapToken_,tight_id_decisions);  
   iEvent.getByToken(eleHEEPIdMapToken_, heep_id_decisions);
 
+  // Get BeamSpot Information
+  reco::BeamSpot beamSpot;
+  edm::Handle<reco::BeamSpot> beamSpotHandle;
+  iEvent.getByLabel(_beamSpot, beamSpotHandle);
+
+  if ( beamSpotHandle.isValid() )
+   {
+     beamSpot = *beamSpotHandle;
+
+   } else {
+    edm::LogInfo("MyAnalyzer")
+      << "No beam spot available from EventSetup \n";
+   }
+
+  math::XYZPoint point(beamSpot.x0(),beamSpot.y0(), beamSpot.z0());
+
+
   reco::VertexCollection::const_iterator firstGoodVertex = vtx->end();
   for(edm::View<pat::Electron>::const_iterator el = electron_pat->begin(); el != electron_pat->end(); el++){
     if (el->pt() < _patElectron_pt_min) continue;
@@ -69,9 +87,17 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent){
     passMediumId_.push_back( isPassMedium );
     passTightId_.push_back( isPassTight );
     passHEEPId_.push_back( isHEEPId );   
- 
-    patElectron_d0.push_back( (-1) * el->gsfTrack()->dxy(firstGoodVertex->position() ) );
+
+    // Variables for life-time (impact parameter) studies  
+    patElectron_gsfTrack_normChi2.push_back(el->gsfTrack()->normalizedChi2());
+    patElectron_gsfTrack_ndof.push_back(el->gsfTrack()->ndof());
+    patElectron_gsfTrack_vtx.push_back(el->gsfTrack()->vx()); 
+    patElectron_gsfTrack_vty.push_back(el->gsfTrack()->vy());
+    patElectron_gsfTrack_vtz.push_back(el->gsfTrack()->vz());
+    patElectron_dxy.push_back( (-1) * el->gsfTrack()->dxy(firstGoodVertex->position() ) );
+    patElectron_dxyError.push_back(el->gsfTrack()->d0Error());
     patElectron_dz.push_back( el->gsfTrack()->dz( firstGoodVertex->position() ) );
+    patElectron_dxy_bs.push_back ( el->gsfTrack()->dxy(point) );
     expectedMissingInnerHits.push_back(el->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) );
     passConversionVeto_.push_back( el->passConversionVeto() );
     
@@ -91,24 +117,31 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent){
 void ElectronPatSelector::SetBranches(){
   if(debug_)    std::cout<<"setting branches: calling AddBranch of baseTree"<<std::endl;
   
-  AddBranch(&patElectron_pt           ,"patElectron_pt");
-  AddBranch(&patElectron_eta          ,"patElectron_eta");
-  AddBranch(&patElectron_phi          ,"patElectron_phi");
-  AddBranch(&patElectron_energy       ,"patElectron_energy");
-  AddBranch(&patElectron_charge       ,"patElectron_charge");
-  AddBranch(&passVetoId_              ,"patElectron_isPassVeto");          
-  AddBranch(&passLooseId_             ,"patElectron_isPassLoose");
-  AddBranch(&passMediumId_            ,"patElectron_isPassMedium");
-  AddBranch(&passTightId_             ,"patElectron_isPassTight");
-  AddBranch(&passHEEPId_              ,"patElectron_isPassHEEPId");
-  AddBranch(&patElectron_d0           ,"patElectron_d0");
-  AddBranch(&patElectron_dz           ,"patElectron_dz");
-  AddBranch(&expectedMissingInnerHits ,"patElectron_expectedMissingInnerHits");
-  AddBranch(&passConversionVeto_      ,"patElectron_passConversionVeto"); 
-  AddBranch(&isoChargedHadrons_       ,"patElectron_isoChargedHadrons");
-  AddBranch(&isoNeutralHadrons_       ,"patElectron_isoNeutralHadrons");
-  AddBranch(&isoPhotons_              ,"patElectron_isoPhotons");
-  AddBranch(&isoPU_                   ,"patElectron_isoPU");
+  AddBranch(&patElectron_pt                ,"patElectron_pt");
+  AddBranch(&patElectron_eta               ,"patElectron_eta");
+  AddBranch(&patElectron_phi               ,"patElectron_phi");
+  AddBranch(&patElectron_energy            ,"patElectron_energy");
+  AddBranch(&patElectron_charge            ,"patElectron_charge");
+  AddBranch(&passVetoId_                   ,"patElectron_isPassVeto");          
+  AddBranch(&passLooseId_                  ,"patElectron_isPassLoose");
+  AddBranch(&passMediumId_                 ,"patElectron_isPassMedium");
+  AddBranch(&passTightId_                  ,"patElectron_isPassTight");
+  AddBranch(&passHEEPId_                   ,"patElectron_isPassHEEPId");
+  AddBranch(&patElectron_dxy               ,"patElectron_dxy");
+  AddBranch(&patElectron_dxyError          ,"patElectron_dxyError");
+  AddBranch(&patElectron_dz                ,"patElectron_dz");
+  AddBranch(&patElectron_dxy_bs            ,"patElectron_dxy_bs");
+  AddBranch(&patElectron_gsfTrack_normChi2 ,"patElectron_gsfTrack_normChi2");
+  AddBranch(&patElectron_gsfTrack_ndof     ,"patElectron_gsfTrack_ndof");
+  AddBranch(&patElectron_gsfTrack_vtx      ,"patElectron_gsfTrack_vtx");
+  AddBranch(&patElectron_gsfTrack_vty      ,"patElectron_gsfTrack_vty");
+  AddBranch(&patElectron_gsfTrack_vtz      ,"patElectron_gsfTrack_vtz");
+  AddBranch(&expectedMissingInnerHits      ,"patElectron_expectedMissingInnerHits");
+  AddBranch(&passConversionVeto_           ,"patElectron_passConversionVeto"); 
+  AddBranch(&isoChargedHadrons_            ,"patElectron_isoChargedHadrons");
+  AddBranch(&isoNeutralHadrons_            ,"patElectron_isoNeutralHadrons");
+  AddBranch(&isoPhotons_                   ,"patElectron_isoPhotons");
+  AddBranch(&isoPU_                        ,"patElectron_isoPU");
   
   if(debug_)    std::cout<<"set branches"<<std::endl;
 }
@@ -125,8 +158,15 @@ void ElectronPatSelector::Clear(){
   passMediumId_.clear();
   passTightId_.clear();  
   passHEEPId_.clear();
-  patElectron_d0.clear();
+  patElectron_dxy.clear();
+  patElectron_dxyError.clear();
+  patElectron_gsfTrack_normChi2.clear();
+  patElectron_gsfTrack_ndof.clear();
+  patElectron_gsfTrack_vtx.clear(); 
+  patElectron_gsfTrack_vty.clear();
+  patElectron_gsfTrack_vtz.clear();
   patElectron_dz.clear();
+  patElectron_dxy_bs.clear();
   expectedMissingInnerHits.clear();
   passConversionVeto_.clear();
   isoChargedHadrons_.clear();

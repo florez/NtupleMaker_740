@@ -4,6 +4,7 @@ MuonSelector::MuonSelector(std::string name, TTree* tree, bool debug, const pset
   
   _muonToken               = iConfig.getParameter<edm::InputTag>("muons");
   _vertexInputTag          = iConfig.getParameter<edm::InputTag>("vertices");
+  _beamSpot                = iConfig.getParameter<edm::InputTag>("beamSpot");
   _Muon_pt_min             = iConfig.getParameter<double>("Muon_pt_min");
   _Muon_eta_max            = iConfig.getParameter<double>("Muon_eta_max");
   _Muon_vtx_ndof_min       = iConfig.getParameter<int>("Muon_vtx_ndof_min");
@@ -27,7 +28,23 @@ void MuonSelector::Fill(const edm::Event& iEvent){
   
   edm::Handle<reco::VertexCollection> vtx_h;
   iEvent.getByLabel(_vertexInputTag, vtx_h);
-  
+
+  // Get BeamSpot information
+  reco::BeamSpot beamSpot;
+  edm::Handle<reco::BeamSpot> beamSpotHandle;
+  iEvent.getByLabel(_beamSpot, beamSpotHandle);
+
+  if ( beamSpotHandle.isValid() )
+   {
+     beamSpot = *beamSpotHandle;
+
+   } else {
+    edm::LogInfo("MyAnalyzer")
+      << "No beam spot available from EventSetup \n";
+   }
+
+  math::XYZPoint point(beamSpot.x0(),beamSpot.y0(), beamSpot.z0());
+ 
   reco::VertexCollection::const_iterator firstGoodVertex = vtx_h->end();
   for (reco::VertexCollection::const_iterator it = vtx_h->begin(); it != firstGoodVertex; it++)
     {
@@ -59,21 +76,33 @@ void MuonSelector::Fill(const edm::Event& iEvent){
         Muon_validHits.push_back(-9999);  
       }
       Muon_matchedStat.push_back(mu->numberOfMatchedStations());
-      Muon_dxy.push_back(mu->muonBestTrack()->dxy(firstGoodVertex->position())); 
-    
+      Muon_isGlobal.push_back(mu->isGlobalMuon());
+
       if(mu->innerTrack().isNonnull()){
         Muon_validHitsInner.push_back(mu->innerTrack()->hitPattern().numberOfValidPixelHits());
         Muon_TLayers.push_back(mu->innerTrack()->hitPattern().trackerLayersWithMeasurement());
+        Muon_dxy.push_back(mu->innerTrack()->dxy(firstGoodVertex->position()));
+        Muon_dxy_bs.push_back(-1.*(mu->innerTrack()->dxy(point)));
+        Muon_dxy_bs_dz.push_back(mu->innerTrack()->dz(point));
+        Muon_dz.push_back(mu->innerTrack()->dz(firstGoodVertex->position()));
+        Muon_dzError.push_back(mu->innerTrack()->dzError());
+        Muon_dxyError.push_back(mu->innerTrack()->d0Error());
+        Muon_ndof.push_back(mu->innerTrack()->ndof());
+        Muon_vtx.push_back(mu->innerTrack()->vx());
+        Muon_vty.push_back(mu->innerTrack()->vy());
+        Muon_vtz.push_back(mu->innerTrack()->vz());
+        Muon_track_pt.push_back(mu->innerTrack()->pt());
+        Muon_track_ptError.push_back(mu->innerTrack()->ptError());
       } else {
         Muon_validHitsInner.push_back(-999);
         Muon_TLayers.push_back(-999);
       }
     
-      Muon_dz.push_back(mu->muonBestTrack()->dz(firstGoodVertex->position()));
       Muon_isoNeutralHadron.push_back((mu->pfIsolationR04().sumNeutralHadronEt));
       Muon_isoPhoton.push_back((mu->pfIsolationR04().sumPhotonEt));
       Muon_isoPU.push_back((mu->pfIsolationR04().sumPUPt));
     }
+
     Muon_loose.push_back(mu->isLooseMuon());
     Muon_tight.push_back(mu->isTightMuon(*firstGoodVertex));
     Muon_soft.push_back(mu->isSoftMuon(*firstGoodVertex));
@@ -113,8 +142,19 @@ void MuonSelector::SetBranches(){
     AddBranch(&Muon_validHitsInner    ,"Muon_validHitsInner");
     AddBranch(&Muon_matchedStat       ,"Muon_matchedStat");
     AddBranch(&Muon_dxy               ,"Muon_dxy");
-    AddBranch(&Muon_TLayers           ,"Muon_TLayers");
+    AddBranch(&Muon_dxy_bs            ,"Muon_dxy_bs");
+    AddBranch(&Muon_dxy_bs_dz         ,"Muon_dxy_bs_dz");
+    AddBranch(&Muon_dxyError           ,"Muon_dxyError");
+    AddBranch(&Muon_dzError           ,"Muon_dzError");
     AddBranch(&Muon_dz                ,"Muon_dz");
+    AddBranch(&Muon_ndof              ,"Muon_ndof");
+    AddBranch(&Muon_vtx               ,"Muon_vtx");
+    AddBranch(&Muon_vty               ,"Muon_vty");
+    AddBranch(&Muon_vtz               ,"Muon_vtz");
+    AddBranch(&Muon_track_pt          ,"Muon_track_pt");
+    AddBranch(&Muon_track_ptError     ,"Muon_track_ptError");
+    AddBranch(&Muon_isGlobal          ,"Muon_isGlobal");
+    AddBranch(&Muon_TLayers           ,"Muon_TLayers");
     AddBranch(&Muon_isoNeutralHadron  ,"Muon_isoNeutralHadron");
     AddBranch(&Muon_isoPhoton         ,"Muon_isoPhoton");
     AddBranch(&Muon_isoPU             ,"Muon_isoPU");
@@ -145,6 +185,17 @@ void MuonSelector::Clear(){
   Muon_validHitsInner.clear(); 
   Muon_matchedStat.clear(); 
   Muon_dxy.clear(); 
+  Muon_dxy_bs.clear();
+  Muon_dxy_bs_dz.clear();
+  Muon_dxyError.clear();
+  Muon_dzError.clear();
+  Muon_ndof.clear();
+  Muon_vtx.clear();
+  Muon_vty.clear();
+  Muon_vtz.clear();
+  Muon_isGlobal.clear();
+  Muon_track_pt.clear();
+  Muon_track_ptError.clear();
   Muon_TLayers.clear(); 
   
 }

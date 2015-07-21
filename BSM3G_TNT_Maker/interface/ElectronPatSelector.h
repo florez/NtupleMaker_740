@@ -79,12 +79,15 @@ public:
   // ----------member data ---------------------------
   
   vector<double> patElectron_pt , patElectron_eta, patElectron_phi, patElectron_energy, patElectron_charge;
-  vector<double> patElectron_d0, patElectron_dz, isoChargedHadrons_, isoNeutralHadrons_, isoPhotons_, isoPU_;
-  vector<int> passVetoId_, passLooseId_, passMediumId_, passTightId_, passHEEPId_, passConversionVeto_, expectedMissingInnerHits;
+  vector<double> patElectron_gsfTrack_ndof, patElectron_dxy, patElectron_dxyError, patElectron_gsfTrack_normChi2, patElectron_dz; 
+  vector<double> patElectron_gsfTrack_vtx, patElectron_gsfTrack_vty, patElectron_gsfTrack_vtz;
+  vector<double> patElectron_dxy_bs, isoChargedHadrons_, isoNeutralHadrons_, isoPhotons_, isoPU_;
+  vector<int>  passVetoId_, passLooseId_, passMediumId_, passTightId_, passHEEPId_, passConversionVeto_, expectedMissingInnerHits;
   
   // confit variables
   edm::InputTag _patElectronToken;
   edm::InputTag _vertexInputTag;
+  edm::InputTag _beamSpot;
   double _patElectron_pt_min;
   double _patElectron_eta_max;
 };

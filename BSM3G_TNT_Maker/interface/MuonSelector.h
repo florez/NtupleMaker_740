@@ -73,15 +73,18 @@ private:
   vector <double> Muon_isoSum , Muon_isoCharParPt ;
   vector <double> Muon_pt ,Muon_eta,Muon_phi, Muon_dz, Muon_energy, Muon_iso;
   vector <double> Muon_isoCharged, Muon_isoNeutralHadron , Muon_isoPhoton, Muon_isoPU;
-  vector <double> Muon_charge, Muon_chi2, Muon_p, Muon_matchedStat, Muon_dxy, Muon_validHits, Muon_validHitsInner, Muon_TLayers; 
-  vector <bool> Muon_loose, Muon_tight, Muon_soft, Muon_isHighPt, Muon_pf ;   
+  vector <double> Muon_charge, Muon_chi2, Muon_p, Muon_matchedStat, Muon_dxy, Muon_dxy_bs; 
+  vector <double> Muon_dxy_bs_dz, Muon_dzError, Muon_dxyError, Muon_ndof, Muon_vtx, Muon_vty, Muon_vtz; 
+  vector <double> Muon_track_pt, Muon_track_ptError, Muon_validHits, Muon_validHitsInner, Muon_TLayers; 
+  vector <bool> Muon_loose, Muon_tight, Muon_soft, Muon_isHighPt, Muon_pf, Muon_isGlobal;   
 
   // super tiny ntuple?
   bool _super_TNT;
 
   // confit variables
   edm::InputTag _muonToken;
-  edm::InputTag _vertexInputTag; 
+  edm::InputTag _vertexInputTag;
+  edm::InputTag _beamSpot; 
   double _Muon_pt_min;
   double _Muon_eta_max;
   int _Muon_vtx_ndof_min;
