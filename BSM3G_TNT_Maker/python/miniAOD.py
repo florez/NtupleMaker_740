@@ -12,16 +12,12 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 # for PHYS14 scenario PU20bx25: global tag is PHYS14_25_V1
 # as a rule, find the global tag in the DAS under the Configs for given dataset
 process.GlobalTag.globaltag = 'PHYS14_25_V1::All'
-#process.GlobalTag.globaltag = 'GR_R_74_V8'
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+#process.GlobalTag.globaltag = 'MCRUN2_74_V9::All'
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-      #'/store/data/Run2012D/DoubleMuParked/AOD/22Jan2013-v1/20000/002E1374-5F84-E211-83C4-20CF305616D0.root',
-      #'/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/0432E62A-7A6C-E411-87BB-002590DB92A8.root',
-      #'/store/relval/CMSSW_7_4_0/DoubleMu/MINIAOD/GR_R_74_V10A_RelVal_zMu2011A-v1/00000/2835BE8D-9FDA-E411-BD9B-002590593878.root',
-      #'/store/relval/CMSSW_7_4_0_pre8_ROOT6/SingleElectron/MINIAOD/GR_R_74_V8A_RelVal_wEl2012D-v1/00000/02C2F4FB-27BF-E411-899E-0025905A48B2.root',
-      'file:mini_AODSIM.root'
+      'file:/eos/uscms/store/user/lammel/r2.2015/chi250_stau225_lsp200/evts_7aod_10k.root',
     )
 )
 
@@ -64,10 +60,10 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     fillmuoninfo        = cms.bool(True),
     fillelectronpatinfo = cms.bool(True),
     filltauinfo         = cms.bool(True),
-    fillgeninfo         = cms.bool(False),
-    fillPVinfo          = cms.bool(False),
+    fillgeninfo         = cms.bool(True),
+    fillPVinfo          = cms.bool(True),
     filljetinfo         = cms.bool(True),
-    fillMETinfo         = cms.bool(False),
+    fillMETinfo         = cms.bool(True),
     fillphotoninfo      = cms.bool(True),   
 
     # make a super tiny ntuple, only with a few branches?
@@ -78,11 +74,11 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     # input tags 
     triggerResults      = cms.InputTag( 'TriggerResults', '', 'HLT' ),
     vertices            = cms.InputTag("offlineSlimmedPrimaryVertices"),
+    beamSpot            = cms.InputTag("offlineBeamSpot"),
     muons               = cms.InputTag("slimmedMuons"),
     patElectrons        = cms.InputTag("slimmedElectrons"),
     taus                = cms.InputTag("slimmedTaus"),
     photons             = cms.InputTag("slimmedPhotons"),
-    #jets                = cms.InputTag("selectedPatJetsAK8PFCHS"),
     jets                = cms.InputTag("slimmedJets"),
     fatjets             = cms.InputTag("slimmedJetsAK8"),
     mets                = cms.InputTag("slimmedMETs"),
@@ -121,6 +117,7 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     Pvtx_ndof_min   = cms.double(4.),
     Pvtx_vtx_max  = cms.double(24.),
     Pvtx_vtxdxy_max = cms.double(24.),
+
 )
 
 process.p = cms.Path(process.egmGsfElectronIDSequence * process.TNT)
