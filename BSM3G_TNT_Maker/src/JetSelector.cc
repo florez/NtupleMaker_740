@@ -1,3 +1,7 @@
+// Authors:  Alfredo Gurrola (Vanderbilt University)
+// Andres Florez: Universidad de los Andes, Colombia.
+// kaur amandeepkalsi: Panjab University, India.
+
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/JetSelector.h"
 
 JetSelector::JetSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):baseTree(name,tree,debug){
@@ -33,7 +37,10 @@ void JetSelector::Fill(const edm::Event& iEvent){
     Jet_phi.push_back(j.phi());       
     Jet_energy.push_back(j.energy());
     Jet_bDiscriminator.push_back(j.bDiscriminator("combinedSecondaryVertexBJetTags"));
+    Jet_bDiscriminator_CISVV2.push_back(j.bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags"));
+    Jet_bDiscriminator_pfCISVV2.push_back(j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
     Jet_pileupId.push_back(j.userFloat("pileupJetId:fullDiscriminant"));
+    Jet_partonFlavour.push_back(j.partonFlavour());
 
     if(!_super_TNT){
 //      Jet_neutralHadEnergy.push_back(j.neutralHadronEnergy());                               
@@ -68,7 +75,10 @@ void JetSelector::SetBranches(){
   AddBranch(&Jet_phi,                 "Jet_phi");
   AddBranch(&Jet_energy,              "Jet_energy");
   AddBranch(&Jet_bDiscriminator,      "Jet_bDiscriminator");
+  AddBranch(&Jet_bDiscriminator_CISVV2,      "Jet_bDiscriminator_CISVV2");
+  AddBranch(&Jet_bDiscriminator_pfCISVV2,      "Jet_bDiscriminator_pfCISVV2");
   AddBranch(&Jet_pileupId,            "Jet_pileupId");
+  AddBranch(&Jet_partonFlavour,       "Jet_partonFlavour");
 
   if(!_super_TNT){
     AddBranch(&Jet_mass,                "Jet_mass");
@@ -93,7 +103,10 @@ void JetSelector::Clear(){
   Jet_phi.clear();
   Jet_energy.clear();
   Jet_bDiscriminator.clear();
+  Jet_bDiscriminator_CISVV2.clear();
+  Jet_bDiscriminator_pfCISVV2.clear();
   Jet_pileupId.clear();
+  Jet_partonFlavour.clear();
   Jet_mass.clear();
   Jet_neutralHadEnergyFraction.clear();
   Jet_neutralEmEmEnergyFraction.clear();
