@@ -4,7 +4,8 @@
 // Class:      BSM3G_TNT_Maker
 // 
 //
-// Authors:  Andres Florez: Universidad de los Andes, Colombia. 
+// Authors:  Alfredo Gurrola (Vanderbilt University)
+// Andres Florez: Universidad de los Andes, Colombia. 
 // kaur amandeepkalsi: Panjab University, India. 
 //
 
@@ -43,6 +44,7 @@
 #pragma link C++ class std::vector<std::vector<bool> >+;
 #pragma extra_include "std::vector";
 #endif
+
 //
 // class declaration
 //
@@ -59,6 +61,7 @@ private:
   virtual void beginRun(edm::Run const &, edm::EventSetup const&);
   virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
   virtual void endJob() override;
+
   // ----------member data ---------------------------
   
   TFile* file;
