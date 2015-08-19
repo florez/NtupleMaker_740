@@ -89,6 +89,8 @@ void PVSelector::Fill(const edm::Event& iEvent){
   beamSpot_x0.push_back(beamSpot.x0());
   beamSpot_y0.push_back(beamSpot.y0());
   beamSpot_z0.push_back(beamSpot.z0());
+  beamSpot_xWidth.push_back(beamSpot.BeamWidthX());
+  beamSpot_yWidth.push_back(beamSpot.BeamWidthY());
 
 }
 
@@ -110,6 +112,8 @@ void PVSelector::SetBranches(){
     AddBranch(&beamSpot_x0     ,"beamSpot_x0");
     AddBranch(&beamSpot_y0     ,"beamSpot_y0");
     AddBranch(&beamSpot_z0     ,"beamSpot_z0");
+    AddBranch(&beamSpot_xWidth ,"beamSpot_xWidth");
+    AddBranch(&beamSpot_yWidth ,"beamSpot_yWidth");
   }
   if(debug_)    std::cout<<"set branches"<<std::endl;
 }
@@ -125,4 +129,6 @@ void PVSelector::Clear(){
   beamSpot_x0.clear();
   beamSpot_y0.clear();
   beamSpot_z0.clear();
+  beamSpot_xWidth.clear();
+  beamSpot_yWidth.clear();
 }
