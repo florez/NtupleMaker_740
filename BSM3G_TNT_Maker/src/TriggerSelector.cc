@@ -32,14 +32,11 @@ void TriggerSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSet
          }
          std::cout << "Trigger Name = " << hltConfig_.triggerNames().at(u) << ", Decision = " << triggerResultsHandle_->accept(triggerIndex) << ", HLT Pre-scale = " << prescalesInDetail.second << std::endl;
 */
-         if(prescalesInDetail.second == 1) {
-           std::cout << "Trigger Name = " << hltConfig_.triggerNames().at(u) << ", Decision = " << triggerResultsHandle_->accept(triggerIndex) << ", HLT Pre-scale = " << prescalesInDetail.second << std::endl;
+         if(prescalesInDetail.second == 1) { // only keep trigger information if it's unprescaled at HLT
+//           std::cout << "Trigger Name = " << hltConfig_.triggerNames().at(u) << ", Decision = " << triggerResultsHandle_->accept(triggerIndex) << ", HLT Pre-scale = " << prescalesInDetail.second << std::endl;
            Trigger_names.push_back(hltConfig_.triggerNames().at(u));
-           if(triggerResultsHandle_->accept(triggerIndex) ){
-             Trigger_decision.push_back(1);
-           }else {
-             Trigger_decision.push_back(0);
-           }
+           if(triggerResultsHandle_->accept(triggerIndex) ){ Trigger_decision.push_back(1); }
+           else { Trigger_decision.push_back(0); }
          }
        }
      }
