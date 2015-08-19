@@ -3,21 +3,29 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("Demo")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.load("Configuration.StandardSequences.Geometry_cff")
-process.load('Configuration.StandardSequences.Services_cff')
-process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 
+process.load('TrackingTools.TransientTrack.TransientTrackBuilder_cfi')
+#process.load('Configuration.Geometry.GeometryRecoDB_cff')
+process.load('Configuration.Geometry.GeometryIdeal_cff')
+process.load("Configuration.StandardSequences.MagneticField_cff")
+#process.load("MagneticField.Engine.volumeBasedMagneticField_cfi")
+#process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 # NOTE: the pick the right global tag!
 # for PHYS14 scenario PU20bx25: global tag is PHYS14_25_V1
 # as a rule, find the global tag in the DAS under the Configs for given dataset
 process.GlobalTag.globaltag = 'PHYS14_25_V1::All'
 #process.GlobalTag.globaltag = 'MCRUN2_74_V9::All'
+
+process.load('Configuration.StandardSequences.Services_cff')
+process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
+
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-      'file:/eos/uscms/store/user/lammel/r2.2015/chi250_stau225_lsp200/evts_7aod_10k.root',
+#      'file:/scratch/gurrola/CMSSW_7_4_4/src/step3_PAT.root',
+      'file:/scratch/gurrola/CMSSW_7_4_4/src/miniAOD.root',
     )
 )
 
@@ -101,10 +109,16 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     # electron cuts
     patElectron_pt_min       = cms.double(10.0),
     patElectron_eta_max      = cms.double(2.4),
+    patElectron_vtx_ndof_min        = cms.int32(4),
+    patElectron_vtx_rho_max         = cms.int32(2),
+    patElectron_vtx_position_z_max  = cms.double(24.),
 
     # tau cuts
     Tau_pt_min  = cms.double(20.),
     Tau_eta_max = cms.double(2.3),
+    Tau_vtx_ndof_min        = cms.int32(4),
+    Tau_vtx_rho_max         = cms.int32(2),
+    Tau_vtx_position_z_max  = cms.double(24.),
 
     # jet cuts
     Jet_pt_min   = cms.double(25.),
@@ -120,5 +134,31 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
 
 )
 
-process.p = cms.Path(process.egmGsfElectronIDSequence * process.TNT)
+# filter out anomalous MET from detector noise, cosmic rays, and beam halo particles
+process.load("RecoMET.METFilters.metFilters_cff")
+
+process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
+                                           vertexCollection = cms.InputTag('offlineSlimmedPrimaryVertices'),
+                                           minimumNDOF = cms.uint32(4) ,
+                                           maxAbsZ = cms.double(24),
+                                           maxd0 = cms.double(2)
+)
+
+##___________________________HCAL_Noise_Filter________________________________||
+process.load('CommonTools.RecoAlgos.HBHENoiseFilterResultProducer_cfi')
+process.HBHENoiseFilterResultProducer.minZeros = cms.int32(99999)
+
+process.ApplyBaselineHBHENoiseFilter = cms.EDFilter('BooleanFlagFilter',
+   inputLabel = cms.InputTag('HBHENoiseFilterResultProducer','HBHENoiseFilterResult'),
+   reverseDecision = cms.bool(False)
+)
+
+process.p = cms.Path(process.primaryVertexFilter * 
+#                     process.CSCTightHaloFilter * 
+#                     process.eeBadScFilter * 
+#                     process.HBHENoiseFilterResultProducer * 
+#                     process.ApplyBaselineHBHENoiseFilter * 
+                     process.egmGsfElectronIDSequence * 
+                     process.TNT
+)
 #process.p = cms.Path(process.TNT)
