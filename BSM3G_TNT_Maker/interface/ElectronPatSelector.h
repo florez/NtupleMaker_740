@@ -1,7 +1,7 @@
-// 
-// Authors:  Andres Florez: Universidad de los Andes, Colombia. 
-// kaur amandeepkalsi: Panjab University, India. 
-//
+// Authors:  Alfredo Gurrola (Vanderbilt University)
+// Andres Florez: Universidad de los Andes, Colombia.
+// kaur amandeepkalsi: Panjab University, India.
+
 #ifndef __ELECTRON_PAT_H_                                                                                                                                  
 #define __ELECTRON_PAT_H_
 
@@ -26,30 +26,41 @@
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/ESHandle.h"
+#include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/EDFilter.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/PatCandidates/interface/Photon.h"
-#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
-#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+#include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/Common/interface/View.h"
 #include "DataFormats/Common/interface/ValueMap.h"
-#include "Math/VectorUtil.h"
-#include "FWCore/Framework/interface/EDFilter.h"
-#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
-#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "DataFormats/Math/interface/deltaR.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "CommonTools/Utils/interface/TFileDirectory.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
-#include "DataFormats/Math/interface/deltaR.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
-#include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
-#include "DataFormats/Candidate/interface/Candidate.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "MagneticField/Engine/interface/MagneticField.h"
+#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
+#include "Geometry/DTGeometry/interface/DTGeometry.h"
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
+#include "Geometry/CommonDetUnit/interface/GlobalTrackingGeometry.h"
+#include "TrackingTools/Records/interface/TransientTrackRecord.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "RecoVertex/KinematicFitPrimitives/interface/KinematicParticleFactoryFromTransientTrack.h"
+#include "Math/VectorUtil.h"
 #include "baseTree.h"
 
 using namespace std;
@@ -65,9 +76,10 @@ public:
 
   ElectronPatSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg, edm::ConsumesCollector && iC);
   ~ElectronPatSelector();
-  void Fill(const edm::Event& iEvent);
+  void Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   void SetBranches();
   void Clear();
+  bool isGoodVertex(const reco::Vertex& vtxx);
  private:
   ElectronPatSelector(){};
   
@@ -79,17 +91,27 @@ public:
   // ----------member data ---------------------------
   
   vector<double> patElectron_pt , patElectron_eta, patElectron_phi, patElectron_energy, patElectron_charge;
-  vector<double> patElectron_gsfTrack_ndof, patElectron_dxy, patElectron_dxyError, patElectron_gsfTrack_normChi2, patElectron_dz; 
+  vector<double> patElectron_gsfTrack_ndof, patElectron_dxy_pv, patElectron_dxyError, patElectron_gsfTrack_normChi2, patElectron_dz_pv, patElectron_dz_bs; 
   vector<double> patElectron_gsfTrack_vtx, patElectron_gsfTrack_vty, patElectron_gsfTrack_vtz;
   vector<double> patElectron_dxy_bs, isoChargedHadrons_, isoNeutralHadrons_, isoPhotons_, isoPU_;
+  vector<double> patElectron_gsfTrack_PCAx_bs, patElectron_gsfTrack_PCAy_bs, patElectron_gsfTrack_PCAz_bs;
+  vector<double> patElectron_gsfTrack_PCAx_pv, patElectron_gsfTrack_PCAy_pv, patElectron_gsfTrack_PCAz_pv;
   vector<int>  passVetoId_, passLooseId_, passMediumId_, passTightId_, passHEEPId_, passConversionVeto_, expectedMissingInnerHits;
-  
+  vector<double> patElectron_gsfTrackFitErrorMatrix_00, patElectron_gsfTrackFitErrorMatrix_01, patElectron_gsfTrackFitErrorMatrix_02, patElectron_gsfTrackFitErrorMatrix_11, patElectron_gsfTrackFitErrorMatrix_12, patElectron_gsfTrackFitErrorMatrix_22;
+
+  // super tiny ntuple?
+  bool _super_TNT;
+ 
   // confit variables
   edm::InputTag _patElectronToken;
   edm::InputTag _vertexInputTag;
   edm::InputTag _beamSpot;
   double _patElectron_pt_min;
   double _patElectron_eta_max;
+  int _patElectron_vtx_ndof_min;
+  int _patElectron_vtx_rho_max;
+  double _patElectron_vtx_position_z_max;
+
 };
 
 #endif
