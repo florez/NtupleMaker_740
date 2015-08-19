@@ -1,3 +1,7 @@
+// Authors:  Alfredo Gurrola (Vanderbilt University)
+// Andres Florez: Universidad de los Andes, Colombia.
+// kaur amandeepkalsi: Panjab University, India.
+
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/BSM3G_TNT_Maker.h"
 #include <memory>
 #include <string>
@@ -54,9 +58,9 @@ BSM3G_TNT_Maker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   using namespace reco;
 
   if( _filltriggerinfo)      trselector->Fill(iEvent, iSetup);
-  if( _fillmuoninfo)         muselector->Fill(iEvent);
-  if( _fillelectronpatinfo)  elpatselector->Fill(iEvent); 
-  if( _filltauinfo)          tauselector->Fill(iEvent); 
+  if( _fillmuoninfo)         muselector->Fill(iEvent, iSetup);
+  if( _fillelectronpatinfo)  elpatselector->Fill(iEvent, iSetup); 
+  if( _filltauinfo)          tauselector->Fill(iEvent, iSetup); 
   if( _filljetinfo)          jetselector->Fill(iEvent);
   if( _fillgeninfo)          genselector->Fill(iEvent); 
   if( _fillPVinfo)           pvselector->Fill(iEvent);
