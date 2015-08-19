@@ -1,3 +1,7 @@
+// Authors:  Alfredo Gurrola (Vanderbilt University)
+// Andres Florez: Universidad de los Andes, Colombia.
+// kaur amandeepkalsi: Panjab University, India.
+
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/GenParticleSelector.h"
 
 GenParticleSelector::GenParticleSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):baseTree(name,tree,debug){
