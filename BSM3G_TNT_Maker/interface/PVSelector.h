@@ -114,7 +114,7 @@ class PVSelector : public baseTree{
   int ootnpuVertices,npuVertices, npuVerticesm1, npuVerticesp1;
   vector<float> pvertex_x, pvertex_y, pvertex_z;
   vector<float> pvertex_xError, pvertex_yError, pvertex_zError;
-  vector<float> beamSpot_x0, beamSpot_y0, beamSpot_z0;
+  vector<float> beamSpot_x0, beamSpot_y0, beamSpot_z0, beamSpot_xWidth, beamSpot_yWidth;
   float trueInteractions;
 
   // Primary vertex cuts
