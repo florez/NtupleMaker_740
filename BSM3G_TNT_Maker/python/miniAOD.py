@@ -5,8 +5,8 @@ process = cms.Process("Demo")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
 process.load('TrackingTools.TransientTrack.TransientTrackBuilder_cfi')
-#process.load('Configuration.Geometry.GeometryRecoDB_cff')
-process.load('Configuration.Geometry.GeometryIdeal_cff')
+process.load('Configuration.Geometry.GeometryRecoDB_cff')
+#process.load('Configuration.Geometry.GeometryIdeal_cff')
 process.load("Configuration.StandardSequences.MagneticField_cff")
 #process.load("MagneticField.Engine.volumeBasedMagneticField_cfi")
 #process.load("Configuration.StandardSequences.Geometry_cff")
@@ -88,8 +88,10 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     taus                = cms.InputTag("slimmedTaus"),
     photons             = cms.InputTag("slimmedPhotons"),
     jets                = cms.InputTag("slimmedJets"),
+    jetsPUPPI           = cms.InputTag("slimmedJetsPuppi"),
     fatjets             = cms.InputTag("slimmedJetsAK8"),
     mets                = cms.InputTag("slimmedMETs"),
+    metsPUPPI           = cms.InputTag("slimmedMETsPuppi"),
     bits                = cms.InputTag("TriggerResults","","HLT"),
     prescales           = cms.InputTag("patTrigger"),
     objects             = cms.InputTag("selectedPatTrigger"),  
@@ -100,7 +102,7 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     eleHEEPIdMap        = cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV51"),
 
     # muon cuts
-    Muon_pt_min              = cms.double(10.0),
+    Muon_pt_min              = cms.double(8.0),
     Muon_eta_max             = cms.double(2.4),
     Muon_vtx_ndof_min        = cms.int32(4),
     Muon_vtx_rho_max         = cms.int32(2),
@@ -121,10 +123,10 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     Tau_vtx_position_z_max  = cms.double(24.),
 
     # jet cuts
-    Jet_pt_min   = cms.double(25.),
+    Jet_pt_min   = cms.double(30.),
 
     # photon cuts 
-    Photon_pt_min   = cms.double(5.0),
+    Photon_pt_min   = cms.double(10.0),
     Photon_eta_max  = cms.double(5.0),    
 
     # primary vertex cuts
