@@ -82,7 +82,7 @@ public:
  private:
   JetSelector(){};
   
-  vector <double> Jet_pt, Jet_eta, Jet_phi,Jet_energy,  Jet_bDiscriminator,  Jet_mass, JetParton, JetjetId;
+  vector <double> Jet_pt, Jet_eta, Jet_phi,Jet_energy,  Jet_bDiscriminator,  Jet_mass;
   vector <double> Jet_bDiscriminator_pfCISVV2, Jet_bDiscriminator_CISVV2;
   vector <double> Jet_pileupId, JetIDPU, Jetpass_pileupJetId, Jet_neutralHadEnergyFraction, Jet_neutralEmEmEnergyFraction; 
   vector <double> Jet_chargedHadronEnergyFraction, Jet_chargedEmEnergyFraction, Jet_muonEnergyFraction; 
@@ -90,9 +90,18 @@ public:
   vector <int> Jet_numberOfConstituents;
   vector <int> Jet_chargedMultiplicity, Jet_partonFlavour;
 
+  vector <double> Jet_puppi_pt, Jet_puppi_eta, Jet_puppi_phi, Jet_puppi_energy, Jet_puppi_bDiscriminator, Jet_puppi_mass;
+  vector <double> Jet_puppi_bDiscriminator_pfCISVV2, Jet_puppi_bDiscriminator_CISVV2;
+  vector <double> Jet_puppi_pileupId, Jet_puppi_neutralHadEnergyFraction, Jet_puppi_neutralEmEmEnergyFraction; 
+  vector <double> Jet_puppi_chargedHadronEnergyFraction, Jet_puppi_chargedEmEnergyFraction, Jet_puppi_muonEnergyFraction; 
+  vector <double> Jet_puppi_electronEnergy, Jet_puppi_photonEnergy, UncorrJet_puppi_pt; 
+  vector <int> Jet_puppi_numberOfConstituents;
+  vector <int> Jet_puppi_chargedMultiplicity, Jet_puppi_partonFlavour;
+
   bool _super_TNT;
   // Jet cuts
   edm::InputTag jetToken_;
+  edm::InputTag puppi_jetToken_;
   edm::InputTag _vertexInputTag;
   double _Jet_pt_min;
 };
