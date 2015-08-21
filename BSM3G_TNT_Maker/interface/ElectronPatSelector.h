@@ -51,8 +51,8 @@
 #include "CommonTools/Utils/interface/TFileDirectory.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
-#include "MagneticField/Engine/interface/MagneticField.h"
-#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
+//#include "MagneticField/Engine/interface/MagneticField.h"
+//#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 #include "Geometry/DTGeometry/interface/DTGeometry.h"
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
@@ -91,9 +91,9 @@ public:
   // ----------member data ---------------------------
   
   vector<double> patElectron_pt , patElectron_eta, patElectron_phi, patElectron_energy, patElectron_charge;
-  vector<double> patElectron_gsfTrack_ndof, patElectron_dxy_pv, patElectron_dxyError, patElectron_gsfTrack_normChi2, patElectron_dz_pv, patElectron_dz_bs; 
+  vector<double> patElectron_gsfTrack_ndof, patElectron_gsfTrack_dxy_pv, patElectron_dxyError, patElectron_gsfTrack_normChi2, patElectron_gsfTrack_dz_pv, patElectron_gsfTrack_dz_bs; 
   vector<double> patElectron_gsfTrack_vtx, patElectron_gsfTrack_vty, patElectron_gsfTrack_vtz;
-  vector<double> patElectron_dxy_bs, isoChargedHadrons_, isoNeutralHadrons_, isoPhotons_, isoPU_;
+  vector<double> patElectron_gsfTrack_dxy_bs, isoChargedHadrons_, isoNeutralHadrons_, isoPhotons_, isoPU_;
   vector<double> patElectron_gsfTrack_PCAx_bs, patElectron_gsfTrack_PCAy_bs, patElectron_gsfTrack_PCAz_bs;
   vector<double> patElectron_gsfTrack_PCAx_pv, patElectron_gsfTrack_PCAy_pv, patElectron_gsfTrack_PCAz_pv;
   vector<int>  passVetoId_, passLooseId_, passMediumId_, passTightId_, passHEEPId_, passConversionVeto_, expectedMissingInnerHits;
