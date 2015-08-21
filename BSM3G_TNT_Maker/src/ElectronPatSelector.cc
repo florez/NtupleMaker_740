@@ -17,16 +17,16 @@ ElectronPatSelector::ElectronPatSelector(std::string name, TTree* tree, bool deb
   eleHEEPIdMapToken_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleHEEPIdMap")))
 {
   
-  SetBranches();
-  _vertexInputTag        = iConfig.getParameter<edm::InputTag>("vertices");
-  _beamSpot              = iConfig.getParameter<edm::InputTag>("beamSpot");
-  _patElectronToken      = iConfig.getParameter<edm::InputTag>("patElectrons");
-  _patElectron_pt_min    = iConfig.getParameter<double>("patElectron_pt_min");
-  _patElectron_eta_max   = iConfig.getParameter<double>("patElectron_eta_max");
+  _patElectronToken      	  = iConfig.getParameter<edm::InputTag>("patElectrons");
+  _vertexInputTag       	  = iConfig.getParameter<edm::InputTag>("vertices");
+  _beamSpot              	  = iConfig.getParameter<edm::InputTag>("beamSpot");
+  _patElectron_pt_min    	  = iConfig.getParameter<double>("patElectron_pt_min");
+  _patElectron_eta_max   	  = iConfig.getParameter<double>("patElectron_eta_max");
   _patElectron_vtx_ndof_min       = iConfig.getParameter<int>("patElectron_vtx_ndof_min");
   _patElectron_vtx_rho_max        = iConfig.getParameter<int>("patElectron_vtx_rho_max");
   _patElectron_vtx_position_z_max = iConfig.getParameter<double>("patElectron_vtx_position_z_max");
-  _super_TNT               = iConfig.getParameter<bool>("super_TNT");
+  _super_TNT               	  = iConfig.getParameter<bool>("super_TNT");
+  SetBranches();
 
 }
 
@@ -134,11 +134,11 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
       patElectron_gsfTrack_vtx.push_back(el->gsfTrack()->vx()); 
       patElectron_gsfTrack_vty.push_back(el->gsfTrack()->vy());
       patElectron_gsfTrack_vtz.push_back(el->gsfTrack()->vz());
-      patElectron_dxy_pv.push_back( (-1) * el->gsfTrack()->dxy(firstGoodVertex->position() ) );
-      patElectron_dxy_bs.push_back ( el->gsfTrack()->dxy(point) );
+      patElectron_gsfTrack_dxy_pv.push_back(el->gsfTrack()->dxy(firstGoodVertex->position()));
+      patElectron_gsfTrack_dxy_bs.push_back(el->gsfTrack()->dxy(point));
+      patElectron_gsfTrack_dz_pv.push_back(el->gsfTrack()->dz(firstGoodVertex->position()));
+      patElectron_gsfTrack_dz_bs.push_back(el->gsfTrack()->dz(point));
       patElectron_dxyError.push_back(el->gsfTrack()->d0Error());
-      patElectron_dz_pv.push_back( el->gsfTrack()->dz( firstGoodVertex->position() ) );
-      patElectron_dz_bs.push_back ( el->gsfTrack()->dz(point) );
     
       // point of closest approach (PCA) to the beamspot and primary vertex
       TransientTrack elecTransTkPtr = theB->build(*(el->gsfTrack()));
@@ -194,11 +194,11 @@ void ElectronPatSelector::SetBranches(){
   AddBranch(&passConversionVeto_           ,"patElectron_passConversionVeto"); 
 
   if (!_super_TNT){
-    AddBranch(&patElectron_dxy_pv            ,"patElectron_dxy_pv");
-    AddBranch(&patElectron_dxy_bs            ,"patElectron_dxy_bs");
+    AddBranch(&patElectron_gsfTrack_dxy_pv   ,"patElectron_gsfTrack_dxy_pv");
+    AddBranch(&patElectron_gsfTrack_dxy_bs   ,"patElectron_gsfTrack_dxy_bs");
     AddBranch(&patElectron_dxyError          ,"patElectron_dxyError");
-    AddBranch(&patElectron_dz_pv             ,"patElectron_dz_pv");
-    AddBranch(&patElectron_dz_bs             ,"patElectron_dz_bs");
+    AddBranch(&patElectron_gsfTrack_dz_pv    ,"patElectron_gsfTrack_dz_pv");
+    AddBranch(&patElectron_gsfTrack_dz_bs    ,"patElectron_gsfTrack_dz_bs");
     AddBranch(&patElectron_gsfTrack_normChi2 ,"patElectron_gsfTrack_normChi2");
     AddBranch(&patElectron_gsfTrack_ndof     ,"patElectron_gsfTrack_ndof");
     AddBranch(&patElectron_gsfTrack_vtx      ,"patElectron_gsfTrack_vtx");
@@ -232,11 +232,11 @@ void ElectronPatSelector::Clear(){
   passMediumId_.clear();
   passTightId_.clear();  
   passHEEPId_.clear();
-  patElectron_dxy_pv.clear();
-  patElectron_dxy_bs.clear();
+  patElectron_gsfTrack_dxy_pv.clear();
+  patElectron_gsfTrack_dxy_bs.clear();
   patElectron_dxyError.clear();
-  patElectron_dz_pv.clear();
-  patElectron_dz_bs.clear();
+  patElectron_gsfTrack_dz_pv.clear();
+  patElectron_gsfTrack_dz_bs.clear();
   patElectron_gsfTrack_normChi2.clear();
   patElectron_gsfTrack_ndof.clear();
   patElectron_gsfTrack_vtx.clear(); 
