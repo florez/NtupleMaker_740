@@ -56,8 +56,8 @@ void METSelector::Fill(const edm::Event& iEvent){
     if (!_is_data) Gen_Met = met.genMET()->pt();
     Met_type1PF_shiftedPtUp = met.shiftedPt(pat::MET::JetEnUp);
     Met_type1PF_shiftedPtDown  = met.shiftedPt(pat::MET::JetEnDown);
-    Met_puppi_shiftedPtUp = puppimet.shiftedPt(pat::MET::JetEnUp);
-    Met_puppi_shiftedPtDown  = puppimet.shiftedPt(pat::MET::JetEnDown);
+//    Met_puppi_shiftedPtUp = puppimet.shiftedPt(pat::MET::JetEnUp);
+//    Met_puppi_shiftedPtDown  = puppimet.shiftedPt(pat::MET::JetEnDown);
   }
   if(debug_)    std::cout<<"got MET info"<<std::endl;
 }
@@ -81,8 +81,8 @@ void METSelector::SetBranches(){
     AddBranch(&Gen_Met,           "Gen_Met");
     AddBranch(&Met_type1PF_shiftedPtUp,   "Met_type1PF_shiftedPtUp");
     AddBranch(&Met_type1PF_shiftedPtDown, "Met_type1PF_shiftedPtDown");
-    AddBranch(&Met_puppi_shiftedPtUp,     "Met_puppi_shiftedPtUp");
-    AddBranch(&Met_puppi_shiftedPtDown,   "Met_puppi_shiftedPtDown");
+//    AddBranch(&Met_puppi_shiftedPtUp,     "Met_puppi_shiftedPtUp");
+//    AddBranch(&Met_puppi_shiftedPtDown,   "Met_puppi_shiftedPtDown");
   }
   if(debug_)    std::cout<<"set branches"<<std::endl;
 }
@@ -103,7 +103,7 @@ void METSelector::Clear(){
   Met_puppi_pz = -9999999999;
   Met_puppi_phi  = -9999999999;
   Met_puppi_sumEt  = -9999999999 ;
-  Met_puppi_shiftedPtUp  = -9999999999;
-  Met_puppi_shiftedPtDown   = -9999999999;
+//  Met_puppi_shiftedPtUp  = -9999999999;
+//  Met_puppi_shiftedPtDown   = -9999999999;
   Gen_Met  = -9999999999;
 }
