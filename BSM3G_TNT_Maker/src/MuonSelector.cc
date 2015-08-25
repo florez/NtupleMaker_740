@@ -71,6 +71,7 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     if (mu->pt() < _Muon_pt_min) continue;
     if (fabs(mu->eta()) > _Muon_eta_max) continue;  
     if (!(mu->innerTrack().isNonnull())) continue;
+    if (!(mu->globalTrack().isNonnull())) continue;
 
     reco::TrackRef gtk = mu->globalTrack();
 
@@ -98,13 +99,8 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     // store additional information such as lifetime variables (needed for tau analyses)
     if (!_super_TNT){
-      if(gtk.isNonnull()){
-        Muon_chi2.push_back(gtk->normalizedChi2());
-        Muon_validHits.push_back(gtk->hitPattern().numberOfValidMuonHits()); 
-      } else {                
-        Muon_chi2.push_back(-9999);
-        Muon_validHits.push_back(-9999);  
-      }
+      Muon_chi2.push_back(gtk->normalizedChi2());
+      Muon_validHits.push_back(gtk->hitPattern().numberOfValidMuonHits()); 
       Muon_matchedStat.push_back(mu->numberOfMatchedStations());
       Muon_isGlobal.push_back(mu->isGlobalMuon());
       Muon_validHitsInner.push_back(mu->innerTrack()->hitPattern().numberOfValidPixelHits());
