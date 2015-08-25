@@ -90,7 +90,9 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
   for(edm::View<pat::Electron>::const_iterator el = electron_pat->begin(); el != electron_pat->end(); el++) {
     if (el->pt() < _patElectron_pt_min) continue;
     if (fabs(el->eta()) > _patElectron_eta_max) continue;  
-    
+    if (!(el->gsfTrack().isNonnull())) continue;
+    if (!(el->track().isNonnull())) continue;
+
     // fill root tree with "necessary" information:  kinematics, ID, isolation
     patElectron_pt.push_back(el->pt());
     patElectron_eta.push_back(el->eta());
@@ -141,9 +143,11 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
       patElectron_dxyError.push_back(el->gsfTrack()->d0Error());
     
       // point of closest approach (PCA) to the beamspot and primary vertex
-      TransientTrack elecTransTkPtr = theB->build(*(el->gsfTrack()));
+      TransientTrack elecTransTkPtr = theB->build(*(el->track()));
+//      TransientTrack elecTransTkPtr = theB->build(*(el->gsfTrack()));
 //      TransientTrack elecTransTkPtr(*(el->gsfTrack()), magfield.product(),theTrackingGeometry);
       GlobalPoint patElectron_pca_bs = elecTransTkPtr.trajectoryStateClosestToPoint(thebs).position();
+//      GlobalPoint patElectron_pca_bs(el->TrackPositionAtVtx().X(), el->TrackPositionAtVtx().Y(),el->TrackPositionAtVtx().Z());
       GlobalPoint patElectron_pca_pv = elecTransTkPtr.trajectoryStateClosestToPoint(thepv).position();
       patElectron_gsfTrack_PCAx_bs.push_back(patElectron_pca_bs.x());
       patElectron_gsfTrack_PCAy_bs.push_back(patElectron_pca_bs.y());
