@@ -7,25 +7,31 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load('TrackingTools.TransientTrack.TransientTrackBuilder_cfi')
 process.load('Configuration.Geometry.GeometryRecoDB_cff')
 #process.load('Configuration.Geometry.GeometryIdeal_cff')
-process.load("Configuration.StandardSequences.MagneticField_cff")
+#process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load("Configuration.StandardSequences.MagneticField_38T_PostLS1_cff")
 #process.load("MagneticField.Engine.volumeBasedMagneticField_cfi")
+
+#needs to be commented out or else it complains about: 'two EventSetup Producers want to deliver type="CaloSubdetectorGeometry" label="ZDC"'
 #process.load("Configuration.StandardSequences.Geometry_cff")
+
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 # NOTE: the pick the right global tag!
 # for PHYS14 scenario PU20bx25: global tag is PHYS14_25_V1
 # as a rule, find the global tag in the DAS under the Configs for given dataset
-process.GlobalTag.globaltag = 'PHYS14_25_V1::All'
-#process.GlobalTag.globaltag = 'MCRUN2_74_V9::All'
+#process.GlobalTag.globaltag = 'PHYS14_25_V1::All'
+process.GlobalTag.globaltag = 'MCRUN2_74_V9::All'
 
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(300) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
 #      'file:/scratch/gurrola/CMSSW_7_4_4/src/step3_PAT.root',
-      'file:/scratch/gurrola/CMSSW_7_4_4/src/miniAOD.root',
+#      'file:/scratch/gurrola/CMSSW_7_4_4/src/miniAOD.root',
+#      '/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v2/00000/00C4781D-6B08-E511-8A0A-0025905A6084.root'
+      '/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v2/00000/00C4781D-6B08-E511-8A0A-0025905A6084.root'
     )
 )
 
