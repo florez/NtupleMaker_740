@@ -115,6 +115,7 @@ private:
 
   // config variables
   edm::InputTag tauToken_;
+  edm::InputTag packedPFCandidateToken_;
   edm::InputTag _vertexInputTag;
   edm::InputTag _beamSpot;
 
