@@ -10,15 +10,16 @@ using namespace reco;
 
 TauSelector::TauSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):
  baseTree(name,tree,debug){
-  tauToken_       = iConfig.getParameter<edm::InputTag>("taus");
-  _vertexInputTag = iConfig.getParameter<edm::InputTag>("vertices");
-  _beamSpot                = iConfig.getParameter<edm::InputTag>("beamSpot");
-  _Tau_pt_min     = iConfig.getParameter<double>("Tau_pt_min");
-  _Tau_eta_max    = iConfig.getParameter<double>("Tau_eta_max");
-  _Tau_vtx_ndof_min       = iConfig.getParameter<int>("Tau_vtx_ndof_min");
-  _Tau_vtx_rho_max        = iConfig.getParameter<int>("Tau_vtx_rho_max");
-  _Tau_vtx_position_z_max = iConfig.getParameter<double>("Tau_vtx_position_z_max");
-  _super_TNT      = iConfig.getParameter<bool>("super_TNT");
+  tauToken_       		= iConfig.getParameter<edm::InputTag>("taus");
+  packedPFCandidateToken_       = iConfig.getParameter<edm::InputTag>("packedPFCandidates");
+  _vertexInputTag 		= iConfig.getParameter<edm::InputTag>("vertices");
+  _beamSpot                	= iConfig.getParameter<edm::InputTag>("beamSpot");
+  _Tau_pt_min     		= iConfig.getParameter<double>("Tau_pt_min");
+  _Tau_eta_max    		= iConfig.getParameter<double>("Tau_eta_max");
+  _Tau_vtx_ndof_min       	= iConfig.getParameter<int>("Tau_vtx_ndof_min");
+  _Tau_vtx_rho_max        	= iConfig.getParameter<int>("Tau_vtx_rho_max");
+  _Tau_vtx_position_z_max 	= iConfig.getParameter<double>("Tau_vtx_position_z_max");
+  _super_TNT      		= iConfig.getParameter<bool>("super_TNT");
   SetBranches();
 }
 
@@ -32,8 +33,13 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
   int taucoun = 0;
 
   // grab handle to the tau collection
-  edm::Handle<pat::TauCollection> taus;
+  edm::Handle<edm::View<pat::Tau> > taus;
   iEvent.getByLabel(tauToken_, taus);
+
+  // grab handle to the packed pf candidate collection
+  edm::Handle<pat::PackedCandidateCollection> pfs;
+  //iEvent.getByLabel("packedPFCandidates", pfs);
+  iEvent.getByLabel(packedPFCandidateToken_, pfs);
 
   // grab handle to the vertex collection
   edm::Handle<reco::VertexCollection> vtx;
@@ -58,98 +64,111 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
   GlobalPoint thebs(beamSpot.x0(),beamSpot.y0(),beamSpot.z0());
 
   // get magnetic field and detector geometry information --> used to build transient tracks
-//  edm::ESHandle<MagneticField> magfield;
-//  iSetup.get<IdealMagneticFieldRecord>().get(magfield);
-//  edm::ESHandle<GlobalTrackingGeometry> theTrackingGeometry;
-//  iSetup.get<GlobalTrackingGeometryRecord>().get(theTrackingGeometry);
-  
   edm::ESHandle<TransientTrackBuilder> theB;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
 
   // loop over taus
-  for (const pat::Tau &tau : *taus) {
-    if (tau.pt() < _Tau_pt_min) continue;
-    if(fabs(tau.eta()) > _Tau_eta_max) continue;
-    if(!(tau.leadChargedHadrCand().isNonnull())) continue;
-    if(!(tau.leadTrack().isNonnull())) continue;
-    
+  for(edm::View<pat::Tau>::const_iterator tau = taus->begin(); tau != taus->end(); tau++) {
+    if (tau->pt() < _Tau_pt_min) continue;
+    if(fabs(tau->eta()) > _Tau_eta_max) continue;
+    if(!(tau->leadChargedHadrCand().isNonnull())) continue;
+
+    // get the embedded packed candidate of the leading PF charged hadron
+    const reco::CandidatePtr hadTauLeadChargedCand = tau->leadChargedHadrCand();                                                                   
+    //std::cout << "Tau lead charged hadron: pt = " << hadTauLeadChargedCand->pt() << ", eta = " << hadTauLeadChargedCand->eta() << ", phi = " << hadTauLeadChargedCand->phi() << std::endl;
+
+    // loop over packed PF candidates and find the one which matches the embedded packed candidate within the pat::Tau
+    const reco::Track *leadTrack = 0;
+    bool isBestTrackNonNull = true;
+    bool leadPackedCandidateExists = true;
+    for(unsigned int iPF = 0, nPF = pfs->size(); iPF < nPF; ++iPF) {
+      const pat::PackedCandidate &pfCandidate = (*pfs)[iPF];
+      if( (hadTauLeadChargedCand->pt() == pfCandidate.pt()) && (hadTauLeadChargedCand->eta() == pfCandidate.eta()) && 
+          (hadTauLeadChargedCand->phi() == pfCandidate.phi()) ) { // the packed PF candidate and embedded lead candidate within the pat::Tau should be the same
+        //std::cout << "          PF Candidate #" << iPF << ": pt = " << pfCandidate.pt() << ", eta = " << pfCandidate.eta() << ", phi = " << pfCandidate.phi() << std::endl;
+        if(pfCandidate.bestTrack() != 0) {leadTrack = pfCandidate.bestTrack();} // grab the associated CTF track (if it exists)
+        else {isBestTrackNonNull = false;} // if it doesn't exist, set the 'isBestTrackNonNull' flag to false
+      } else {leadPackedCandidateExists = false;} // if there is not match between the packed PF candidate and embedded lead candidate within the pat::Tau, set the 'leadPackedCandidateExists' flag to false
+    }
+    if(!(leadPackedCandidateExists)) continue; // throw away the tau if there was no matching packed PF candidate to the embedded lead candidate within the pat::Tau
+    if(!(isBestTrackNonNull)) continue; // throw away the tau if it's lead charged hadron has no associated CTF track
+    //std::cout << "          Track Candidate: pt = " << leadTrack->pt() << ", eta = " << leadTrack->eta() << ", phi = " << leadTrack->phi() << std::endl;
+
     // fill root tree with "necessary" information:  kinematics, ID, isolation
-    Tau_eta.push_back( tau.eta());
-    Tau_phi.push_back( tau.phi());
-    Tau_pt.push_back( tau.pt());
-    Tau_energy.push_back( tau.energy());
-    Tau_charge.push_back( tau.charge());
-    Tau_nProngs.push_back(tau.signalChargedHadrCands().size());
-    Tau_chargedIsoPtSum.push_back(tau.tauID("chargedIsoPtSum"));
-    Tau_neutralIsoPtSum.push_back(tau.tauID("neutralIsoPtSum"));
-    Tau_puCorrPtSum.push_back(tau.tauID("puCorrPtSum"));
+    Tau_eta.push_back(tau->eta());
+    Tau_phi.push_back(tau->phi());
+    Tau_pt.push_back(tau->pt());
+    Tau_energy.push_back(tau->energy());
+    Tau_charge.push_back(tau->charge());
+    Tau_nProngs.push_back(tau->signalChargedHadrCands().size());
+    Tau_chargedIsoPtSum.push_back(tau->tauID("chargedIsoPtSum"));
+    Tau_neutralIsoPtSum.push_back(tau->tauID("neutralIsoPtSum"));
+    Tau_puCorrPtSum.push_back(tau->tauID("puCorrPtSum"));
 
     // tau id. discriminators
-    Tau_decayModeFinding.push_back( tau.tauID("decayModeFinding"));
-    Tau_decayModeFindingNewDMs.push_back( tau.tauID("decayModeFindingNewDMs"));
-    Tau_byLooseIsolationMVA3newDMwLT.push_back(tau.tauID("byLooseIsolationMVA3newDMwLT"));
-    Tau_byLooseIsolationMVA3newDMwoLT.push_back(tau.tauID("byLooseIsolationMVA3newDMwoLT"));
-    Tau_byLooseIsolationMva3oldDMwLT.push_back(tau.tauID("byLooseIsolationMVA3oldDMwLT"));
-    Tau_byLooseIsolationMVA3oldDMwoLT.push_back(tau.tauID("byLooseIsolationMVA3oldDMwoLT"));
-    Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits.push_back(tau.tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits"));
-    Tau_byMediumIsolationMVA3newDMwLT.push_back(tau.tauID("byMediumIsolationMVA3newDMwLT"));
-    Tau_byMediumIsolationMVA3newDMwoLT.push_back(tau.tauID("byMediumIsolationMVA3newDMwoLT"));
-    Tau_byMediumIsolationMva3oldDMwLT.push_back(tau.tauID("byMediumIsolationMVA3oldDMwLT"));
-    Tau_byMediumIsolationMVA3oldDMwoLT.push_back(tau.tauID("byMediumIsolationMVA3oldDMwoLT"));
-    Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits.push_back(tau.tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits"));
-    Tau_byTightIsolationMVA3newDMwLT.push_back(tau.tauID("byTightIsolationMVA3newDMwLT"));
-    Tau_byTightIsolationMVA3newDMwoLT.push_back(tau.tauID("byTightIsolationMVA3newDMwoLT"));
-    Tau_byTightIsolationMva3oldDMwLT.push_back(tau.tauID("byTightIsolationMVA3oldDMwLT"));
-    Tau_byTightIsolationMVA3oldDMwoLT.push_back(tau.tauID("byTightIsolationMVA3oldDMwoLT"));
-    Tau_byTightCombinedIsolationDeltaBetaCorr3Hits.push_back(tau.tauID("byTightCombinedIsolationDeltaBetaCorr3Hits"));
+    Tau_decayModeFinding.push_back(tau->tauID("decayModeFinding"));
+    Tau_decayModeFindingNewDMs.push_back(tau->tauID("decayModeFindingNewDMs"));
+    Tau_byLooseIsolationMVA3newDMwLT.push_back(tau->tauID("byLooseIsolationMVA3newDMwLT"));
+    Tau_byLooseIsolationMVA3newDMwoLT.push_back(tau->tauID("byLooseIsolationMVA3newDMwoLT"));
+    Tau_byLooseIsolationMva3oldDMwLT.push_back(tau->tauID("byLooseIsolationMVA3oldDMwLT"));
+    Tau_byLooseIsolationMVA3oldDMwoLT.push_back(tau->tauID("byLooseIsolationMVA3oldDMwoLT"));
+    Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits"));
+    Tau_byMediumIsolationMVA3newDMwLT.push_back(tau->tauID("byMediumIsolationMVA3newDMwLT"));
+    Tau_byMediumIsolationMVA3newDMwoLT.push_back(tau->tauID("byMediumIsolationMVA3newDMwoLT"));
+    Tau_byMediumIsolationMva3oldDMwLT.push_back(tau->tauID("byMediumIsolationMVA3oldDMwLT"));
+    Tau_byMediumIsolationMVA3oldDMwoLT.push_back(tau->tauID("byMediumIsolationMVA3oldDMwoLT"));
+    Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits"));
+    Tau_byTightIsolationMVA3newDMwLT.push_back(tau->tauID("byTightIsolationMVA3newDMwLT"));
+    Tau_byTightIsolationMVA3newDMwoLT.push_back(tau->tauID("byTightIsolationMVA3newDMwoLT"));
+    Tau_byTightIsolationMva3oldDMwLT.push_back(tau->tauID("byTightIsolationMVA3oldDMwLT"));
+    Tau_byTightIsolationMVA3oldDMwoLT.push_back(tau->tauID("byTightIsolationMVA3oldDMwoLT"));
+    Tau_byTightCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byTightCombinedIsolationDeltaBetaCorr3Hits"));
 
     // discriminators against electrons/muons
-    Tau_againstMuonLoose2.push_back( tau.tauID("againstMuonLoose2"));
-    Tau_againstMuonLoose3.push_back( tau.tauID("againstMuonLoose3"));
-    Tau_againstMuonTight2.push_back( tau.tauID("againstMuonTight2"));
-    Tau_againstMuonTight3.push_back( tau.tauID("againstMuonTight3"));
-    Tau_againstElectronMVALooseMVA5.push_back( tau.tauID("againstElectronLooseMVA5"));
-    Tau_againstElectronMVAMediumMVA5.push_back( tau.tauID("againstElectronMediumMVA5"));
-    Tau_againstElectronMVATightMVA5.push_back( tau.tauID("againstElectronTightMVA5"));
+    Tau_againstMuonLoose2.push_back(tau->tauID("againstMuonLoose2"));
+    Tau_againstMuonLoose3.push_back(tau->tauID("againstMuonLoose3"));
+    Tau_againstMuonTight2.push_back(tau->tauID("againstMuonTight2"));
+    Tau_againstMuonTight3.push_back(tau->tauID("againstMuonTight3"));
+    Tau_againstElectronMVALooseMVA5.push_back(tau->tauID("againstElectronLooseMVA5"));
+    Tau_againstElectronMVAMediumMVA5.push_back(tau->tauID("againstElectronMediumMVA5"));
+    Tau_againstElectronMVATightMVA5.push_back(tau->tauID("againstElectronTightMVA5"));
 
     // store additional information such as lifetime variables
     if(!_super_TNT){
     
-      const reco::CandidatePtr hadTauLeadChargedCand = tau.leadChargedHadrCand();                                                                   
       Tau_leadChargedCandPt.push_back(hadTauLeadChargedCand.isNonnull() ? hadTauLeadChargedCand->pt() : -1.);      
       Tau_leadChargedCandEta.push_back(hadTauLeadChargedCand.isNonnull() ? hadTauLeadChargedCand->eta() : -999);
       Tau_leadChargedCandPhi.push_back(hadTauLeadChargedCand.isNonnull() ? hadTauLeadChargedCand->phi() : -999);
       Tau_leadChargedCandCharge.push_back(hadTauLeadChargedCand.isNonnull() ? hadTauLeadChargedCand->charge() : -2);   
-      Tau_leadChargedCandChi2.push_back(tau.leadTrack()->chi2());
-      Tau_leadChargedCandValidHits.push_back(tau.leadTrack()->numberOfValidHits());
-      Tau_leadChargedCandDxy_pv.push_back(tau.leadTrack()->dxy(firstGoodVertex->position()));
-      Tau_leadChargedCandDxy_bs.push_back(-1.*(tau.leadTrack()->dxy(point)));
-      Tau_leadChargedCandDz_pv.push_back(tau.leadTrack()->dz(firstGoodVertex->position()));
-      Tau_leadChargedCandDz_bs.push_back(tau.leadTrack()->dz(point));
-      Tau_leadChargedCandDxyError.push_back(tau.leadTrack()->d0Error());
-      Tau_leadChargedCandDzError.push_back(tau.leadTrack()->dzError());
-      Tau_leadChargedCandNdof.push_back(tau.leadTrack()->ndof());
-      Tau_leadChargedCandVtx.push_back(tau.leadTrack()->vx());
-      Tau_leadChargedCandVty.push_back(tau.leadTrack()->vy());
-      Tau_leadChargedCandVtz.push_back(tau.leadTrack()->vz());
-      Tau_leadChargedCandTrack_pt.push_back(tau.leadTrack()->pt());
-      Tau_leadChargedCandTrack_ptError.push_back(tau.leadTrack()->ptError());
+      Tau_leadChargedCandChi2.push_back(leadTrack->chi2());
+      Tau_leadChargedCandValidHits.push_back(leadTrack->numberOfValidHits());
+      Tau_leadChargedCandDxy_pv.push_back(leadTrack->dxy(firstGoodVertex->position()));
+      Tau_leadChargedCandDxy_bs.push_back(-1.*(leadTrack->dxy(point)));
+      Tau_leadChargedCandDz_pv.push_back(leadTrack->dz(firstGoodVertex->position()));
+      Tau_leadChargedCandDz_bs.push_back(leadTrack->dz(point));
+      Tau_leadChargedCandDxyError.push_back(leadTrack->d0Error());
+      Tau_leadChargedCandDzError.push_back(leadTrack->dzError());
+      Tau_leadChargedCandNdof.push_back(leadTrack->ndof());
+      Tau_leadChargedCandVtx.push_back(leadTrack->vx());
+      Tau_leadChargedCandVty.push_back(leadTrack->vy());
+      Tau_leadChargedCandVtz.push_back(leadTrack->vz());
+      Tau_leadChargedCandTrack_pt.push_back(leadTrack->pt());
+      Tau_leadChargedCandTrack_ptError.push_back(leadTrack->ptError());
 
       // default tau POG lifetime variables
-      Tau_defaultDxy.push_back(tau.dxy());
-      Tau_defaultDxyError.push_back(tau.dxy_error());
-      Tau_defaultDxySig.push_back(tau.dxy_Sig());
-      Tau_defaultFlightLengthX.push_back(tau.flightLength().x());
-      Tau_defaultFlightLengthY.push_back(tau.flightLength().y());
-      Tau_defaultFlightLengthZ.push_back(tau.flightLength().z());
-      Tau_defaultFlightLengthSig.push_back(tau.flightLengthSig());
-      Tau_default_PCAx_pv.push_back(tau.dxy_PCA().x());
-      Tau_default_PCAy_pv.push_back(tau.dxy_PCA().y());
-      Tau_default_PCAz_pv.push_back(tau.dxy_PCA().z());
+      Tau_defaultDxy.push_back(tau->dxy());
+      Tau_defaultDxyError.push_back(tau->dxy_error());
+      Tau_defaultDxySig.push_back(tau->dxy_Sig());
+      Tau_defaultFlightLengthX.push_back(tau->flightLength().x());
+      Tau_defaultFlightLengthY.push_back(tau->flightLength().y());
+      Tau_defaultFlightLengthZ.push_back(tau->flightLength().z());
+      Tau_defaultFlightLengthSig.push_back(tau->flightLengthSig());
+      Tau_default_PCAx_pv.push_back(tau->dxy_PCA().x());
+      Tau_default_PCAy_pv.push_back(tau->dxy_PCA().y());
+      Tau_default_PCAz_pv.push_back(tau->dxy_PCA().z());
 
       // tau lead track point of closest approach (PCA) to the beamspot and primary vertex
-      TransientTrack tauTransTkPtr = theB->build(*(tau.leadTrack()));
-//      TransientTrack tauTransTkPtr(*(tau.leadTrack()), magfield.product(),theTrackingGeometry);
+      TransientTrack tauTransTkPtr = theB->build(leadTrack);
       GlobalPoint tauLeadTrack_pca_bs = tauTransTkPtr.trajectoryStateClosestToPoint(thebs).position();
       GlobalPoint tauLeadTrack_pca_pv = tauTransTkPtr.trajectoryStateClosestToPoint(thepv).position();
       Tau_leadChargedCandTrack_PCAx_bs.push_back(tauLeadTrack_pca_bs.x());
