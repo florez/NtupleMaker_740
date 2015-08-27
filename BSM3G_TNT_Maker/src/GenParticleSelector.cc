@@ -18,14 +18,14 @@ void GenParticleSelector::Fill(const edm::Event& iEvent){
   Clear(); 
   if(debug_)    std::cout<<"getting gen particle info"<<std::endl;
   
+  // grabbing the gen particle handle
   Handle< reco::GenParticleCollection > _Gen_collection;
   iEvent.getByLabel("prunedGenParticles", _Gen_collection);
-  
-  std::cout<<"muons:"<<std::endl;
-  // getting muons
-  for ( reco::GenParticleCollection::const_iterator genparticles = _Gen_collection->begin(); 
-        genparticles !=  _Gen_collection->end(); ++genparticles){
-    
+
+  //int ng = 0;  
+  // looping over gen particles
+  for(reco::GenParticleCollection::const_iterator genparticles = _Gen_collection->begin(); genparticles !=  _Gen_collection->end(); ++genparticles) {
+
     Gen_pt.push_back(genparticles->pt());
     Gen_eta.push_back(genparticles->eta()); 
     Gen_phi.push_back(genparticles->phi());
@@ -38,19 +38,24 @@ void GenParticleSelector::Fill(const edm::Event& iEvent){
     Gen_vy.push_back(genparticles->vy());
     Gen_vz.push_back(genparticles->vz());
     Gen_charge.push_back(genparticles->charge());
-    
     Gen_numDaught.push_back(genparticles->numberOfDaughters());
     Gen_numMother.push_back(genparticles->numberOfMothers());
     
     int idx = -1;
-    for (reco::GenParticleCollection::const_iterator mit = _Gen_collection->begin();mit != _Gen_collection->end(); ++mit ) {
-      if ( genparticles->mother() == &(*mit) ) {
+    for(reco::GenParticleCollection::const_iterator mit = _Gen_collection->begin();mit != _Gen_collection->end(); ++mit) {
+      if(genparticles->mother() == &(*mit) ) {
 	idx = std::distance(_Gen_collection->begin(),mit);
 	break;
       }
     }
-    
-    Gen_BmotherIndex = idx;
+    Gen_BmotherIndex.push_back(idx);
+
+    //std::cout << "Gen particle #" << ng << ": pdg id = " << genparticles->pdgId() << ", pt = " << genparticles->pt() << std::endl;
+    //if(genparticles->numberOfMothers() > 0) {
+    //  std::cout << "     Mother: " << ": pdg id = " << genparticles->mother(0)->pdgId() << ", pt = " << genparticles->mother(0)->pt() << std::endl;
+    //  std::cout << "     Matched mother is index: " << idx << std::endl;
+    //}
+    //ng++;
     
     for (size_t j = 0; j < genparticles->numberOfMothers(); ++j) {
       const reco::Candidate* m = genparticles->mother(j);
@@ -119,6 +124,6 @@ void GenParticleSelector::Clear(){
   Gen_numMother.clear();
   Gen_BmotherIndices.clear();
   Gen_BdaughtIndices.clear();
-  Gen_BmotherIndex = 0;
+  Gen_BmotherIndex.clear();
   
 }
