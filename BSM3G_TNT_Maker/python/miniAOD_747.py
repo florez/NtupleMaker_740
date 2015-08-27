@@ -11,7 +11,6 @@ process.load('Configuration.Geometry.GeometryRecoDB_cff')
 
 process.load("Configuration.StandardSequences.MagneticField_38T_PostLS1_cff")
 #process.load("Configuration.StandardSequences.MagneticField_cff")
-#process.load("MagneticField.Engine.volumeBasedMagneticField_cfi")
 
 #needs to be commented out or else it complains about: 'two EventSetup Producers want to deliver type="CaloSubdetectorGeometry" label="ZDC"'
 #process.load("Configuration.StandardSequences.Geometry_cff")
@@ -22,12 +21,12 @@ process.GlobalTag.globaltag = 'MCRUN2_74_V9A::All'
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(300) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(500) )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(
-      '/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v2/00000/00C4781D-6B08-E511-8A0A-0025905A6084.root'
-    )
+  fileNames = cms.untracked.vstring(
+    '/store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v2/00000/00C4781D-6B08-E511-8A0A-0025905A6084.root'
+  )
 )
 
 #
@@ -47,8 +46,6 @@ process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
 # Each of these two example IDs contains all four standard
 # cut-based ID working points (only two WP of the PU20bx25 are actually used here).
 # define which IDs we want to produce
-#my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V2_cff',
-#                 'RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff']
 my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_50ns_V1_cff',
                  'RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff']
 #Add them to the VID producer
@@ -83,7 +80,7 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     is_data     = cms.bool(False),
  
     # input tags 
-    triggerResults      = cms.InputTag( 'TriggerResults', '', 'HLT' ),
+    triggerResults      = cms.InputTag( 'TriggerResults', '', 'PAT' ),
     vertices            = cms.InputTag("offlineSlimmedPrimaryVertices"),
     beamSpot            = cms.InputTag("offlineBeamSpot"),
     muons               = cms.InputTag("slimmedMuons"),
@@ -98,6 +95,7 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     bits                = cms.InputTag("TriggerResults","","HLT"),
     prescales           = cms.InputTag("patTrigger"),
     objects             = cms.InputTag("selectedPatTrigger"),  
+    packedPFCandidates  = cms.InputTag("packedPFCandidates"),
     electronVetoIdMap   = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-veto"),
     electronLooseIdMap  = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-loose"),
     electronMediumIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-medium"),
