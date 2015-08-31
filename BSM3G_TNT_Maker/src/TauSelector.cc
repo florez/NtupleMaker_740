@@ -68,31 +68,39 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
 
   // loop over taus
+  //int nTau=0;
   for(edm::View<pat::Tau>::const_iterator tau = taus->begin(); tau != taus->end(); tau++) {
+    //nTau++;
+    //std::cout << "Tau #" << nTau << ": pt = " << tau->pt() << ", eta = " << tau->eta() << ", phi = " << tau->phi() << ", isLeadChargedHadrCandNonNull = " << tau->leadChargedHadrCand().isNonnull() <<  std::endl;
+
     if (tau->pt() < _Tau_pt_min) continue;
     if(fabs(tau->eta()) > _Tau_eta_max) continue;
     if(!(tau->leadChargedHadrCand().isNonnull())) continue;
 
+    //std::cout << "PASSED KINEMATIC CUTS & LEAD CHARGED HADRON ISNONNULL CUT" << std::endl;
+
     // get the embedded packed candidate of the leading PF charged hadron
     const reco::CandidatePtr hadTauLeadChargedCand = tau->leadChargedHadrCand();                                                                   
-    //std::cout << "Tau lead charged hadron: pt = " << hadTauLeadChargedCand->pt() << ", eta = " << hadTauLeadChargedCand->eta() << ", phi = " << hadTauLeadChargedCand->phi() << std::endl;
+    //std::cout << "     Tau lead charged hadron: pt = " << hadTauLeadChargedCand->pt() << ", eta = " << hadTauLeadChargedCand->eta() << ", phi = " << hadTauLeadChargedCand->phi() << std::endl;
 
     // loop over packed PF candidates and find the one which matches the embedded packed candidate within the pat::Tau
     const reco::Track *leadTrack = 0;
-    bool isBestTrackNonNull = true;
-    bool leadPackedCandidateExists = true;
+    bool isBestTrackNonNull = false;
+    bool leadPackedCandidateExists = false;
     for(unsigned int iPF = 0, nPF = pfs->size(); iPF < nPF; ++iPF) {
       const pat::PackedCandidate &pfCandidate = (*pfs)[iPF];
       if( (hadTauLeadChargedCand->pt() == pfCandidate.pt()) && (hadTauLeadChargedCand->eta() == pfCandidate.eta()) && 
           (hadTauLeadChargedCand->phi() == pfCandidate.phi()) ) { // the packed PF candidate and embedded lead candidate within the pat::Tau should be the same
-        //std::cout << "          PF Candidate #" << iPF << ": pt = " << pfCandidate.pt() << ", eta = " << pfCandidate.eta() << ", phi = " << pfCandidate.phi() << std::endl;
-        if(pfCandidate.bestTrack() != 0) {leadTrack = pfCandidate.bestTrack();} // grab the associated CTF track (if it exists)
-        else {isBestTrackNonNull = false;} // if it doesn't exist, set the 'isBestTrackNonNull' flag to false
-      } else {leadPackedCandidateExists = false;} // if there is not match between the packed PF candidate and embedded lead candidate within the pat::Tau, set the 'leadPackedCandidateExists' flag to false
+        //std::cout << "          PF Candidate #" << iPF << ": pt = " << pfCandidate.pt() << ", eta = " << pfCandidate.eta() << ", phi = " << pfCandidate.phi();
+        leadPackedCandidateExists = true; // if there is a match between the packed PF candidate and embedded lead candidate within the pat::Tau
+        if(pfCandidate.bestTrack() != NULL) {isBestTrackNonNull = true; leadTrack = pfCandidate.bestTrack();} // grab the associated CTF track (if it exists)
+      }
     }
+    //std::cout << ", leadPackedCandidateExists = " << leadPackedCandidateExists << ", isBestTrackNonNull = " << isBestTrackNonNull << std::endl;
     if(!(leadPackedCandidateExists)) continue; // throw away the tau if there was no matching packed PF candidate to the embedded lead candidate within the pat::Tau
     if(!(isBestTrackNonNull)) continue; // throw away the tau if it's lead charged hadron has no associated CTF track
     //std::cout << "          Track Candidate: pt = " << leadTrack->pt() << ", eta = " << leadTrack->eta() << ", phi = " << leadTrack->phi() << std::endl;
+    //std::cout << "PASSED LEAD TRACK ISNONNULL CUT" << std::endl;
 
     // fill root tree with "necessary" information:  kinematics, ID, isolation
     Tau_eta.push_back(tau->eta());
