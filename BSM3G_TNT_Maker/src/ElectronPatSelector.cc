@@ -87,11 +87,17 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
 
   // loop over electrons
+  //int nElec=0;
   for(edm::View<pat::Electron>::const_iterator el = electron_pat->begin(); el != electron_pat->end(); el++) {
+    //nElec++;
+    //std::cout << "Elec #" << nElec << ": pt = " << el->pt() << ", eta = " << el->eta() << ", gsfTrackIsNonnull = " << el->gsfTrack().isNonnull() << ", trackIsNonnull = " << el->closestCtfTrackRef().isNonnull() << std::endl;
+
     if (el->pt() < _patElectron_pt_min) continue;
     if (fabs(el->eta()) > _patElectron_eta_max) continue;  
     if (!(el->gsfTrack().isNonnull())) continue;
-    if (!(el->track().isNonnull())) continue;
+    if (!(el->closestCtfTrackRef().isNonnull())) continue;
+
+    //std::cout << "PASSED KINEMATIC CUTS & ISNONNULL CUTS" << std::endl;
 
     // fill root tree with "necessary" information:  kinematics, ID, isolation
     patElectron_pt.push_back(el->pt());
@@ -143,7 +149,7 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
       patElectron_dxyError.push_back(el->gsfTrack()->d0Error());
     
       // point of closest approach (PCA) to the beamspot and primary vertex
-      TransientTrack elecTransTkPtr = theB->build(*(el->track()));
+      TransientTrack elecTransTkPtr = theB->build(*(el->closestCtfTrackRef()));
 //      TransientTrack elecTransTkPtr = theB->build(*(el->gsfTrack()));
 //      TransientTrack elecTransTkPtr(*(el->gsfTrack()), magfield.product(),theTrackingGeometry);
       GlobalPoint patElectron_pca_bs = elecTransTkPtr.trajectoryStateClosestToPoint(thebs).position();
