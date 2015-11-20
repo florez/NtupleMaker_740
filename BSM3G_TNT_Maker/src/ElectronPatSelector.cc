@@ -16,7 +16,7 @@ ElectronPatSelector::ElectronPatSelector(std::string name, TTree* tree, bool deb
   electronTightIdMapToken_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronTightIdMap"))),
   eleHEEPIdMapToken_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleHEEPIdMap")))
 {
-  
+  if(debug) std::cout << "BSM3G TNT Maker: In the ElectronPatSelector Constructor --> getting parameters & calling SetBranches()." << std::endl;
   _patElectronToken      	  = iConfig.getParameter<edm::InputTag>("patElectrons");
   _vertexInputTag       	  = iConfig.getParameter<edm::InputTag>("vertices");
   _beamSpot              	  = iConfig.getParameter<edm::InputTag>("beamSpot");
@@ -36,12 +36,16 @@ ElectronPatSelector::~ElectronPatSelector(){
 
 void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
   Clear();
+
+  if(debug_) std::cout << "     ElectronPatSelector: Cleared the vectors, grabbing the electron/PV/BeamSpot collection handles." << std::endl;
   
   int elcoun = 0;
   
   // grab handle to the electron collection
   edm::Handle<edm::View<pat::Electron> > electron_pat;
   iEvent.getByLabel(_patElectronToken, electron_pat);
+
+  if(debug_) std::cout << "     ElectronPatSelector: Looping over PVs to extract the position of the best PV." << std::endl;
 
   // grab handle to the vertex collection
   edm::Handle<reco::VertexCollection> vtx;
@@ -56,6 +60,8 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
   if (firstGoodVertex == vtx->end()) return; // skip event if there are no good PVs
   GlobalPoint thepv(firstGoodVertex->position().x(),firstGoodVertex->position().y(),firstGoodVertex->position().z());
 
+  if(debug_) std::cout << "     ElectronPatSelector: Extracting the beamspot position." << std::endl;
+
   // Get BeamSpot Information
   reco::BeamSpot beamSpot;
   edm::Handle<reco::BeamSpot> beamSpotHandle;
@@ -64,6 +70,8 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
   else { edm::LogInfo("MyAnalyzer") << "No beam spot available from EventSetup \n"; }
   math::XYZPoint point(beamSpot.x0(),beamSpot.y0(), beamSpot.z0());
   GlobalPoint thebs(beamSpot.x0(),beamSpot.y0(),beamSpot.z0());
+
+  if(debug_) std::cout << "     ElectronPatSelector: Grabbing the electron ID value maps." << std::endl;
 
   // Get electron ID value maps
   edm::Handle<edm::ValueMap<bool> > veto_id_decisions;
@@ -77,27 +85,24 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
   iEvent.getByToken(electronTightIdMapToken_,tight_id_decisions);  
   iEvent.getByToken(eleHEEPIdMapToken_, heep_id_decisions);
 
-  // get magnetic field and detector geometry information --> used to build transient tracks
-//  edm::ESHandle<MagneticField> magfield;
-//  iSetup.get<IdealMagneticFieldRecord>().get(magfield);
-//  edm::ESHandle<GlobalTrackingGeometry> theTrackingGeometry;
-//  iSetup.get<GlobalTrackingGeometryRecord>().get(theTrackingGeometry);
-
   edm::ESHandle<TransientTrackBuilder> theB;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
 
+  if(debug_) std::cout << "     ElectronPatSelector: Looping over electrons." << std::endl;
+
   // loop over electrons
-  //int nElec=0;
+  int nElec=0;
   for(edm::View<pat::Electron>::const_iterator el = electron_pat->begin(); el != electron_pat->end(); el++) {
-    //nElec++;
-    //std::cout << "Elec #" << nElec << ": pt = " << el->pt() << ", eta = " << el->eta() << ", gsfTrackIsNonnull = " << el->gsfTrack().isNonnull() << ", trackIsNonnull = " << el->closestCtfTrackRef().isNonnull() << std::endl;
+    nElec++;
+
+    if(debug_) std::cout << "          Electron info: Elec #" << nElec << ": pt = " << el->pt() << ", eta = " << el->eta() << ", gsfTrackIsNonnull = " << el->gsfTrack().isNonnull() << ", trackIsNonnull = " << el->closestCtfTrackRef().isNonnull() << std::endl;
 
     if (el->pt() < _patElectron_pt_min) continue;
     if (fabs(el->eta()) > _patElectron_eta_max) continue;  
     if (!(el->gsfTrack().isNonnull())) continue;
     if (!(el->closestCtfTrackRef().isNonnull())) continue;
 
-    //std::cout << "PASSED KINEMATIC CUTS & ISNONNULL CUTS" << std::endl;
+    if(debug_) std::cout << "          Electron info: Elec #" << nElec << " passed kinematic cuts & isNonNull cuts" << std::endl;
 
     // fill root tree with "necessary" information:  kinematics, ID, isolation
     patElectron_pt.push_back(el->pt());
@@ -151,7 +156,6 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
       // point of closest approach (PCA) to the beamspot and primary vertex
       TransientTrack elecTransTkPtr = theB->build(*(el->closestCtfTrackRef()));
 //      TransientTrack elecTransTkPtr = theB->build(*(el->gsfTrack()));
-//      TransientTrack elecTransTkPtr(*(el->gsfTrack()), magfield.product(),theTrackingGeometry);
       GlobalPoint patElectron_pca_bs = elecTransTkPtr.trajectoryStateClosestToPoint(thebs).position();
 //      GlobalPoint patElectron_pca_bs(el->TrackPositionAtVtx().X(), el->TrackPositionAtVtx().Y(),el->TrackPositionAtVtx().Z());
       GlobalPoint patElectron_pca_pv = elecTransTkPtr.trajectoryStateClosestToPoint(thepv).position();
@@ -184,7 +188,7 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
 }
 
 void ElectronPatSelector::SetBranches(){
-  if(debug_)    std::cout<<"setting branches: calling AddBranch of baseTree"<<std::endl;
+  if(debug_) std::cout << "     ElectronPatSelector: Setting branches by calling AddBranch of baseTree." << std::endl;
   
   AddBranch(&patElectron_pt                ,"patElectron_pt");
   AddBranch(&patElectron_eta               ,"patElectron_eta");
@@ -227,7 +231,8 @@ void ElectronPatSelector::SetBranches(){
     AddBranch(&patElectron_gsfTrackFitErrorMatrix_12     ,"patElectron_gsfTrackFitErrorMatrix_12");
     AddBranch(&patElectron_gsfTrackFitErrorMatrix_22     ,"patElectron_gsfTrackFitErrorMatrix_22");
   }
-  if(debug_)    std::cout<<"set branches"<<std::endl;
+
+  if(debug_) std::cout << "     ElectronPatSelector: Finished setting branches." << std::endl;
 }
 
 void ElectronPatSelector::Clear(){

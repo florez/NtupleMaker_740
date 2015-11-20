@@ -70,6 +70,7 @@
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "PhysicsTools/JetMCUtils/interface/JetMCTag.h"
 #include "Geometry/Records/interface/GlobalTrackingGeometryRecord.h"   
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "boost/regex.hpp"
 #include <Math/VectorUtil.h>
 #include <TH1.h>
@@ -105,10 +106,11 @@ class GenParticleSelector : public baseTree{
  private:
   GenParticleSelector(){};
 
+  bool   _is_data;
 
  //variables which would become branches
  vector <double> Gen_pt, Gen_eta, Gen_phi, Gen_status, Gen_pdg_id, Gen_motherpdg_id;
- vector <double> Gen_p, Gen_energy, Gen_vx, Gen_vy, Gen_vz; 
+ vector <double> Gen_energy, Gen_vx, Gen_vy, Gen_vz; 
  vector <double> Gen_charge, Gen_numDaught, Gen_numMother;
  vector <int> Gen_BmotherIndices, Gen_BdaughtIndices, Gen_BmotherIndex;
 };

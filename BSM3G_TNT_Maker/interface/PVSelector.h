@@ -106,16 +106,17 @@ class PVSelector : public baseTree{
 
  private:
   PVSelector(){};
-  edm::InputTag pileUpLabel_;
+  edm::InputTag _pileupInfoSrc;
   edm::InputTag _beamSpot;
+  edm::InputTag _vertexInputTag;
 
-  //variables which would become branches
+  // variables which will become branches
   int nBestVtx;
-  int ootnpuVertices,npuVertices, npuVerticesm1, npuVerticesp1;
+  int nObservedOutOfTimePUVertices, nObservedInTimePUVertices, nObservedMinus1BXPUVertices, nObservedPlus1BXPUVertices;
   vector<float> pvertex_x, pvertex_y, pvertex_z;
   vector<float> pvertex_xError, pvertex_yError, pvertex_zError;
   vector<float> beamSpot_x0, beamSpot_y0, beamSpot_z0, beamSpot_xWidth, beamSpot_yWidth;
-  float trueInteractions;
+  float nTruePUInteractions;
 
   // Primary vertex cuts
   double _Pvtx_ndof_min;

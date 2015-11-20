@@ -8,8 +8,8 @@ using namespace edm;
 using namespace std;
 using namespace reco;
 
-TauSelector::TauSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):
- baseTree(name,tree,debug){
+TauSelector::TauSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):baseTree(name,tree,debug) {
+  if(debug) std::cout << "BSM3G TNT Maker: In the TauSelector Constructor --> getting parameters & calling SetBranches()." << std::endl;
   tauToken_       		= iConfig.getParameter<edm::InputTag>("taus");
   packedPFCandidateToken_       = iConfig.getParameter<edm::InputTag>("packedPFCandidates");
   _vertexInputTag 		= iConfig.getParameter<edm::InputTag>("vertices");
@@ -30,11 +30,15 @@ TauSelector::~TauSelector(){
 void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
   Clear();
 
+  if(debug_) std::cout << "     TauSelector: Cleared the vectors, grabbing the tau/PV/BeamSpot collection handles." << std::endl;
+
   int taucoun = 0;
 
   // grab handle to the tau collection
   edm::Handle<edm::View<pat::Tau> > taus;
   iEvent.getByLabel(tauToken_, taus);
+
+  if(debug_) std::cout << "     TauSelector: Looping over PVs to extract the position of the best PV." << std::endl;
 
   // grab handle to the packed pf candidate collection
   edm::Handle<pat::PackedCandidateCollection> pfs;
@@ -54,6 +58,8 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
   if (firstGoodVertex == vtx->end()) return; // skip event if there are no good PVs
   GlobalPoint thepv(firstGoodVertex->position().x(),firstGoodVertex->position().y(),firstGoodVertex->position().z());
 
+  if(debug_) std::cout << "     TauSelector: Extracting the beamspot position." << std::endl;
+
   // Get BeamSpot Information
   reco::BeamSpot beamSpot;
   edm::Handle<reco::BeamSpot> beamSpotHandle;
@@ -67,21 +73,24 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
   edm::ESHandle<TransientTrackBuilder> theB;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
 
+  if(debug_) std::cout << "     TauSelector: Looping over taus." << std::endl;
+
   // loop over taus
-  //int nTau=0;
+  int nTau=0;
   for(edm::View<pat::Tau>::const_iterator tau = taus->begin(); tau != taus->end(); tau++) {
-    //nTau++;
-    //std::cout << "Tau #" << nTau << ": pt = " << tau->pt() << ", eta = " << tau->eta() << ", phi = " << tau->phi() << ", isLeadChargedHadrCandNonNull = " << tau->leadChargedHadrCand().isNonnull() <<  std::endl;
+    nTau++;
+    if(debug_) std::cout << "          Tau info: Tau #" << nTau << ": pt = " << tau->pt() << ", eta = " << tau->eta() << ", phi = " << tau->phi() << ", isLeadChargedHadrCandNonNull = " << tau->leadChargedHadrCand().isNonnull() <<  std::endl;
 
     if (tau->pt() < _Tau_pt_min) continue;
     if(fabs(tau->eta()) > _Tau_eta_max) continue;
     if(!(tau->leadChargedHadrCand().isNonnull())) continue;
 
-    //std::cout << "PASSED KINEMATIC CUTS & LEAD CHARGED HADRON ISNONNULL CUT" << std::endl;
+    if(debug_) std::cout << "          Tau info: Tau #" << nTau << " passed kinematic cuts & lead charged hadron IsNonNull cut" << std::endl;
 
     // get the embedded packed candidate of the leading PF charged hadron
     const reco::CandidatePtr hadTauLeadChargedCand = tau->leadChargedHadrCand();                                                                   
-    //std::cout << "     Tau lead charged hadron: pt = " << hadTauLeadChargedCand->pt() << ", eta = " << hadTauLeadChargedCand->eta() << ", phi = " << hadTauLeadChargedCand->phi() << std::endl;
+
+    if(debug_) std::cout << "          Tau info: Tau #" << nTau << " --> Tau lead charged hadron: pt = " << hadTauLeadChargedCand->pt() << ", eta = " << hadTauLeadChargedCand->eta() << ", phi = " << hadTauLeadChargedCand->phi() << std::endl;
 
     // loop over packed PF candidates and find the one which matches the embedded packed candidate within the pat::Tau
     const reco::Track *leadTrack = 0;
@@ -91,16 +100,16 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
       const pat::PackedCandidate &pfCandidate = (*pfs)[iPF];
       if( (hadTauLeadChargedCand->pt() == pfCandidate.pt()) && (hadTauLeadChargedCand->eta() == pfCandidate.eta()) && 
           (hadTauLeadChargedCand->phi() == pfCandidate.phi()) ) { // the packed PF candidate and embedded lead candidate within the pat::Tau should be the same
-        //std::cout << "          PF Candidate #" << iPF << ": pt = " << pfCandidate.pt() << ", eta = " << pfCandidate.eta() << ", phi = " << pfCandidate.phi();
+        if(debug_) std::cout << "               PF Candidate info: PF Candidate #" << iPF << ": pt = " << pfCandidate.pt() << ", eta = " << pfCandidate.eta() << ", phi = " << pfCandidate.phi();
         leadPackedCandidateExists = true; // if there is a match between the packed PF candidate and embedded lead candidate within the pat::Tau
         if(pfCandidate.bestTrack() != NULL) {isBestTrackNonNull = true; leadTrack = pfCandidate.bestTrack();} // grab the associated CTF track (if it exists)
       }
     }
-    //std::cout << ", leadPackedCandidateExists = " << leadPackedCandidateExists << ", isBestTrackNonNull = " << isBestTrackNonNull << std::endl;
+    if(debug_) std::cout << "          Tau info: Tau #" << nTau << ", leadPackedCandidateExists = " << leadPackedCandidateExists << ", isBestTrackNonNull = " << isBestTrackNonNull << std::endl;
     if(!(leadPackedCandidateExists)) continue; // throw away the tau if there was no matching packed PF candidate to the embedded lead candidate within the pat::Tau
     if(!(isBestTrackNonNull)) continue; // throw away the tau if it's lead charged hadron has no associated CTF track
-    //std::cout << "          Track Candidate: pt = " << leadTrack->pt() << ", eta = " << leadTrack->eta() << ", phi = " << leadTrack->phi() << std::endl;
-    //std::cout << "PASSED LEAD TRACK ISNONNULL CUT" << std::endl;
+    if(debug_) std::cout << "               Track Candidate info: Track Candidate pt = " << leadTrack->pt() << ", eta = " << leadTrack->eta() << ", phi = " << leadTrack->phi() << std::endl;
+    if(debug_) std::cout << "          Tau info: Tau #" << nTau << " passed lead track IsNonNull cut" << std::endl;
 
     // fill root tree with "necessary" information:  kinematics, ID, isolation
     Tau_eta.push_back(tau->eta());
@@ -108,35 +117,44 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
     Tau_pt.push_back(tau->pt());
     Tau_energy.push_back(tau->energy());
     Tau_charge.push_back(tau->charge());
+    Tau_decayMode.push_back(tau->decayMode());
     Tau_nProngs.push_back(tau->signalChargedHadrCands().size());
     Tau_chargedIsoPtSum.push_back(tau->tauID("chargedIsoPtSum"));
     Tau_neutralIsoPtSum.push_back(tau->tauID("neutralIsoPtSum"));
     Tau_puCorrPtSum.push_back(tau->tauID("puCorrPtSum"));
+    Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits.push_back(tau->tauID("byCombinedIsolationDeltaBetaCorrRaw3Hits"));
+    Tau_byPileupWeightedIsolationRaw3Hits.push_back(tau->tauID("byPileupWeightedIsolationRaw3Hits"));
 
     // tau id. discriminators
     Tau_decayModeFinding.push_back(tau->tauID("decayModeFinding"));
     Tau_decayModeFindingNewDMs.push_back(tau->tauID("decayModeFindingNewDMs"));
+    Tau_byVLooseIsolationMVA3newDMwLT.push_back(tau->tauID("byVLooseIsolationMVA3newDMwLT"));
+    Tau_byVLooseIsolationMva3oldDMwLT.push_back(tau->tauID("byVLooseIsolationMVA3oldDMwLT"));
     Tau_byLooseIsolationMVA3newDMwLT.push_back(tau->tauID("byLooseIsolationMVA3newDMwLT"));
-    Tau_byLooseIsolationMVA3newDMwoLT.push_back(tau->tauID("byLooseIsolationMVA3newDMwoLT"));
+    //Tau_byLooseIsolationMVA3newDMwoLT.push_back(tau->tauID("byLooseIsolationMVA3newDMwoLT")); // only in miniAODv1
     Tau_byLooseIsolationMva3oldDMwLT.push_back(tau->tauID("byLooseIsolationMVA3oldDMwLT"));
-    Tau_byLooseIsolationMVA3oldDMwoLT.push_back(tau->tauID("byLooseIsolationMVA3oldDMwoLT"));
+    //Tau_byLooseIsolationMVA3oldDMwoLT.push_back(tau->tauID("byLooseIsolationMVA3oldDMwoLT")); // only in miniAODv1
     Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits"));
     Tau_byMediumIsolationMVA3newDMwLT.push_back(tau->tauID("byMediumIsolationMVA3newDMwLT"));
-    Tau_byMediumIsolationMVA3newDMwoLT.push_back(tau->tauID("byMediumIsolationMVA3newDMwoLT"));
+    //Tau_byMediumIsolationMVA3newDMwoLT.push_back(tau->tauID("byMediumIsolationMVA3newDMwoLT")); // only in miniAODv1
     Tau_byMediumIsolationMva3oldDMwLT.push_back(tau->tauID("byMediumIsolationMVA3oldDMwLT"));
-    Tau_byMediumIsolationMVA3oldDMwoLT.push_back(tau->tauID("byMediumIsolationMVA3oldDMwoLT"));
+    //Tau_byMediumIsolationMVA3oldDMwoLT.push_back(tau->tauID("byMediumIsolationMVA3oldDMwoLT")); // only in miniAODv1
     Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits"));
     Tau_byTightIsolationMVA3newDMwLT.push_back(tau->tauID("byTightIsolationMVA3newDMwLT"));
-    Tau_byTightIsolationMVA3newDMwoLT.push_back(tau->tauID("byTightIsolationMVA3newDMwoLT"));
+    //Tau_byTightIsolationMVA3newDMwoLT.push_back(tau->tauID("byTightIsolationMVA3newDMwoLT")); // only in miniAODv1
     Tau_byTightIsolationMva3oldDMwLT.push_back(tau->tauID("byTightIsolationMVA3oldDMwLT"));
-    Tau_byTightIsolationMVA3oldDMwoLT.push_back(tau->tauID("byTightIsolationMVA3oldDMwoLT"));
+    //Tau_byTightIsolationMVA3oldDMwoLT.push_back(tau->tauID("byTightIsolationMVA3oldDMwoLT")); // only in miniAODv1
     Tau_byTightCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byTightCombinedIsolationDeltaBetaCorr3Hits"));
+    Tau_byLoosePileupWeightedIsolation3Hits.push_back(tau->tauID("byLoosePileupWeightedIsolation3Hits"));
+    Tau_byMediumPileupWeightedIsolation3Hits.push_back(tau->tauID("byMediumPileupWeightedIsolation3Hits"));
+    Tau_byTightPileupWeightedIsolation3Hits.push_back(tau->tauID("byTightPileupWeightedIsolation3Hits"));
 
     // discriminators against electrons/muons
-    Tau_againstMuonLoose2.push_back(tau->tauID("againstMuonLoose2"));
+    //Tau_againstMuonLoose2.push_back(tau->tauID("againstMuonLoose2")); // only in miniAODv1
     Tau_againstMuonLoose3.push_back(tau->tauID("againstMuonLoose3"));
-    Tau_againstMuonTight2.push_back(tau->tauID("againstMuonTight2"));
+    //Tau_againstMuonTight2.push_back(tau->tauID("againstMuonTight2")); // only in miniAODv1
     Tau_againstMuonTight3.push_back(tau->tauID("againstMuonTight3"));
+    Tau_againstElectronMVAVLooseMVA5.push_back(tau->tauID("againstElectronVLooseMVA5"));
     Tau_againstElectronMVALooseMVA5.push_back(tau->tauID("againstElectronLooseMVA5"));
     Tau_againstElectronMVAMediumMVA5.push_back(tau->tauID("againstElectronMediumMVA5"));
     Tau_againstElectronMVATightMVA5.push_back(tau->tauID("againstElectronTightMVA5"));
@@ -206,38 +224,47 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 }
 
 void TauSelector::SetBranches(){
-  if(debug_)    std::cout<<"setting branches: calling AddBranch of baseTree"<<std::endl;
+  if(debug_) std::cout << "     TauSelector: Setting branches by calling AddBranch of baseTree." << std::endl;
 
   AddBranch(&Tau_eta,                         "Tau_eta");
   AddBranch(&Tau_phi,                         "Tau_phi");
   AddBranch(&Tau_pt,                          "Tau_pt");
   AddBranch(&Tau_energy,                      "Tau_energy");
   AddBranch(&Tau_charge,                      "Tau_charge");
+  AddBranch(&Tau_decayMode,                   "Tau_decayMode");
   AddBranch(&Tau_nProngs,                     "Tau_nProngs");
   AddBranch(&Tau_chargedIsoPtSum,             "Tau_chargedIsoPtSum");
   AddBranch(&Tau_neutralIsoPtSum,             "Tau_neutralIsoPtSum");
   AddBranch(&Tau_puCorrPtSum,                 "Tau_puCorrPtSum");
+  AddBranch(&Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits,                 "Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits");
+  AddBranch(&Tau_byPileupWeightedIsolationRaw3Hits,                 "Tau_byPileupWeightedIsolationRaw3Hits");
   AddBranch(&Tau_decayModeFinding,            "Tau_decayModeFinding");
   AddBranch(&Tau_decayModeFindingNewDMs,      "Tau_decayModeFindingNewDMs");
+  AddBranch(&Tau_byVLooseIsolationMVA3newDMwLT,                 "Tau_byVLooseIsolationMVA3newDMwLT");
+  AddBranch(&Tau_byVLooseIsolationMva3oldDMwLT,                 "Tau_byVLooseIsolationMva3oldDMwLT");
   AddBranch(&Tau_byLooseIsolationMVA3newDMwLT,                  "Tau_byLooseIsolationMVA3newDMwLT");
-  AddBranch(&Tau_byLooseIsolationMVA3newDMwoLT,                 "Tau_byLooseIsolationMVA3newDMwoLT");
+  //AddBranch(&Tau_byLooseIsolationMVA3newDMwoLT,                 "Tau_byLooseIsolationMVA3newDMwoLT"); // only in miniAODv1
   AddBranch(&Tau_byLooseIsolationMva3oldDMwLT,                  "Tau_byLooseIsolationMva3oldDMwLT");
-  AddBranch(&Tau_byLooseIsolationMVA3oldDMwoLT,                 "Tau_byLooseIsolationMVA3oldDMwoLT");
+  //AddBranch(&Tau_byLooseIsolationMVA3oldDMwoLT,                 "Tau_byLooseIsolationMVA3oldDMwoLT"); // only in miniAODv1
   AddBranch(&Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits,    "Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits");
   AddBranch(&Tau_byMediumIsolationMVA3newDMwLT,                 "Tau_byMediumIsolationMVA3newDMwLT");
-  AddBranch(&Tau_byMediumIsolationMVA3newDMwoLT,                "Tau_byMediumIsolationMVA3newDMwoLT");
+  //AddBranch(&Tau_byMediumIsolationMVA3newDMwoLT,                "Tau_byMediumIsolationMVA3newDMwoLT"); // only in miniAODv1
   AddBranch(&Tau_byMediumIsolationMva3oldDMwLT,                 "Tau_byMediumIsolationMva3oldDMwLT");
-  AddBranch(&Tau_byMediumIsolationMVA3oldDMwoLT,                "Tau_byMediumIsolationMVA3oldDMwoLT");
+  //AddBranch(&Tau_byMediumIsolationMVA3oldDMwoLT,                "Tau_byMediumIsolationMVA3oldDMwoLT"); // only in miniAODv1
   AddBranch(&Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits,   "Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits");
   AddBranch(&Tau_byTightIsolationMVA3newDMwLT,                  "Tau_byTightIsolationMVA3newDMwLT");
-  AddBranch(&Tau_byTightIsolationMVA3newDMwoLT,                 "Tau_byTightIsolationMVA3newDMwoLT");
+  //AddBranch(&Tau_byTightIsolationMVA3newDMwoLT,                 "Tau_byTightIsolationMVA3newDMwoLT"); // only in miniAODv1
   AddBranch(&Tau_byTightIsolationMva3oldDMwLT,                  "Tau_byTightIsolationMva3oldDMwLT");
-  AddBranch(&Tau_byTightIsolationMVA3oldDMwoLT,                 "Tau_byTightIsolationMVA3oldDMwoLT");
+  //AddBranch(&Tau_byTightIsolationMVA3oldDMwoLT,                 "Tau_byTightIsolationMVA3oldDMwoLT"); // only in miniAODv1
   AddBranch(&Tau_byTightCombinedIsolationDeltaBetaCorr3Hits,    "Tau_byTightCombinedIsolationDeltaBetaCorr3Hits");
-  AddBranch(&Tau_againstMuonLoose2,                             "Tau_againstMuonLoose2");
+  AddBranch(&Tau_byLoosePileupWeightedIsolation3Hits,           "Tau_byLoosePileupWeightedIsolation3Hits");
+  AddBranch(&Tau_byMediumPileupWeightedIsolation3Hits,          "Tau_byMediumPileupWeightedIsolation3Hits");
+  AddBranch(&Tau_byTightPileupWeightedIsolation3Hits,           "Tau_byTightPileupWeightedIsolation3Hits");
+  //AddBranch(&Tau_againstMuonLoose2,                             "Tau_againstMuonLoose2"); // only in miniAODv1
   AddBranch(&Tau_againstMuonLoose3,                             "Tau_againstMuonLoose3");
-  AddBranch(&Tau_againstMuonTight2,                             "Tau_againstMuonTight2");
+  //AddBranch(&Tau_againstMuonTight2,                             "Tau_againstMuonTight2"); // only in miniAODv1
   AddBranch(&Tau_againstMuonTight3,                             "Tau_againstMuonTight3"); 
+  AddBranch(&Tau_againstElectronMVAVLooseMVA5,                  "Tau_againstElectronMVAVLooseMVA5");
   AddBranch(&Tau_againstElectronMVALooseMVA5,                   "Tau_againstElectronMVALooseMVA5");
   AddBranch(&Tau_againstElectronMVAMediumMVA5,                  "Tau_againstElectronMVAMediumMVA5");
   AddBranch(&Tau_againstElectronMVATightMVA5,                   "Tau_againstElectronMVATightMVA5");
@@ -283,6 +310,8 @@ void TauSelector::SetBranches(){
     AddBranch(&Tau_default_PCAy_pv                           ,"Tau_default_PCAy_pv");
     AddBranch(&Tau_default_PCAz_pv                           ,"Tau_default_PCAz_pv");
   }
+
+  if(debug_) std::cout << "     TauSelector: Finished setting branches." << std::endl;
 }
 
 void TauSelector::Clear(){
@@ -293,30 +322,39 @@ void TauSelector::Clear(){
   Tau_energy.clear(); 
   Tau_charge.clear(); 
   Tau_nProngs.clear();
+  Tau_decayMode.clear();
   Tau_chargedIsoPtSum.clear(); 
   Tau_neutralIsoPtSum.clear(); 
   Tau_puCorrPtSum.clear(); 
+  Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits.clear();
+  Tau_byPileupWeightedIsolationRaw3Hits.clear();
   Tau_decayModeFinding.clear(); 
   Tau_decayModeFindingNewDMs.clear(); 
+  Tau_byVLooseIsolationMVA3newDMwLT.clear();
+  Tau_byVLooseIsolationMva3oldDMwLT.clear();
   Tau_byLooseIsolationMVA3newDMwLT.clear();
-  Tau_byLooseIsolationMVA3newDMwoLT.clear();
+  //Tau_byLooseIsolationMVA3newDMwoLT.clear(); // only in miniAODv1
   Tau_byLooseIsolationMva3oldDMwLT.clear();
-  Tau_byLooseIsolationMVA3oldDMwoLT.clear();
+  //Tau_byLooseIsolationMVA3oldDMwoLT.clear(); // only in miniAODv1
   Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits.clear(); 
   Tau_byMediumIsolationMVA3newDMwLT.clear();
-  Tau_byMediumIsolationMVA3newDMwoLT.clear();
+  //Tau_byMediumIsolationMVA3newDMwoLT.clear(); // only in miniAODv1
   Tau_byMediumIsolationMva3oldDMwLT.clear();
-  Tau_byMediumIsolationMVA3oldDMwoLT.clear();
+  //Tau_byMediumIsolationMVA3oldDMwoLT.clear(); // only in miniAODv1
   Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits.clear(); 
   Tau_byTightIsolationMVA3newDMwLT.clear();
-  Tau_byTightIsolationMVA3newDMwoLT.clear();
+  //Tau_byTightIsolationMVA3newDMwoLT.clear(); // only in miniAODv1
   Tau_byTightIsolationMva3oldDMwLT.clear();
-  Tau_byTightIsolationMVA3oldDMwoLT.clear();
+  //Tau_byTightIsolationMVA3oldDMwoLT.clear(); // only in miniAODv1
   Tau_byTightCombinedIsolationDeltaBetaCorr3Hits.clear(); 
-  Tau_againstMuonLoose2.clear();
+  Tau_byLoosePileupWeightedIsolation3Hits.clear();
+  Tau_byMediumPileupWeightedIsolation3Hits.clear();
+  Tau_byTightPileupWeightedIsolation3Hits.clear();
+  //Tau_againstMuonLoose2.clear(); // only in miniAODv1
   Tau_againstMuonLoose3.clear();
-  Tau_againstMuonTight2.clear();
+  //Tau_againstMuonTight2.clear(); // only in miniAODv1
   Tau_againstMuonTight3.clear();
+  Tau_againstElectronMVAVLooseMVA5.clear();
   Tau_againstElectronMVALooseMVA5.clear();
   Tau_againstElectronMVAMediumMVA5.clear();
   Tau_againstElectronMVATightMVA5.clear();

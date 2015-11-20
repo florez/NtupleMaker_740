@@ -5,14 +5,13 @@
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/JetSelector.h"
 
 JetSelector::JetSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):baseTree(name,tree,debug){
-  
+  if(debug) std::cout << "BSM3G TNT Maker: In the JetSelector Constructor --> getting parameters & calling SetBranches()." << std::endl;
   jetToken_       = iConfig.getParameter<edm::InputTag>("jets");
   puppi_jetToken_ = iConfig.getParameter<edm::InputTag>("jetsPUPPI");
   _vertexInputTag = iConfig.getParameter<edm::InputTag>("vertices");
   _Jet_pt_min     = iConfig.getParameter<double>("Jet_pt_min");
   _super_TNT      = iConfig.getParameter<bool>("super_TNT");
   SetBranches();
-
 }
 
 JetSelector::~JetSelector(){
@@ -27,6 +26,8 @@ void JetSelector::Fill(const edm::Event& iEvent){
   iEvent.getByLabel(jetToken_, jets);                                         
   edm::Handle<pat::JetCollection> puppijets;                                       
   iEvent.getByLabel(puppi_jetToken_, puppijets);                                         
+
+  if(debug_) std::cout << "     JetSelector: Cleared the vectors, grabbed the jet collection handle, and looping over jets." << std::endl;
   
   // loop over "standard" ak4 CHS PF jets
   for (const pat::Jet &j : *jets) { 
@@ -40,6 +41,9 @@ void JetSelector::Fill(const edm::Event& iEvent){
     Jet_bDiscriminator.push_back(j.bDiscriminator("combinedSecondaryVertexBJetTags"));
     Jet_bDiscriminator_CISVV2.push_back(j.bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags"));
     Jet_bDiscriminator_pfCISVV2.push_back(j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+    Jet_vtxMass.push_back(j.userFloat("vtxMass"));
+    Jet_decayLength.push_back(j.userFloat("vtx3DVal"));
+    Jet_decayLengthSignificance.push_back(j.userFloat("vtx3DSig"));
     Jet_pileupId.push_back(j.userFloat("pileupJetId:fullDiscriminant"));
     Jet_partonFlavour.push_back(j.partonFlavour());
     Jet_neutralHadEnergyFraction.push_back(j.neutralHadronEnergyFraction());                               
@@ -71,6 +75,9 @@ void JetSelector::Fill(const edm::Event& iEvent){
     Jet_puppi_bDiscriminator.push_back(j.bDiscriminator("combinedSecondaryVertexBJetTags"));
     Jet_puppi_bDiscriminator_CISVV2.push_back(j.bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags"));
     Jet_puppi_bDiscriminator_pfCISVV2.push_back(j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+    Jet_puppi_vtxMass.push_back(j.userFloat("vtxMass"));
+    Jet_puppi_decayLength.push_back(j.userFloat("vtx3DVal"));
+    Jet_puppi_decayLengthSignificance.push_back(j.userFloat("vtx3DSig"));
     Jet_puppi_pileupId.push_back(j.userFloat("pileupJetId:fullDiscriminant"));
     Jet_puppi_partonFlavour.push_back(j.partonFlavour());
     Jet_puppi_neutralHadEnergyFraction.push_back(j.neutralHadronEnergyFraction());                               
@@ -92,8 +99,8 @@ void JetSelector::Fill(const edm::Event& iEvent){
 }
 
 void JetSelector::SetBranches(){
-  
-  if(debug_)    std::cout<<"setting branches: calling AddBranch of baseTree"<<std::endl;
+  if(debug_) std::cout << "     JetSelector: Setting branches by calling AddBranch of baseTree." << std::endl;
+
   AddBranch(&Jet_pt,                  		"Jet_pt");
   AddBranch(&Jet_eta,                 		"Jet_eta");
   AddBranch(&Jet_phi,                 		"Jet_phi");
@@ -101,6 +108,9 @@ void JetSelector::SetBranches(){
   AddBranch(&Jet_bDiscriminator,      		"Jet_bDiscriminator");
   AddBranch(&Jet_bDiscriminator_CISVV2,      	"Jet_bDiscriminator_CISVV2");
   AddBranch(&Jet_bDiscriminator_pfCISVV2,      	"Jet_bDiscriminator_pfCISVV2");
+  AddBranch(&Jet_vtxMass,            		"Jet_vtxMass");
+  AddBranch(&Jet_decayLength,            	"Jet_decayLength");
+  AddBranch(&Jet_decayLengthSignificance,	"Jet_decayLengthSignificance");
   AddBranch(&Jet_pileupId,            		"Jet_pileupId");
   AddBranch(&Jet_partonFlavour,       		"Jet_partonFlavour");
   AddBranch(&Jet_neutralHadEnergyFraction,    	"Jet_neutralHadEnergyFraction");
@@ -117,6 +127,9 @@ void JetSelector::SetBranches(){
   AddBranch(&Jet_puppi_bDiscriminator,      	"Jet_puppi_bDiscriminator");
   AddBranch(&Jet_puppi_bDiscriminator_CISVV2,   "Jet_puppi_bDiscriminator_CISVV2");
   AddBranch(&Jet_puppi_bDiscriminator_pfCISVV2, "Jet_puppi_bDiscriminator_pfCISVV2");
+  AddBranch(&Jet_puppi_vtxMass,       		"Jet_puppi_vtxMass");
+  AddBranch(&Jet_puppi_decayLength,            	"Jet_puppi_decayLength");
+  AddBranch(&Jet_puppi_decayLengthSignificance,	"Jet_puppi_decayLengthSignificance");
   AddBranch(&Jet_puppi_pileupId,            	"Jet_puppi_pileupId");
   AddBranch(&Jet_puppi_partonFlavour,       	"Jet_puppi_partonFlavour");
   AddBranch(&Jet_puppi_neutralHadEnergyFraction,"Jet_puppi_neutralHadEnergyFraction");
@@ -136,7 +149,8 @@ void JetSelector::SetBranches(){
     AddBranch(&Jet_puppi_photonEnergy,        	"Jet_puppi_photonEnergy");
     AddBranch(&UncorrJet_puppi_pt,            	"UncorrJet_puppi_pt");
   }
-  if(debug_)    std::cout<<"set branches"<<std::endl;
+
+  if(debug_) std::cout << "     JetSelector: Finished setting branches." << std::endl;
 }
 
 void JetSelector::Clear(){
@@ -148,6 +162,9 @@ void JetSelector::Clear(){
   Jet_bDiscriminator.clear();
   Jet_bDiscriminator_CISVV2.clear();
   Jet_bDiscriminator_pfCISVV2.clear();
+  Jet_vtxMass.clear();
+  Jet_decayLength.clear();
+  Jet_decayLengthSignificance.clear();
   Jet_pileupId.clear();
   Jet_partonFlavour.clear();
   Jet_mass.clear();
@@ -168,6 +185,9 @@ void JetSelector::Clear(){
   Jet_puppi_bDiscriminator.clear();
   Jet_puppi_bDiscriminator_CISVV2.clear();
   Jet_puppi_bDiscriminator_pfCISVV2.clear();
+  Jet_puppi_vtxMass.clear();
+  Jet_puppi_decayLength.clear();
+  Jet_puppi_decayLengthSignificance.clear();
   Jet_puppi_pileupId.clear();
   Jet_puppi_partonFlavour.clear();
   Jet_puppi_mass.clear();

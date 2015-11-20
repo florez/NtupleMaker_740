@@ -110,8 +110,10 @@ private:
   vector <int> Tau_byMediumIsolationMva3oldDMwLT, Tau_byMediumIsolationMVA3oldDMwoLT, Tau_byTightIsolationMVA3newDMwLT;  
   vector <int> Tau_byTightIsolationMVA3newDMwoLT, Tau_byTightIsolationMva3oldDMwLT, Tau_byTightIsolationMVA3oldDMwoLT; 
   vector <int> Tau_againstMuonLoose2, Tau_againstMuonLoose3, Tau_againstMuonTight2, Tau_againstMuonTight3; 
-  vector <int> Tau_againstElectronMVALooseMVA5, Tau_againstElectronMVAMediumMVA5, Tau_againstElectronMVATightMVA5; 
-  vector <int> Tau_byVLooseCombinedIsolationDeltaBetaCorr; 
+  vector <int> Tau_againstElectronMVALooseMVA5, Tau_againstElectronMVAMediumMVA5, Tau_againstElectronMVATightMVA5, Tau_againstElectronMVAVLooseMVA5; 
+  vector <int> Tau_byVLooseCombinedIsolationDeltaBetaCorr, Tau_byVLooseIsolationMVA3newDMwLT, Tau_byVLooseIsolationMva3oldDMwLT; 
+  vector <int> Tau_decayMode, Tau_byLoosePileupWeightedIsolation3Hits, Tau_byMediumPileupWeightedIsolation3Hits, Tau_byTightPileupWeightedIsolation3Hits; 
+  vector<double> Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits, Tau_byPileupWeightedIsolationRaw3Hits;
 
   // config variables
   edm::InputTag tauToken_;

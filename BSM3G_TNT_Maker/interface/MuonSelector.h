@@ -84,7 +84,7 @@ private:
   vector <double> Muon_isoSum , Muon_isoCharParPt ;
   vector <double> Muon_pt ,Muon_eta,Muon_phi, Muon_dz_pv, Muon_energy, Muon_iso;
   vector <double> Muon_isoCharged, Muon_isoNeutralHadron , Muon_isoPhoton, Muon_isoPU;
-  vector <double> Muon_charge, Muon_chi2, Muon_p, Muon_matchedStat, Muon_dxy_pv, Muon_dxy_bs; 
+  vector <double> Muon_charge, Muon_chi2, Muon_matchedStat, Muon_dxy_pv, Muon_dxy_bs; 
   vector <double> Muon_dz_bs, Muon_dzError, Muon_dxyError, Muon_ndof, Muon_vtx, Muon_vty, Muon_vtz; 
   vector <double> Muon_track_pt, Muon_track_ptError, Muon_validHits, Muon_validHitsInner, Muon_TLayers; 
   vector <bool> Muon_loose, Muon_medium, Muon_tight, Muon_soft, Muon_isHighPt, Muon_pf, Muon_isGlobal;   

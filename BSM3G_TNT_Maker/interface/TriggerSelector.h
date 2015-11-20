@@ -60,8 +60,10 @@ class TriggerSelector : public baseTree{
   TriggerSelector(){};
   vector <int> Trigger_decision;
   vector <string> Trigger_names;
+  vector <int> Trigger_prescale;
   HLTConfigProvider hltConfig_;
   edm::InputTag triggerResultsTag_;
+  edm::InputTag triggerPrescales_;
 };
 
 #endif
