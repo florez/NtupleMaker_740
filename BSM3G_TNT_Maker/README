@@ -63,3 +63,37 @@ In order to use the code you need to follow carefully these steps:
 7. In the python directory, there is file called miniAOD_747.py.
    7.1 You can run it with CMSSW (make sure it runs in a valid Spring15 miniOAD)
 
+
+#####################################################################
+#                         CMSSW_7_4_15 Recipe                        #
+#####################################################################
+
+1. You need to work at the SLC6 area.
+
+2. set the CMSSW release: cmsrel CMSSW_7_4_15
+
+3. cd CMSSW_7_4_15/src
+
+4. cmsenv
+
+5. Install and compile the code to use the PAT-electron ID:
+
+  5.1 git cms-merge-topic ikrav:egm_id_7.4.12_v1
+  5.2 scram b -j 10
+  
+6. Install and compile the code to use the MET producers (for covariance matrix):
+
+  6.1 git cms-addpkg RecoMET/METProducers
+  6.2 scram b -j 10
+
+7. Get the NTupleMaker code and compile it:
+
+  7.1 git clone https://github.com/florez/NtupleMaker_740
+  7.2 cd NtupleMaker_740
+  7.3 git checkout miniAODv2_ForHiggsDalitz
+  7.4 cd ./..
+  7.5 mv NtupleMaker_740 NtupleMaker
+  7.6 scram b -j 10
+
+8. In the python directory, there is file called miniAODv2_7415_25ns_*.py (name specifies which file is appropriate)
+   8.1 You can run it with CMSSW (make sure it runs on a valid miniOADv2): cmsRun miniAODv2_7415_25ns_MC.py
