@@ -14,7 +14,9 @@ ElectronPatSelector::ElectronPatSelector(std::string name, TTree* tree, bool deb
   electronLooseIdMapToken_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronLooseIdMap"))),
   electronMediumIdMapToken_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronMediumIdMap"))),
   electronTightIdMapToken_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronTightIdMap"))),
-  eleHEEPIdMapToken_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleHEEPIdMap")))
+  eleHEEPIdMapToken_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleHEEPIdMap"))),
+  electronMVAwp1Token_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronMVA_wp1"))),
+  electronMVAwp2Token_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronMVA_wp2")))
 {
   if(debug) std::cout << "BSM3G TNT Maker: In the ElectronPatSelector Constructor --> getting parameters & calling SetBranches()." << std::endl;
   _patElectronToken      	  = iConfig.getParameter<edm::InputTag>("patElectrons");
@@ -79,11 +81,15 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
   edm::Handle<edm::ValueMap<bool> > medium_id_decisions;
   edm::Handle<edm::ValueMap<bool> > tight_id_decisions;
   edm::Handle<edm::ValueMap<bool> > heep_id_decisions;
+  edm::Handle<edm::ValueMap<bool> > mva_wp1_id_decisions;
+  edm::Handle<edm::ValueMap<bool> > mva_wp2_id_decisions;
   iEvent.getByToken(electronVetoIdMapToken_,veto_id_decisions);
   iEvent.getByToken(electronLooseIdMapToken_,loose_id_decisions);
   iEvent.getByToken(electronMediumIdMapToken_,medium_id_decisions);
   iEvent.getByToken(electronTightIdMapToken_,tight_id_decisions);  
   iEvent.getByToken(eleHEEPIdMapToken_, heep_id_decisions);
+  iEvent.getByToken(electronMVAwp1Token_, mva_wp1_id_decisions);
+  iEvent.getByToken(electronMVAwp2Token_, mva_wp2_id_decisions);
 
   edm::ESHandle<TransientTrackBuilder> theB;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
@@ -119,13 +125,16 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
     bool isPassMedium = (*medium_id_decisions)[ elPtr ];
     bool isPassTight  = (*tight_id_decisions)[ elPtr ];
     bool isHEEPId     = (*heep_id_decisions)[ elPtr ];
- 
+    bool isMVAwp1     = (*mva_wp1_id_decisions)[ elPtr ];
+    bool isMVAwp2     = (*mva_wp2_id_decisions)[ elPtr ]; 
+
     passVetoId_.push_back( isPassVeto );
     passLooseId_.push_back( isPassLoose );
     passMediumId_.push_back( isPassMedium );
     passTightId_.push_back( isPassTight );
     passHEEPId_.push_back( isHEEPId );   
-
+    passMVAwp1Id_.push_back(isMVAwp1);
+    passMVAwp2Id_.push_back(isMVAwp2);
     // Isolation
     reco::GsfElectron::PflowIsolationVariables pfIso = el->pfIsolationVariables();
     // Compute isolation with delta beta correction for PU
@@ -200,6 +209,8 @@ void ElectronPatSelector::SetBranches(){
   AddBranch(&passMediumId_                 ,"patElectron_isPassMedium");
   AddBranch(&passTightId_                  ,"patElectron_isPassTight");
   AddBranch(&passHEEPId_                   ,"patElectron_isPassHEEPId");
+  AddBranch(&passMVAwp1Id_                 ,"patElectron_passMV1wp1Id");
+  AddBranch(&passMVAwp2Id_                 ,"patElectron_passMV2wp1Id");
   AddBranch(&isoChargedHadrons_            ,"patElectron_isoChargedHadrons");
   AddBranch(&isoNeutralHadrons_            ,"patElectron_isoNeutralHadrons");
   AddBranch(&isoPhotons_                   ,"patElectron_isoPhotons");
@@ -247,6 +258,8 @@ void ElectronPatSelector::Clear(){
   passMediumId_.clear();
   passTightId_.clear();  
   passHEEPId_.clear();
+  passMVAwp1Id_.clear();
+  passMVAwp2Id_.clear();
   patElectron_gsfTrack_dxy_pv.clear();
   patElectron_gsfTrack_dxy_bs.clear();
   patElectron_dxyError.clear();

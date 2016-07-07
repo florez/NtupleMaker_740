@@ -102,18 +102,21 @@ private:
   vector<double> Tau_defaultDxy, Tau_defaultDxyError, Tau_defaultDxySig, Tau_defaultFlightLengthSig, Tau_default_PCAx_pv, Tau_default_PCAy_pv, Tau_default_PCAz_pv;
   vector<double> Tau_defaultFlightLengthX, Tau_defaultFlightLengthY, Tau_defaultFlightLengthZ;
   vector <int> Tau_decayModeFinding, Tau_decayModeFindingOldDMs, Tau_decayModeFindingNewDMs; 
-  vector <int> Tau_byLooseCombinedIsolationDeltaBetaCorr,Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits;
-  vector <int> Tau_byMediumCombinedIsolationDeltaBetaCorr,Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits; 
-  vector <int> Tau_byTightCombinedIsolationDeltaBetaCorr,Tau_byTightCombinedIsolationDeltaBetaCorr3Hits; 
-  vector <int> Tau_byLooseIsolationMVA3newDMwLT,Tau_byLooseIsolationMVA3newDMwoLT,Tau_byMediumIsolationMVA3newDMwLT; 
-  vector <int> Tau_byMediumIsolationMVA3newDMwoLT, Tau_byLooseIsolationMva3oldDMwLT, Tau_byLooseIsolationMVA3oldDMwoLT; 
-  vector <int> Tau_byMediumIsolationMva3oldDMwLT, Tau_byMediumIsolationMVA3oldDMwoLT, Tau_byTightIsolationMVA3newDMwLT;  
-  vector <int> Tau_byTightIsolationMVA3newDMwoLT, Tau_byTightIsolationMva3oldDMwLT, Tau_byTightIsolationMVA3oldDMwoLT; 
+  vector <int> Tau_byVLooseIsolationMVArun2v1DBoldDMwLT, Tau_byLooseIsolationMVArun2v1DBoldDMwLT, Tau_byMediumIsolationMVArun2v1DBoldDMwLT;
+  vector <int> Tau_byTightIsolationMVArun2v1DBoldDMwLT, Tau_byVTightIsolationMVArun2v1DBoldDMwLT;
+  vector <int> Tau_byVLooseIsolationMVArun2v1DBnewDMwLT, Tau_byLooseIsolationMVArun2v1DBnewDMwLT, Tau_byMediumIsolationMVArun2v1DBnewDMwLT;
+  vector <int> Tau_byTightIsolationMVArun2v1DBnewDMwLT, Tau_byVTightIsolationMVArun2v1DBnewDMwLT;
+ 
+  vector <int> Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits, Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits, Tau_byTightCombinedIsolationDeltaBetaCorr3Hits;
+  vector <int> Tau_byLooseCombinedIsolationDeltaBetaCorr3HitsdR03, Tau_byMediumCombinedIsolationDeltaBetaCorr3HitsdR03, Tau_byTightCombinedIsolationDeltaBetaCorr3HitsdR03; 
+
+  vector <int> Tau_byVLooseIsolationMVArun2v1DBdR03oldDMwLT, Tau_byLooseIsolationMVArun2v1DBdR03oldDMwLT, Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT;
+  vector <int> Tau_byTightIsolationMVArun2v1DBdR03oldDMwLT, Tau_byVTightIsolationMVArun2v1DBdR03oldDMwLT;
   vector <int> Tau_againstMuonLoose2, Tau_againstMuonLoose3, Tau_againstMuonTight2, Tau_againstMuonTight3; 
-  vector <int> Tau_againstElectronMVALooseMVA5, Tau_againstElectronMVAMediumMVA5, Tau_againstElectronMVATightMVA5, Tau_againstElectronMVAVLooseMVA5; 
+  vector <int> Tau_againstElectronMVALooseMVA6, Tau_againstElectronMVAMediumMVA6, Tau_againstElectronMVATightMVA6, Tau_againstElectronMVAVLooseMVA6; 
   vector <int> Tau_byVLooseCombinedIsolationDeltaBetaCorr, Tau_byVLooseIsolationMVA3newDMwLT, Tau_byVLooseIsolationMva3oldDMwLT; 
-  vector <int> Tau_decayMode, Tau_byLoosePileupWeightedIsolation3Hits, Tau_byMediumPileupWeightedIsolation3Hits, Tau_byTightPileupWeightedIsolation3Hits; 
-  vector<double> Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits, Tau_byPileupWeightedIsolationRaw3Hits;
+  vector <int> Tau_decayMode; 
+  vector<double> Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits;
 
   // config variables
   edm::InputTag tauToken_;

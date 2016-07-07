@@ -1,9 +1,9 @@
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/TriggerSelector.h"
 
-TriggerSelector::TriggerSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):baseTree(name,tree,debug){
+TriggerSelector::TriggerSelector(std::string name, TTree* tree, bool debug, const pset& iConfig, edm::ConsumesCollector&& iCC):baseTree(name,tree,debug){
   if(debug) std::cout << "BSM3G TNT Maker: In the TriggerSelector Constructor --> getting parameters & calling SetBranches()." << std::endl;
-  triggerResultsTag_  = iConfig.getParameter<edm::InputTag>("triggerResults");
-  triggerPrescales_   = iConfig.getParameter<edm::InputTag>("triggerPrescales");
+  triggerResultsTag_  = iCC.consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("triggerResults"));
+  triggerPrescales_   = iCC.consumes<pat::PackedTriggerPrescales>(iConfig.getParameter<edm::InputTag>("triggerPrescales"));
   SetBranches();
 }
 
@@ -15,9 +15,9 @@ void TriggerSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSet
   Clear();
   
   edm::Handle<edm::TriggerResults> triggerBits;
-  iEvent.getByLabel(triggerResultsTag_, triggerBits);
+  iEvent.getByToken(triggerResultsTag_, triggerBits); 
   edm::Handle<pat::PackedTriggerPrescales> triggerPrescales;
-  iEvent.getByLabel(triggerPrescales_, triggerPrescales);
+  iEvent.getByToken(triggerPrescales_, triggerPrescales);
 
   if(debug_) std::cout << "     TriggerSelector: Cleared the vectors, grabbed the trigger collection handles, and looping over triggers." << std::endl;
 

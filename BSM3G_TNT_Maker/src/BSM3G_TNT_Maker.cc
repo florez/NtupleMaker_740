@@ -27,7 +27,7 @@ BSM3G_TNT_Maker::BSM3G_TNT_Maker(const edm::ParameterSet& iConfig):
   edm::Service<TFileService> fs;
   tree_ = fs->make<TTree>("BOOM","BOOM");
 
-  if( _filltriggerinfo)      trselector        = new TriggerSelector("miniAOD", tree_, debug_, iConfig);
+  if( _filltriggerinfo)      trselector        = new TriggerSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
   if( _fillmuoninfo)         muselector        = new MuonSelector("miniAOD", tree_, debug_, iConfig);
   if( _fillelectronpatinfo)  elpatselector     = new ElectronPatSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
   if( _filltauinfo)          tauselector       = new TauSelector("miniAOD", tree_, debug_, iConfig);

@@ -103,6 +103,10 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     Muon_isoNeutralHadron.push_back((mu->pfIsolationR04().sumNeutralHadronEt));
     Muon_isoPhoton.push_back((mu->pfIsolationR04().sumPhotonEt));
     Muon_isoPU.push_back((mu->pfIsolationR04().sumPUPt));
+    // PF combined iso with DeltaBeta corrections
+    double combined_iso = (mu->pfIsolationR04().sumChargedHadronPt + max(0., mu->pfIsolationR04().sumNeutralHadronEt + mu->pfIsolationR04().sumPhotonEt - 0.5*mu->pfIsolationR04().sumPUPt))/mu->pt();
+    Muon_combinedIso.push_back(combined_iso); 
+    Muon_trackRe_iso.push_back(mu->isolationR03().sumPt/mu->pt());
 
     // store additional information such as lifetime variables (needed for tau analyses)
     if (!_super_TNT){
@@ -212,6 +216,8 @@ void MuonSelector::SetBranches(){
     AddBranch(&Muon_isoNeutralHadron  ,"Muon_isoNeutralHadron");
     AddBranch(&Muon_isoPhoton         ,"Muon_isoPhoton");
     AddBranch(&Muon_isoPU             ,"Muon_isoPU");
+    AddBranch(&Muon_combinedIso       ,"Muon_combinedIso");
+    AddBranch(&Muon_trackRe_iso       ,"Muon_trackRe_iso");
     AddBranch(&Muon_dB               ,"Muon_dB");
     AddBranch(&Muon_besttrack_pt     ,"Muon_besttrack_pt");
     AddBranch(&Muon_besttrack_ptError ,"Muon_besttrack_ptError");
@@ -258,6 +264,8 @@ void MuonSelector::Clear(){
   Muon_isoNeutralHadron.clear();
   Muon_isoPhoton.clear();
   Muon_isoPU.clear();
+  Muon_combinedIso.clear();
+  Muon_trackRe_iso.clear();
   Muon_charge.clear(); 
   Muon_chi2.clear(); 
   Muon_validHits.clear();

@@ -123,41 +123,49 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
     Tau_neutralIsoPtSum.push_back(tau->tauID("neutralIsoPtSum"));
     Tau_puCorrPtSum.push_back(tau->tauID("puCorrPtSum"));
     Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits.push_back(tau->tauID("byCombinedIsolationDeltaBetaCorrRaw3Hits"));
-    Tau_byPileupWeightedIsolationRaw3Hits.push_back(tau->tauID("byPileupWeightedIsolationRaw3Hits"));
 
     // tau id. discriminators
-    Tau_decayModeFinding.push_back(tau->tauID("decayModeFinding"));
+    Tau_decayModeFinding.push_back(tau->tauID("decayModeFindingOldDMs"));
     Tau_decayModeFindingNewDMs.push_back(tau->tauID("decayModeFindingNewDMs"));
-    Tau_byVLooseIsolationMVA3newDMwLT.push_back(tau->tauID("byVLooseIsolationMVA3newDMwLT"));
-    Tau_byVLooseIsolationMva3oldDMwLT.push_back(tau->tauID("byVLooseIsolationMVA3oldDMwLT"));
-    Tau_byLooseIsolationMVA3newDMwLT.push_back(tau->tauID("byLooseIsolationMVA3newDMwLT"));
-    //Tau_byLooseIsolationMVA3newDMwoLT.push_back(tau->tauID("byLooseIsolationMVA3newDMwoLT")); // only in miniAODv1
-    Tau_byLooseIsolationMva3oldDMwLT.push_back(tau->tauID("byLooseIsolationMVA3oldDMwLT"));
-    //Tau_byLooseIsolationMVA3oldDMwoLT.push_back(tau->tauID("byLooseIsolationMVA3oldDMwoLT")); // only in miniAODv1
+    //CombinedIsolationDeltaBetaCorr3Hits
     Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits"));
-    Tau_byMediumIsolationMVA3newDMwLT.push_back(tau->tauID("byMediumIsolationMVA3newDMwLT"));
-    //Tau_byMediumIsolationMVA3newDMwoLT.push_back(tau->tauID("byMediumIsolationMVA3newDMwoLT")); // only in miniAODv1
-    Tau_byMediumIsolationMva3oldDMwLT.push_back(tau->tauID("byMediumIsolationMVA3oldDMwLT"));
-    //Tau_byMediumIsolationMVA3oldDMwoLT.push_back(tau->tauID("byMediumIsolationMVA3oldDMwoLT")); // only in miniAODv1
     Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits"));
-    Tau_byTightIsolationMVA3newDMwLT.push_back(tau->tauID("byTightIsolationMVA3newDMwLT"));
-    //Tau_byTightIsolationMVA3newDMwoLT.push_back(tau->tauID("byTightIsolationMVA3newDMwoLT")); // only in miniAODv1
-    Tau_byTightIsolationMva3oldDMwLT.push_back(tau->tauID("byTightIsolationMVA3oldDMwLT"));
-    //Tau_byTightIsolationMVA3oldDMwoLT.push_back(tau->tauID("byTightIsolationMVA3oldDMwoLT")); // only in miniAODv1
-    Tau_byTightCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byTightCombinedIsolationDeltaBetaCorr3Hits"));
-    Tau_byLoosePileupWeightedIsolation3Hits.push_back(tau->tauID("byLoosePileupWeightedIsolation3Hits"));
-    Tau_byMediumPileupWeightedIsolation3Hits.push_back(tau->tauID("byMediumPileupWeightedIsolation3Hits"));
-    Tau_byTightPileupWeightedIsolation3Hits.push_back(tau->tauID("byTightPileupWeightedIsolation3Hits"));
+    Tau_byTightCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byTightCombinedIsolationDeltaBetaCorr3Hits")); 
+
+    //CombinedIsolationDeltaBetaCorr3Hits DR = 0.3
+    Tau_byLooseCombinedIsolationDeltaBetaCorr3HitsdR03.push_back(tau->tauID("byLooseCombinedIsolationDeltaBetaCorr3HitsdR03"));
+    Tau_byMediumCombinedIsolationDeltaBetaCorr3HitsdR03.push_back(tau->tauID("byMediumCombinedIsolationDeltaBetaCorr3HitsdR03"));
+    Tau_byTightCombinedIsolationDeltaBetaCorr3HitsdR03.push_back(tau->tauID("byTightCombinedIsolationDeltaBetaCorr3HitsdR03"));
+ 
+    // Iso wit Old Decay Mode reconstruction:
+    Tau_byVLooseIsolationMVArun2v1DBoldDMwLT.push_back(tau->tauID("byVLooseIsolationMVArun2v1DBoldDMwLT"));
+    Tau_byLooseIsolationMVArun2v1DBoldDMwLT.push_back(tau->tauID("byLooseIsolationMVArun2v1DBoldDMwLT"));
+    Tau_byTightIsolationMVArun2v1DBoldDMwLT.push_back(tau->tauID("byTightIsolationMVArun2v1DBoldDMwLT"));
+    Tau_byVTightIsolationMVArun2v1DBoldDMwLT.push_back(tau->tauID("byVTightIsolationMVArun2v1DBoldDMwLT"));
+    Tau_byMediumIsolationMVArun2v1DBoldDMwLT.push_back(tau->tauID("byMediumIsolationMVArun2v1DBoldDMwLT"));
+
+
+    // Iso With New Decay Mode Reconstruction:
+    Tau_byVLooseIsolationMVArun2v1DBnewDMwLT.push_back(tau->tauID("byVLooseIsolationMVArun2v1DBnewDMwLT"));
+    Tau_byLooseIsolationMVArun2v1DBnewDMwLT.push_back(tau->tauID("byLooseIsolationMVArun2v1DBnewDMwLT"));
+    Tau_byTightIsolationMVArun2v1DBnewDMwLT.push_back(tau->tauID("byTightIsolationMVArun2v1DBnewDMwLT"));
+    Tau_byVTightIsolationMVArun2v1DBnewDMwLT.push_back(tau->tauID("byVTightIsolationMVArun2v1DBnewDMwLT"));
+    Tau_byMediumIsolationMVArun2v1DBnewDMwLT.push_back(tau->tauID("byMediumIsolationMVArun2v1DBnewDMwLT"));
+
+    // Iso MVA with Delta Beta Corrections and DR = 0.3
+    Tau_byVLooseIsolationMVArun2v1DBdR03oldDMwLT.push_back(tau->tauID("byVLooseIsolationMVArun2v1DBdR03oldDMwLT"));
+    Tau_byLooseIsolationMVArun2v1DBdR03oldDMwLT.push_back(tau->tauID("byLooseIsolationMVArun2v1DBdR03oldDMwLT"));
+    Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT.push_back(tau->tauID("byMediumIsolationMVArun2v1DBdR03oldDMwLT"));
+    Tau_byTightIsolationMVArun2v1DBdR03oldDMwLT.push_back(tau->tauID("byTightIsolationMVArun2v1DBdR03oldDMwLT"));
+    Tau_byVTightIsolationMVArun2v1DBdR03oldDMwLT.push_back(tau->tauID("byVTightIsolationMVArun2v1DBdR03oldDMwLT"));
 
     // discriminators against electrons/muons
-    //Tau_againstMuonLoose2.push_back(tau->tauID("againstMuonLoose2")); // only in miniAODv1
     Tau_againstMuonLoose3.push_back(tau->tauID("againstMuonLoose3"));
-    //Tau_againstMuonTight2.push_back(tau->tauID("againstMuonTight2")); // only in miniAODv1
     Tau_againstMuonTight3.push_back(tau->tauID("againstMuonTight3"));
-    Tau_againstElectronMVAVLooseMVA5.push_back(tau->tauID("againstElectronVLooseMVA5"));
-    Tau_againstElectronMVALooseMVA5.push_back(tau->tauID("againstElectronLooseMVA5"));
-    Tau_againstElectronMVAMediumMVA5.push_back(tau->tauID("againstElectronMediumMVA5"));
-    Tau_againstElectronMVATightMVA5.push_back(tau->tauID("againstElectronTightMVA5"));
+    Tau_againstElectronMVAVLooseMVA6.push_back(tau->tauID("againstElectronVLooseMVA6"));
+    Tau_againstElectronMVALooseMVA6.push_back(tau->tauID("againstElectronLooseMVA6"));
+    Tau_againstElectronMVAMediumMVA6.push_back(tau->tauID("againstElectronMediumMVA6"));
+    Tau_againstElectronMVATightMVA6.push_back(tau->tauID("againstElectronTightMVA6"));
 
     // store additional information such as lifetime variables
     if(!_super_TNT){
@@ -237,37 +245,42 @@ void TauSelector::SetBranches(){
   AddBranch(&Tau_neutralIsoPtSum,             "Tau_neutralIsoPtSum");
   AddBranch(&Tau_puCorrPtSum,                 "Tau_puCorrPtSum");
   AddBranch(&Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits,                 "Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits");
-  AddBranch(&Tau_byPileupWeightedIsolationRaw3Hits,                 "Tau_byPileupWeightedIsolationRaw3Hits");
   AddBranch(&Tau_decayModeFinding,            "Tau_decayModeFinding");
   AddBranch(&Tau_decayModeFindingNewDMs,      "Tau_decayModeFindingNewDMs");
-  AddBranch(&Tau_byVLooseIsolationMVA3newDMwLT,                 "Tau_byVLooseIsolationMVA3newDMwLT");
-  AddBranch(&Tau_byVLooseIsolationMva3oldDMwLT,                 "Tau_byVLooseIsolationMva3oldDMwLT");
-  AddBranch(&Tau_byLooseIsolationMVA3newDMwLT,                  "Tau_byLooseIsolationMVA3newDMwLT");
-  //AddBranch(&Tau_byLooseIsolationMVA3newDMwoLT,                 "Tau_byLooseIsolationMVA3newDMwoLT"); // only in miniAODv1
-  AddBranch(&Tau_byLooseIsolationMva3oldDMwLT,                  "Tau_byLooseIsolationMva3oldDMwLT");
-  //AddBranch(&Tau_byLooseIsolationMVA3oldDMwoLT,                 "Tau_byLooseIsolationMVA3oldDMwoLT"); // only in miniAODv1
   AddBranch(&Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits,    "Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits");
-  AddBranch(&Tau_byMediumIsolationMVA3newDMwLT,                 "Tau_byMediumIsolationMVA3newDMwLT");
-  //AddBranch(&Tau_byMediumIsolationMVA3newDMwoLT,                "Tau_byMediumIsolationMVA3newDMwoLT"); // only in miniAODv1
-  AddBranch(&Tau_byMediumIsolationMva3oldDMwLT,                 "Tau_byMediumIsolationMva3oldDMwLT");
-  //AddBranch(&Tau_byMediumIsolationMVA3oldDMwoLT,                "Tau_byMediumIsolationMVA3oldDMwoLT"); // only in miniAODv1
   AddBranch(&Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits,   "Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits");
-  AddBranch(&Tau_byTightIsolationMVA3newDMwLT,                  "Tau_byTightIsolationMVA3newDMwLT");
-  //AddBranch(&Tau_byTightIsolationMVA3newDMwoLT,                 "Tau_byTightIsolationMVA3newDMwoLT"); // only in miniAODv1
-  AddBranch(&Tau_byTightIsolationMva3oldDMwLT,                  "Tau_byTightIsolationMva3oldDMwLT");
-  //AddBranch(&Tau_byTightIsolationMVA3oldDMwoLT,                 "Tau_byTightIsolationMVA3oldDMwoLT"); // only in miniAODv1
   AddBranch(&Tau_byTightCombinedIsolationDeltaBetaCorr3Hits,    "Tau_byTightCombinedIsolationDeltaBetaCorr3Hits");
-  AddBranch(&Tau_byLoosePileupWeightedIsolation3Hits,           "Tau_byLoosePileupWeightedIsolation3Hits");
-  AddBranch(&Tau_byMediumPileupWeightedIsolation3Hits,          "Tau_byMediumPileupWeightedIsolation3Hits");
-  AddBranch(&Tau_byTightPileupWeightedIsolation3Hits,           "Tau_byTightPileupWeightedIsolation3Hits");
-  //AddBranch(&Tau_againstMuonLoose2,                             "Tau_againstMuonLoose2"); // only in miniAODv1
+  AddBranch(&Tau_byLooseCombinedIsolationDeltaBetaCorr3HitsdR03,"Tau_byLooseCombinedIsolationDeltaBetaCorr3HitsdR03");
+  AddBranch(&Tau_byMediumCombinedIsolationDeltaBetaCorr3HitsdR03,"Tau_byMediumCombinedIsolationDeltaBetaCorr3HitsdR03");
+  AddBranch(&Tau_byTightCombinedIsolationDeltaBetaCorr3HitsdR03, "Tau_byTightCombinedIsolationDeltaBetaCorr3HitsdR03");
+  //Iso with Old Decay Mode reconstruction:
+  AddBranch(&Tau_byVLooseIsolationMVArun2v1DBoldDMwLT,          "Tau_byVLooseIsolationMVArun2v1DBoldDMwLT");
+  AddBranch(&Tau_byLooseIsolationMVArun2v1DBoldDMwLT,           "Tau_byLooseIsolationMVArun2v1DBoldDMwLT");
+  AddBranch(&Tau_byMediumIsolationMVArun2v1DBoldDMwLT,          "Tau_byMediumIsolationMVArun2v1DBoldDMwLT");
+  AddBranch(&Tau_byTightIsolationMVArun2v1DBoldDMwLT,           "Tau_byTightIsolationMVArun2v1DBoldDMwLT");
+  AddBranch(&Tau_byVTightIsolationMVArun2v1DBoldDMwLT,          "Tau_byVTightIsolationMVArun2v1DBoldDMwLT");
+
+  //Iso with new Decay Mode reconstruction:
+  AddBranch(&Tau_byVLooseIsolationMVArun2v1DBnewDMwLT,          "Tau_byVLooseIsolationMVArun2v1DBnewDMwLT");
+  AddBranch(&Tau_byLooseIsolationMVArun2v1DBnewDMwLT,           "Tau_byLooseIsolationMVArun2v1DBnewDMwLT");
+  AddBranch(&Tau_byMediumIsolationMVArun2v1DBnewDMwLT,          "Tau_byMediumIsolationMVArun2v1DBnewDMwLT");
+  AddBranch(&Tau_byTightIsolationMVArun2v1DBnewDMwLT,           "Tau_byTightIsolationMVArun2v1DBnewDMwLT");
+  AddBranch(&Tau_byVTightIsolationMVArun2v1DBnewDMwLT,          "Tau_byVTightIsolationMVArun2v1DBnewDMwLT");
+
+  // Iso MVA with Delta Beta correction DR = 0.3
+  AddBranch(&Tau_byVLooseIsolationMVArun2v1DBdR03oldDMwLT,      "Tau_byVLooseIsolationMVArun2v1DBdR03oldDMwLT");
+  AddBranch(&Tau_byLooseIsolationMVArun2v1DBdR03oldDMwLT,       "Tau_byLooseIsolationMVArun2v1DBdR03oldDMwLT");
+  AddBranch(&Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT,      "Tau_byTightIsolationMVArun2v1DBdR03oldDMwLT");
+  AddBranch(&Tau_byTightIsolationMVArun2v1DBdR03oldDMwLT,       "Tau_byTightIsolationMVArun2v1DBdR03oldDMwLT");
+  AddBranch(&Tau_byVTightIsolationMVArun2v1DBdR03oldDMwLT,      "Tau_byVTightIsolationMVArun2v1DBdR03oldDMwLT");
+
+
   AddBranch(&Tau_againstMuonLoose3,                             "Tau_againstMuonLoose3");
-  //AddBranch(&Tau_againstMuonTight2,                             "Tau_againstMuonTight2"); // only in miniAODv1
   AddBranch(&Tau_againstMuonTight3,                             "Tau_againstMuonTight3"); 
-  AddBranch(&Tau_againstElectronMVAVLooseMVA5,                  "Tau_againstElectronMVAVLooseMVA5");
-  AddBranch(&Tau_againstElectronMVALooseMVA5,                   "Tau_againstElectronMVALooseMVA5");
-  AddBranch(&Tau_againstElectronMVAMediumMVA5,                  "Tau_againstElectronMVAMediumMVA5");
-  AddBranch(&Tau_againstElectronMVATightMVA5,                   "Tau_againstElectronMVATightMVA5");
+  AddBranch(&Tau_againstElectronMVAVLooseMVA6,                  "Tau_againstElectronMVAVLooseMVA6");
+  AddBranch(&Tau_againstElectronMVALooseMVA6,                   "Tau_againstElectronMVALooseMVA6");
+  AddBranch(&Tau_againstElectronMVAMediumMVA6,                  "Tau_againstElectronMVAMediumMVA6");
+  AddBranch(&Tau_againstElectronMVATightMVA6,                   "Tau_againstElectronMVATightMVA6");
   if(!_super_TNT){ 
     AddBranch(&Tau_leadChargedCandPt,                           "Tau_leadChargedCandPt");
     AddBranch(&Tau_leadChargedCandEta,                          "Tau_leadChargedCandEta");
@@ -327,37 +340,42 @@ void TauSelector::Clear(){
   Tau_neutralIsoPtSum.clear(); 
   Tau_puCorrPtSum.clear(); 
   Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits.clear();
-  Tau_byPileupWeightedIsolationRaw3Hits.clear();
   Tau_decayModeFinding.clear(); 
   Tau_decayModeFindingNewDMs.clear(); 
-  Tau_byVLooseIsolationMVA3newDMwLT.clear();
-  Tau_byVLooseIsolationMva3oldDMwLT.clear();
-  Tau_byLooseIsolationMVA3newDMwLT.clear();
-  //Tau_byLooseIsolationMVA3newDMwoLT.clear(); // only in miniAODv1
-  Tau_byLooseIsolationMva3oldDMwLT.clear();
-  //Tau_byLooseIsolationMVA3oldDMwoLT.clear(); // only in miniAODv1
   Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits.clear(); 
-  Tau_byMediumIsolationMVA3newDMwLT.clear();
-  //Tau_byMediumIsolationMVA3newDMwoLT.clear(); // only in miniAODv1
-  Tau_byMediumIsolationMva3oldDMwLT.clear();
-  //Tau_byMediumIsolationMVA3oldDMwoLT.clear(); // only in miniAODv1
   Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits.clear(); 
-  Tau_byTightIsolationMVA3newDMwLT.clear();
-  //Tau_byTightIsolationMVA3newDMwoLT.clear(); // only in miniAODv1
-  Tau_byTightIsolationMva3oldDMwLT.clear();
-  //Tau_byTightIsolationMVA3oldDMwoLT.clear(); // only in miniAODv1
   Tau_byTightCombinedIsolationDeltaBetaCorr3Hits.clear(); 
-  Tau_byLoosePileupWeightedIsolation3Hits.clear();
-  Tau_byMediumPileupWeightedIsolation3Hits.clear();
-  Tau_byTightPileupWeightedIsolation3Hits.clear();
-  //Tau_againstMuonLoose2.clear(); // only in miniAODv1
+  Tau_byLooseCombinedIsolationDeltaBetaCorr3HitsdR03.clear();
+  Tau_byMediumCombinedIsolationDeltaBetaCorr3HitsdR03.clear();
+  Tau_byTightCombinedIsolationDeltaBetaCorr3HitsdR03.clear();
+  // iso with Old Decay Mode Reco
+  Tau_byVLooseIsolationMVArun2v1DBoldDMwLT.clear();
+  Tau_byLooseIsolationMVArun2v1DBoldDMwLT.clear();
+  Tau_byMediumIsolationMVArun2v1DBoldDMwLT.clear();
+  Tau_byTightIsolationMVArun2v1DBoldDMwLT.clear();
+  Tau_byVTightIsolationMVArun2v1DBoldDMwLT.clear();
+
+  //iso with new Decay Model Reco
+  Tau_byVLooseIsolationMVArun2v1DBnewDMwLT.clear();
+  Tau_byLooseIsolationMVArun2v1DBnewDMwLT.clear();
+  Tau_byMediumIsolationMVArun2v1DBnewDMwLT.clear();
+  Tau_byTightIsolationMVArun2v1DBnewDMwLT.clear();
+  Tau_byVTightIsolationMVArun2v1DBnewDMwLT.clear();
+
+  // iso with Delta Beta Corrections and DR = 0.3
+  Tau_byVLooseIsolationMVArun2v1DBdR03oldDMwLT.clear();
+  Tau_byLooseIsolationMVArun2v1DBdR03oldDMwLT.clear();
+  Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT.clear();
+  Tau_byTightIsolationMVArun2v1DBdR03oldDMwLT.clear();
+  Tau_byVTightIsolationMVArun2v1DBdR03oldDMwLT.clear();
+
+
   Tau_againstMuonLoose3.clear();
-  //Tau_againstMuonTight2.clear(); // only in miniAODv1
   Tau_againstMuonTight3.clear();
-  Tau_againstElectronMVAVLooseMVA5.clear();
-  Tau_againstElectronMVALooseMVA5.clear();
-  Tau_againstElectronMVAMediumMVA5.clear();
-  Tau_againstElectronMVATightMVA5.clear();
+  Tau_againstElectronMVAVLooseMVA6.clear();
+  Tau_againstElectronMVALooseMVA6.clear();
+  Tau_againstElectronMVAMediumMVA6.clear();
+  Tau_againstElectronMVATightMVA6.clear();
   Tau_leadChargedCandPt.clear();
   Tau_leadChargedCandCharge.clear();
   Tau_leadChargedCandEta.clear();
