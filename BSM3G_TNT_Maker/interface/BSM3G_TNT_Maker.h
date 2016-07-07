@@ -26,6 +26,8 @@
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/JetSelector.h"
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/PVSelector.h"
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/GenParticleSelector.h"
+#include "NtupleMaker/BSM3G_TNT_Maker/interface/GenEventWeightSelector.h"
+#include "NtupleMaker/BSM3G_TNT_Maker/interface/RunInfoSelector.h"
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/METSelector.h"
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/ElectronPatSelector.h"
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/PhotonSelector.h"
@@ -75,19 +77,23 @@ private:
   bool _filltauinfo;
   bool _filljetinfo;
   bool _fillgeninfo;
+  bool _fillruninfo;
+  bool _fillgenweightinfo;
   bool _fillPVinfo;
   bool _fillMETinfo;
   bool _fillphotoninfo;
 
-  TriggerSelector     *trselector;
-  MuonSelector        *muselector;
-  TauSelector         *tauselector;
-  JetSelector         *jetselector;
-  GenParticleSelector *genselector;
-  PVSelector          *pvselector;
-  METSelector         *metselector;
-  ElectronPatSelector *elpatselector;
-  PhotonSelector      *photonselector;
+  TriggerSelector        *trselector;
+  MuonSelector           *muselector;
+  TauSelector            *tauselector;
+  JetSelector            *jetselector;
+  GenParticleSelector    *genselector;
+  GenEventWeightSelector *genweightselector;
+  RunInfoSelector        *runinfoselector;
+  PVSelector             *pvselector;
+  METSelector            *metselector;
+  ElectronPatSelector    *elpatselector;
+  PhotonSelector         *photonselector;
 };
 
 #endif 

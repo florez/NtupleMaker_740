@@ -1,7 +1,9 @@
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/TriggerSelector.h"
 
-TriggerSelector::TriggerSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):baseTree(name,tree,debug){
-  triggerResultsTag_  = iConfig.getParameter<edm::InputTag>("triggerResults");
+TriggerSelector::TriggerSelector(std::string name, TTree* tree, bool debug, const pset& iConfig, edm::ConsumesCollector&& iCC):baseTree(name,tree,debug){
+  if(debug) std::cout << "BSM3G TNT Maker: In the TriggerSelector Constructor --> getting parameters & calling SetBranches()." << std::endl;
+  triggerResultsTag_  = iCC.consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("triggerResults"));
+  triggerPrescales_   = iCC.consumes<pat::PackedTriggerPrescales>(iConfig.getParameter<edm::InputTag>("triggerPrescales"));
   SetBranches();
 }
 
@@ -10,67 +12,45 @@ TriggerSelector::~TriggerSelector(){
 }
 
 void TriggerSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-  
-  if(debug_)    std::cout<<"getting met info"<<std::endl;
-   
   Clear();
   
-  edm::Handle<edm::TriggerResults>      triggerResultsHandle_;
-  iEvent.getByLabel(triggerResultsTag_, triggerResultsHandle_);
+  edm::Handle<edm::TriggerResults> triggerBits;
+  iEvent.getByToken(triggerResultsTag_, triggerBits); 
+  edm::Handle<pat::PackedTriggerPrescales> triggerPrescales;
+  iEvent.getByToken(triggerPrescales_, triggerPrescales);
 
-  if(triggerResultsHandle_.isValid() == true ){
-     const edm::TriggerNames vTrigNames = iEvent.triggerNames(*triggerResultsHandle_);
-     const unsigned int ntrigs = triggerResultsHandle_->size();
-     for(unsigned int u = 0; u < hltConfig_.triggerNames().size(); u++){
-       const unsigned int triggerIndex(hltConfig_.triggerIndex(hltConfig_.triggerNames().at(u)));
-       if( (ntrigs > triggerIndex) ){
-         const std::pair<std::vector<std::pair<std::string,int> >,int> prescalesInDetail(hltConfig_.prescaleValuesInDetail(iEvent,iSetup,hltConfig_.triggerNames().at(u)));
-/*
-         std::cout << "Trigger Name = " << hltConfig_.triggerNames().at(u) << ", Decision = " << triggerResultsHandle_->accept(triggerIndex) << std::endl;
-         for (unsigned int i=0; i<prescalesInDetail.first.size(); ++i) {
-           std::cout << " " << i << ":" << prescalesInDetail.first[i].first << "/" << prescalesInDetail.first[i].second << std::endl;
-         }
-         std::cout << "Trigger Name = " << hltConfig_.triggerNames().at(u) << ", Decision = " << triggerResultsHandle_->accept(triggerIndex) << ", HLT Pre-scale = " << prescalesInDetail.second << std::endl;
-*/
-         if(prescalesInDetail.second == 1) { // only keep trigger information if it's unprescaled at HLT
-//           std::cout << "Trigger Name = " << hltConfig_.triggerNames().at(u) << ", Decision = " << triggerResultsHandle_->accept(triggerIndex) << ", HLT Pre-scale = " << prescalesInDetail.second << std::endl;
-           Trigger_names.push_back(hltConfig_.triggerNames().at(u));
-           if(triggerResultsHandle_->accept(triggerIndex) ){ Trigger_decision.push_back(1); }
-           else { Trigger_decision.push_back(0); }
-         }
-       }
-     }
-  }
-/*
-  edm::Handle< std::vector<pat::TriggerPath> > triggerpaths;
-  iEvent.getByLabel("selectedPatTrigger",triggerpaths);
-  for( std::vector<pat::TriggerPath>::const_iterator tp=triggerpaths->begin(); tp!=triggerpaths->end(); ++tp ){
-    double prescalevalue = tp->prescale();
-    std::string name = tp->name();
-    float decision = tp->wasAccept();
+  if(debug_) std::cout << "     TriggerSelector: Cleared the vectors, grabbed the trigger collection handles, and looping over triggers." << std::endl;
 
-    std::cout << "Trigger Name = " << name << ", Decision = " << decision << ", Pre-scale = " << prescalevalue << std::endl;
-
-    if(prescalevalue == 1.0) {
-      Trigger_names.push_back(name);
-      Trigger_decision.push_back(decision);
+  if(triggerBits.isValid() == true ){
+    const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
+    //std::cout << "\n === TRIGGER PATHS === " << std::endl;
+    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
+      //std::cout << "Trigger " << names.triggerName(i) << ", prescale " << triggerPrescales->getPrescaleForIndex(i) << ": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)") << std::endl;
+      if(names.triggerName(i).find("HLT_") != string::npos) {
+      Trigger_names.push_back(names.triggerName(i));
+        if(triggerBits->accept(i)) { Trigger_decision.push_back(1); }
+        else { Trigger_decision.push_back(0); }
+        Trigger_prescale.push_back(triggerPrescales->getPrescaleForIndex(i));
+      }
     }
   }
-*/
-  if(debug_)    std::cout<<"got Trigger info"<<std::endl;
+
 }
 
 void TriggerSelector::SetBranches(){
-  if(debug_)    std::cout<<"setting branches: calling AddBranch of baseTree"<<std::endl;
+  if(debug_) std::cout << "     TriggerSelector: Setting branches by calling AddBranch of baseTree." << std::endl;
   
   AddBranch(&Trigger_decision,   "Trigger_decision");
   AddBranch(&Trigger_names,   "Trigger_names");
-  if(debug_)    std::cout<<"set branches"<<std::endl;
+  AddBranch(&Trigger_prescale,   "Trigger_prescale");
+
+  if(debug_) std::cout << "     TriggerSelector: Finished setting branches." << std::endl;
 }
 
 void TriggerSelector::Clear(){
   Trigger_decision.clear();
   Trigger_names.clear();  
+  Trigger_prescale.clear();
 }
 
 void TriggerSelector::startTrigger(edm::EventSetup const& iSetup, edm::Run const & iRun){

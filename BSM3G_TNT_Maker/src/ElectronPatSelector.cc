@@ -14,9 +14,11 @@ ElectronPatSelector::ElectronPatSelector(std::string name, TTree* tree, bool deb
   electronLooseIdMapToken_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronLooseIdMap"))),
   electronMediumIdMapToken_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronMediumIdMap"))),
   electronTightIdMapToken_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronTightIdMap"))),
-  eleHEEPIdMapToken_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleHEEPIdMap")))
+  eleHEEPIdMapToken_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleHEEPIdMap"))),
+  electronMVAwp1Token_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronMVA_wp1"))),
+  electronMVAwp2Token_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronMVA_wp2")))
 {
-  
+  if(debug) std::cout << "BSM3G TNT Maker: In the ElectronPatSelector Constructor --> getting parameters & calling SetBranches()." << std::endl;
   _patElectronToken      	  = iConfig.getParameter<edm::InputTag>("patElectrons");
   _vertexInputTag       	  = iConfig.getParameter<edm::InputTag>("vertices");
   _beamSpot              	  = iConfig.getParameter<edm::InputTag>("beamSpot");
@@ -36,12 +38,16 @@ ElectronPatSelector::~ElectronPatSelector(){
 
 void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
   Clear();
+
+  if(debug_) std::cout << "     ElectronPatSelector: Cleared the vectors, grabbing the electron/PV/BeamSpot collection handles." << std::endl;
   
   int elcoun = 0;
   
   // grab handle to the electron collection
   edm::Handle<edm::View<pat::Electron> > electron_pat;
   iEvent.getByLabel(_patElectronToken, electron_pat);
+
+  if(debug_) std::cout << "     ElectronPatSelector: Looping over PVs to extract the position of the best PV." << std::endl;
 
   // grab handle to the vertex collection
   edm::Handle<reco::VertexCollection> vtx;
@@ -56,6 +62,8 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
   if (firstGoodVertex == vtx->end()) return; // skip event if there are no good PVs
   GlobalPoint thepv(firstGoodVertex->position().x(),firstGoodVertex->position().y(),firstGoodVertex->position().z());
 
+  if(debug_) std::cout << "     ElectronPatSelector: Extracting the beamspot position." << std::endl;
+
   // Get BeamSpot Information
   reco::BeamSpot beamSpot;
   edm::Handle<reco::BeamSpot> beamSpotHandle;
@@ -65,39 +73,42 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
   math::XYZPoint point(beamSpot.x0(),beamSpot.y0(), beamSpot.z0());
   GlobalPoint thebs(beamSpot.x0(),beamSpot.y0(),beamSpot.z0());
 
+  if(debug_) std::cout << "     ElectronPatSelector: Grabbing the electron ID value maps." << std::endl;
+
   // Get electron ID value maps
   edm::Handle<edm::ValueMap<bool> > veto_id_decisions;
   edm::Handle<edm::ValueMap<bool> > loose_id_decisions;
   edm::Handle<edm::ValueMap<bool> > medium_id_decisions;
   edm::Handle<edm::ValueMap<bool> > tight_id_decisions;
   edm::Handle<edm::ValueMap<bool> > heep_id_decisions;
+  edm::Handle<edm::ValueMap<bool> > mva_wp1_id_decisions;
+  edm::Handle<edm::ValueMap<bool> > mva_wp2_id_decisions;
   iEvent.getByToken(electronVetoIdMapToken_,veto_id_decisions);
   iEvent.getByToken(electronLooseIdMapToken_,loose_id_decisions);
   iEvent.getByToken(electronMediumIdMapToken_,medium_id_decisions);
   iEvent.getByToken(electronTightIdMapToken_,tight_id_decisions);  
   iEvent.getByToken(eleHEEPIdMapToken_, heep_id_decisions);
-
-  // get magnetic field and detector geometry information --> used to build transient tracks
-//  edm::ESHandle<MagneticField> magfield;
-//  iSetup.get<IdealMagneticFieldRecord>().get(magfield);
-//  edm::ESHandle<GlobalTrackingGeometry> theTrackingGeometry;
-//  iSetup.get<GlobalTrackingGeometryRecord>().get(theTrackingGeometry);
+  iEvent.getByToken(electronMVAwp1Token_, mva_wp1_id_decisions);
+  iEvent.getByToken(electronMVAwp2Token_, mva_wp2_id_decisions);
 
   edm::ESHandle<TransientTrackBuilder> theB;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
 
+  if(debug_) std::cout << "     ElectronPatSelector: Looping over electrons." << std::endl;
+
   // loop over electrons
-  //int nElec=0;
+  int nElec=0;
   for(edm::View<pat::Electron>::const_iterator el = electron_pat->begin(); el != electron_pat->end(); el++) {
-    //nElec++;
-    //std::cout << "Elec #" << nElec << ": pt = " << el->pt() << ", eta = " << el->eta() << ", gsfTrackIsNonnull = " << el->gsfTrack().isNonnull() << ", trackIsNonnull = " << el->closestCtfTrackRef().isNonnull() << std::endl;
+    nElec++;
+
+    if(debug_) std::cout << "          Electron info: Elec #" << nElec << ": pt = " << el->pt() << ", eta = " << el->eta() << ", gsfTrackIsNonnull = " << el->gsfTrack().isNonnull() << ", trackIsNonnull = " << el->closestCtfTrackRef().isNonnull() << std::endl;
 
     if (el->pt() < _patElectron_pt_min) continue;
     if (fabs(el->eta()) > _patElectron_eta_max) continue;  
     if (!(el->gsfTrack().isNonnull())) continue;
     if (!(el->closestCtfTrackRef().isNonnull())) continue;
 
-    //std::cout << "PASSED KINEMATIC CUTS & ISNONNULL CUTS" << std::endl;
+    if(debug_) std::cout << "          Electron info: Elec #" << nElec << " passed kinematic cuts & isNonNull cuts" << std::endl;
 
     // fill root tree with "necessary" information:  kinematics, ID, isolation
     patElectron_pt.push_back(el->pt());
@@ -114,13 +125,16 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
     bool isPassMedium = (*medium_id_decisions)[ elPtr ];
     bool isPassTight  = (*tight_id_decisions)[ elPtr ];
     bool isHEEPId     = (*heep_id_decisions)[ elPtr ];
- 
+    bool isMVAwp1     = (*mva_wp1_id_decisions)[ elPtr ];
+    bool isMVAwp2     = (*mva_wp2_id_decisions)[ elPtr ]; 
+
     passVetoId_.push_back( isPassVeto );
     passLooseId_.push_back( isPassLoose );
     passMediumId_.push_back( isPassMedium );
     passTightId_.push_back( isPassTight );
     passHEEPId_.push_back( isHEEPId );   
-
+    passMVAwp1Id_.push_back(isMVAwp1);
+    passMVAwp2Id_.push_back(isMVAwp2);
     // Isolation
     reco::GsfElectron::PflowIsolationVariables pfIso = el->pfIsolationVariables();
     // Compute isolation with delta beta correction for PU
@@ -151,7 +165,6 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
       // point of closest approach (PCA) to the beamspot and primary vertex
       TransientTrack elecTransTkPtr = theB->build(*(el->closestCtfTrackRef()));
 //      TransientTrack elecTransTkPtr = theB->build(*(el->gsfTrack()));
-//      TransientTrack elecTransTkPtr(*(el->gsfTrack()), magfield.product(),theTrackingGeometry);
       GlobalPoint patElectron_pca_bs = elecTransTkPtr.trajectoryStateClosestToPoint(thebs).position();
 //      GlobalPoint patElectron_pca_bs(el->TrackPositionAtVtx().X(), el->TrackPositionAtVtx().Y(),el->TrackPositionAtVtx().Z());
       GlobalPoint patElectron_pca_pv = elecTransTkPtr.trajectoryStateClosestToPoint(thepv).position();
@@ -184,7 +197,7 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
 }
 
 void ElectronPatSelector::SetBranches(){
-  if(debug_)    std::cout<<"setting branches: calling AddBranch of baseTree"<<std::endl;
+  if(debug_) std::cout << "     ElectronPatSelector: Setting branches by calling AddBranch of baseTree." << std::endl;
   
   AddBranch(&patElectron_pt                ,"patElectron_pt");
   AddBranch(&patElectron_eta               ,"patElectron_eta");
@@ -196,6 +209,8 @@ void ElectronPatSelector::SetBranches(){
   AddBranch(&passMediumId_                 ,"patElectron_isPassMedium");
   AddBranch(&passTightId_                  ,"patElectron_isPassTight");
   AddBranch(&passHEEPId_                   ,"patElectron_isPassHEEPId");
+  AddBranch(&passMVAwp1Id_                 ,"patElectron_passMV1wp1Id");
+  AddBranch(&passMVAwp2Id_                 ,"patElectron_passMV2wp1Id");
   AddBranch(&isoChargedHadrons_            ,"patElectron_isoChargedHadrons");
   AddBranch(&isoNeutralHadrons_            ,"patElectron_isoNeutralHadrons");
   AddBranch(&isoPhotons_                   ,"patElectron_isoPhotons");
@@ -227,7 +242,8 @@ void ElectronPatSelector::SetBranches(){
     AddBranch(&patElectron_gsfTrackFitErrorMatrix_12     ,"patElectron_gsfTrackFitErrorMatrix_12");
     AddBranch(&patElectron_gsfTrackFitErrorMatrix_22     ,"patElectron_gsfTrackFitErrorMatrix_22");
   }
-  if(debug_)    std::cout<<"set branches"<<std::endl;
+
+  if(debug_) std::cout << "     ElectronPatSelector: Finished setting branches." << std::endl;
 }
 
 void ElectronPatSelector::Clear(){
@@ -242,6 +258,8 @@ void ElectronPatSelector::Clear(){
   passMediumId_.clear();
   passTightId_.clear();  
   passHEEPId_.clear();
+  passMVAwp1Id_.clear();
+  passMVAwp2Id_.clear();
   patElectron_gsfTrack_dxy_pv.clear();
   patElectron_gsfTrack_dxy_bs.clear();
   patElectron_dxyError.clear();
