@@ -28,8 +28,11 @@ In order to use the code you need to follow carefully these steps:
 
 5. Install and compile the code to use the MET producers (for covariance matrix):
 
-  6.1 git cms-addpkg RecoMET/METProducers
-  6.2 scram b -j 10
+  6.1 git cms-init
+  6.2 git cms-addpkg RecoMET/METProducers
+  6.3 scram b -j 10
+  6.4 git cms-merge-topic -u cms-met:CMSSW_8_0_X-METFilterUpdate
+  6.5 scram b -j 10
 
 6. Get the NTupleMaker code and compile it:
 
