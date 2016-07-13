@@ -30,6 +30,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
@@ -73,7 +75,7 @@ class JetSelector : public  baseTree{
 
 public:
 
-  JetSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg);
+  JetSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg, edm::ConsumesCollector&& icc);
   ~JetSelector();
   void Fill(const edm::Event& iEvent);
   void SetBranches();
@@ -100,9 +102,13 @@ public:
 
   bool _super_TNT;
   // Jet cuts
-  edm::InputTag jetToken_;
-  edm::InputTag puppi_jetToken_;
-  edm::InputTag _vertexInputTag;
+//  edm::InputTag jetToken_;
+//  edm::InputTag puppi_jetToken_;
+//  edm::InputTag _vertexInputTag;
+  edm::EDGetTokenT<pat::JetCollection> jetToken_;
+  edm::EDGetTokenT<pat::JetCollection> puppi_jetToken_;
+  edm::EDGetTokenT<reco::VertexCollection> _vertexInputTag;
+
   double _Jet_pt_min;
 };
 

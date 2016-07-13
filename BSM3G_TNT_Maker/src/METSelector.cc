@@ -4,11 +4,15 @@
 
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/METSelector.h"
 
-METSelector::METSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):baseTree(name,tree,debug){
+METSelector::METSelector(std::string name, TTree* tree, bool debug, const pset& iConfig, edm::ConsumesCollector&& iCC):baseTree(name,tree,debug){
   if(debug) std::cout << "BSM3G TNT Maker: In the METSelector Constructor --> getting parameters & calling SetBranches()." << std::endl;
-  metToken_ = iConfig.getParameter<edm::InputTag>("mets");
-  puppi_metToken_ = iConfig.getParameter<edm::InputTag>("metsPUPPI");
-  metNoHFToken_ = iConfig.getParameter<edm::InputTag>("metsNoHF");
+//  metToken_ = iConfig.getParameter<edm::InputTag>("mets");
+  metToken_               = iCC.consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("mets"));
+//  puppi_metToken_ = iConfig.getParameter<edm::InputTag>("metsPUPPI");
+  puppi_metToken_               = iCC.consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("metsPUPPI"));
+//  metNoHFToken_ = iConfig.getParameter<edm::InputTag>("metsNoHF");
+  metNoHFToken_               = iCC.consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("metsNoHF"));
+  metCovToken_               = iCC.consumes<ROOT::Math::SMatrix<double,2,2,ROOT::Math::MatRepSym<double,2> > >(iConfig.getParameter<edm::InputTag>("metsCov"));
   _is_data   = iConfig.getParameter<bool>("is_data");
   _super_TNT = iConfig.getParameter<bool>("super_TNT");
   SetBranches();
@@ -23,16 +27,20 @@ void METSelector::Fill(const edm::Event& iEvent){
   
   // grab handle to the met collections
   edm::Handle<pat::METCollection> mets;
-  iEvent.getByLabel(metToken_, mets);
+//  iEvent.getByLabel(metToken_, mets);
+  iEvent.getByToken(metToken_, mets);
   const pat::MET &met = mets->front();
   edm::Handle<pat::METCollection> puppimets;
-  iEvent.getByLabel(puppi_metToken_, puppimets);
+//  iEvent.getByLabel(puppi_metToken_, puppimets);
+  iEvent.getByToken(puppi_metToken_, puppimets);
   const pat::MET &puppimet = puppimets->front();
   edm::Handle<pat::METCollection> metsNoHF;
-  iEvent.getByLabel(metNoHFToken_, metsNoHF);
+//  iEvent.getByLabel(metNoHFToken_, metsNoHF);
+  iEvent.getByToken(metNoHFToken_, metsNoHF);
   const pat::MET &metNoHF = metsNoHF->front();
   edm::Handle<ROOT::Math::SMatrix<double,2,2,ROOT::Math::MatRepSym<double,2> > > metCov;
-  iEvent.getByLabel("METSignificance","METCovariance", metCov);
+//  iEvent.getByLabel("METSignificance","METCovariance", metCov);
+  iEvent.getByToken(metCovToken_, metCov);
   AlgebraicSymMatrix22 metCovMatrix = *(metCov.product());
 
   if(debug_) std::cout << "     METSelector: Cleared the vectors, grabbed the met collection handles, and extracting met values." << std::endl;

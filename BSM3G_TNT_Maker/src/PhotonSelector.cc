@@ -1,8 +1,9 @@
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/PhotonSelector.h"
 
-PhotonSelector::PhotonSelector(std::string name, TTree* tree, bool debug, const pset& iConfig): baseTree(name,tree,debug){
+PhotonSelector::PhotonSelector(std::string name, TTree* tree, bool debug, const pset& iConfig, edm::ConsumesCollector&& iCC): baseTree(name,tree,debug){
   if(debug) std::cout << "BSM3G TNT Maker: In the PhotonSelector Constructor --> getting parameters & calling SetBranches()." << std::endl;
-  _PhotonToken      = iConfig.getParameter<edm::InputTag>("photons");
+//  _PhotonToken      = iConfig.getParameter<edm::InputTag>("photons");
+  _PhotonToken      = iCC.consumes<edm::View<pat::Photon> >(iConfig.getParameter<edm::InputTag>("photons"));
   _Photon_pt_min    = iConfig.getParameter<double>("Photon_pt_min");
   _Photon_eta_max   = iConfig.getParameter<double>("Photon_eta_max");
   SetBranches();
@@ -16,7 +17,8 @@ void PhotonSelector::Fill(const edm::Event& iEvent){
   Clear();
   
   edm::Handle<edm::View<pat::Photon> > photon_handle;
-  iEvent.getByLabel(_PhotonToken, photon_handle);
+//  iEvent.getByLabel(_PhotonToken, photon_handle);
+  iEvent.getByToken(_PhotonToken, photon_handle);
 
   if(debug_) std::cout << "     PhotonSelector: Cleared the vectors, grabbed the photon collection handle, and looping over photons." << std::endl;
  

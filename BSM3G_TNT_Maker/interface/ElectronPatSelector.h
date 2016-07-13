@@ -33,6 +33,7 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
@@ -105,9 +106,12 @@ public:
   bool _super_TNT;
  
   // confit variables
-  edm::InputTag _patElectronToken;
-  edm::InputTag _vertexInputTag;
-  edm::InputTag _beamSpot;
+//  edm::InputTag _patElectronToken;
+  edm::EDGetTokenT<edm::View<pat::Electron> > _patElectronToken;
+//  edm::InputTag _vertexInputTag;
+//  edm::InputTag _beamSpot;
+  edm::EDGetTokenT<reco::VertexCollection> _vertexInputTag;
+  edm::EDGetTokenT<reco::BeamSpot> _beamSpot;
   double _patElectron_pt_min;
   double _patElectron_eta_max;
   int _patElectron_vtx_ndof_min;

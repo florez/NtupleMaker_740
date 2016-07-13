@@ -8,11 +8,14 @@ using namespace edm;
 using namespace std;
 using namespace reco;
 
-MuonSelector::MuonSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):baseTree(name,tree,debug){
+MuonSelector::MuonSelector(std::string name, TTree* tree, bool debug, const pset& iConfig, edm::ConsumesCollector&& iCC):baseTree(name,tree,debug){
   if(debug) std::cout << "BSM3G TNT Maker: In the MuonSelector Constructor --> getting parameters & calling SetBranches()." << std::endl;
-  _muonToken               = iConfig.getParameter<edm::InputTag>("muons");
-  _vertexInputTag          = iConfig.getParameter<edm::InputTag>("vertices");
-  _beamSpot                = iConfig.getParameter<edm::InputTag>("beamSpot");
+//  _muonToken               = iConfig.getParameter<edm::InputTag>("muons");
+  _muonToken               = iCC.consumes<edm::View<pat::Muon> >(iConfig.getParameter<edm::InputTag>("muons"));
+//  _vertexInputTag          = iConfig.getParameter<edm::InputTag>("vertices");
+//  _beamSpot                = iConfig.getParameter<edm::InputTag>("beamSpot");
+  _vertexInputTag          = iCC.consumes<reco::VertexCollection >(iConfig.getParameter<edm::InputTag>("vertices"));
+  _beamSpot                = iCC.consumes<reco::BeamSpot >(iConfig.getParameter<edm::InputTag>("beamSpot"));
   _Muon_pt_min             = iConfig.getParameter<double>("Muon_pt_min");
   _Muon_eta_max            = iConfig.getParameter<double>("Muon_eta_max");
   _Muon_vtx_ndof_min       = iConfig.getParameter<int>("Muon_vtx_ndof_min");
@@ -35,13 +38,15 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // grab handle to the muon collection  
   edm::Handle<edm::View<pat::Muon> > muon_h;
-  iEvent.getByLabel(_muonToken, muon_h);
+//  iEvent.getByLabel(_muonToken, muon_h);
+  iEvent.getByToken(_muonToken, muon_h);
 
   if(debug_) std::cout << "     MuonSelector: Looping over PVs to extract the position of the best PV." << std::endl;
   
   // grab handle to the vertex collection
   edm::Handle<reco::VertexCollection> vtx_h;
-  iEvent.getByLabel(_vertexInputTag, vtx_h);
+//  iEvent.getByLabel(_vertexInputTag, vtx_h);
+  iEvent.getByToken(_vertexInputTag, vtx_h);
   reco::VertexCollection::const_iterator firstGoodVertex = vtx_h->end();
   for (reco::VertexCollection::const_iterator it = vtx_h->begin(); it != vtx_h->end(); it++) {
     if (isGoodVertex(*it)) {
@@ -57,7 +62,8 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Get BeamSpot information
   reco::BeamSpot beamSpot;
   edm::Handle<reco::BeamSpot> beamSpotHandle;
-  iEvent.getByLabel(_beamSpot, beamSpotHandle);
+//  iEvent.getByLabel(_beamSpot, beamSpotHandle);
+  iEvent.getByToken(_beamSpot, beamSpotHandle);
   if ( beamSpotHandle.isValid() ) { beamSpot = *beamSpotHandle; }
   else { edm::LogInfo("MyAnalyzer") << "No beam spot available from EventSetup \n"; }
   math::XYZPoint point(beamSpot.x0(),beamSpot.y0(), beamSpot.z0());

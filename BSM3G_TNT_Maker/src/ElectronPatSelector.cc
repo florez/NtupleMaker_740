@@ -19,9 +19,12 @@ ElectronPatSelector::ElectronPatSelector(std::string name, TTree* tree, bool deb
   electronMVAwp2Token_(ic.consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("electronMVA_wp2")))
 {
   if(debug) std::cout << "BSM3G TNT Maker: In the ElectronPatSelector Constructor --> getting parameters & calling SetBranches()." << std::endl;
-  _patElectronToken      	  = iConfig.getParameter<edm::InputTag>("patElectrons");
-  _vertexInputTag       	  = iConfig.getParameter<edm::InputTag>("vertices");
-  _beamSpot              	  = iConfig.getParameter<edm::InputTag>("beamSpot");
+//  _patElectronToken      	  = iConfig.getParameter<edm::InputTag>("patElectrons");
+  _patElectronToken               = ic.consumes<edm::View<pat::Electron> >(iConfig.getParameter<edm::InputTag>("patElectrons"));
+//  _vertexInputTag       	  = iConfig.getParameter<edm::InputTag>("vertices");
+  _vertexInputTag                 = ic.consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"));
+//  _beamSpot              	  = iConfig.getParameter<edm::InputTag>("beamSpot");
+  _beamSpot                       = ic.consumes<reco::BeamSpot >(iConfig.getParameter<edm::InputTag>("beamSpot"));
   _patElectron_pt_min    	  = iConfig.getParameter<double>("patElectron_pt_min");
   _patElectron_eta_max   	  = iConfig.getParameter<double>("patElectron_eta_max");
   _patElectron_vtx_ndof_min       = iConfig.getParameter<int>("patElectron_vtx_ndof_min");
@@ -45,13 +48,15 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
   
   // grab handle to the electron collection
   edm::Handle<edm::View<pat::Electron> > electron_pat;
-  iEvent.getByLabel(_patElectronToken, electron_pat);
+//  iEvent.getByLabel(_patElectronToken, electron_pat);
+  iEvent.getByToken(_patElectronToken, electron_pat);
 
   if(debug_) std::cout << "     ElectronPatSelector: Looping over PVs to extract the position of the best PV." << std::endl;
 
   // grab handle to the vertex collection
   edm::Handle<reco::VertexCollection> vtx;
-  iEvent.getByLabel(_vertexInputTag, vtx);
+//  iEvent.getByLabel(_vertexInputTag, vtx);
+  iEvent.getByToken(_vertexInputTag, vtx);
   reco::VertexCollection::const_iterator firstGoodVertex = vtx->end();
   for (reco::VertexCollection::const_iterator it = vtx->begin(); it != vtx->end(); it++) {
     if (isGoodVertex(*it)) {
@@ -67,7 +72,8 @@ void ElectronPatSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& 
   // Get BeamSpot Information
   reco::BeamSpot beamSpot;
   edm::Handle<reco::BeamSpot> beamSpotHandle;
-  iEvent.getByLabel(_beamSpot, beamSpotHandle);
+//  iEvent.getByLabel(_beamSpot, beamSpotHandle);
+  iEvent.getByToken(_beamSpot, beamSpotHandle);
   if ( beamSpotHandle.isValid() ) { beamSpot = *beamSpotHandle; }
   else { edm::LogInfo("MyAnalyzer") << "No beam spot available from EventSetup \n"; }
   math::XYZPoint point(beamSpot.x0(),beamSpot.y0(), beamSpot.z0());

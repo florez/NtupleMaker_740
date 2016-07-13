@@ -31,6 +31,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
@@ -70,7 +72,7 @@ class MuonSelector : public  baseTree{
 
 public:
 
-  MuonSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg);
+  MuonSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg, edm::ConsumesCollector&& icc);
   ~MuonSelector();
   void Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   void SetBranches();
@@ -100,9 +102,13 @@ private:
   bool _super_TNT;
 
   // confit variables
-  edm::InputTag _muonToken;
-  edm::InputTag _vertexInputTag;
-  edm::InputTag _beamSpot; 
+//  edm::InputTag _muonToken;
+  edm::EDGetTokenT<edm::View<pat::Muon> > _muonToken;
+//  edm::InputTag _vertexInputTag;
+//  edm::InputTag _beamSpot; 
+  edm::EDGetTokenT<reco::VertexCollection> _vertexInputTag;
+  edm::EDGetTokenT<reco::BeamSpot> _beamSpot;
+
   double _Muon_pt_min;
   double _Muon_eta_max;
   int _Muon_vtx_ndof_min;

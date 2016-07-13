@@ -1,10 +1,13 @@
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/PVSelector.h"
 
-PVSelector::PVSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):baseTree(name,tree,debug) {
+PVSelector::PVSelector(std::string name, TTree* tree, bool debug, const pset& iConfig, edm::ConsumesCollector&& iCC):baseTree(name,tree,debug) {
   if(debug) std::cout << "BSM3G TNT Maker: In the PVSelector Constructor --> getting parameters & calling SetBranches()." << std::endl;
-  _vertexInputTag               = iConfig.getParameter<edm::InputTag>("vertices");
-  _beamSpot        		= iConfig.getParameter<edm::InputTag>("beamSpot");
-  _pileupInfoSrc 		= iConfig.getParameter<edm::InputTag>("pileupInfo");
+//  _vertexInputTag               = iConfig.getParameter<edm::InputTag>("vertices");
+  _vertexInputTag               = iCC.consumes<reco::VertexCollection >(iConfig.getParameter<edm::InputTag>("vertices"));
+//  _beamSpot        		= iConfig.getParameter<edm::InputTag>("beamSpot");
+  _beamSpot                     = iCC.consumes<reco::BeamSpot >(iConfig.getParameter<edm::InputTag>("beamSpot"));
+//  _pileupInfoSrc 		= iConfig.getParameter<edm::InputTag>("pileupInfo");
+  _pileupInfoSrc                = iCC.consumes<std::vector< PileupSummaryInfo > >(iConfig.getParameter<edm::InputTag>("pileupInfo"));
   _Pvtx_ndof_min   		= iConfig.getParameter<double>("Pvtx_ndof_min");
   _Pvtx_vtx_max    		= iConfig.getParameter<double>("Pvtx_vtx_max");
   _Pvtx_vtxdxy_max 		= iConfig.getParameter<double>("Pvtx_vtxdxy_max");
@@ -24,7 +27,8 @@ void PVSelector::Fill(const edm::Event& iEvent) {
 
   // grab the user defined vertex collection
   edm::Handle<reco::VertexCollection> vtx;
-  iEvent.getByLabel(_vertexInputTag,vtx);
+//  iEvent.getByLabel(_vertexInputTag,vtx);
+  iEvent.getByToken(_vertexInputTag,vtx);
 
   if(debug_) std::cout << "     PVSelector: Cleared the vectors, grabbed the vertex collection handle, and looping over PVs." << std::endl;
   
@@ -53,7 +57,8 @@ void PVSelector::Fill(const edm::Event& iEvent) {
  
   if(!_is_data) {
     Handle<std::vector< PileupSummaryInfo > > PupInfo;
-    iEvent.getByLabel(_pileupInfoSrc, PupInfo); 
+//    iEvent.getByLabel(_pileupInfoSrc, PupInfo); 
+    iEvent.getByToken(_pileupInfoSrc, PupInfo); 
 
     if(debug_) std::cout << "     PVSelector: Grabbed the Pileup collection handle, looping over bunch crossings, and extracting in-time and out-of-time PU info." << std::endl;
 
@@ -74,7 +79,8 @@ void PVSelector::Fill(const edm::Event& iEvent) {
 
   reco::BeamSpot beamSpot;
   edm::Handle<reco::BeamSpot> beamSpotHandle;
-  iEvent.getByLabel(_beamSpot, beamSpotHandle);
+//  iEvent.getByLabel(_beamSpot, beamSpotHandle);
+  iEvent.getByToken(_beamSpot, beamSpotHandle);
 
   if(beamSpotHandle.isValid()) {
     beamSpot = *beamSpotHandle;

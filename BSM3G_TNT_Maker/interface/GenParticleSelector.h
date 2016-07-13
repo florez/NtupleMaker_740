@@ -15,6 +15,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "FWCore/Utilities/interface/Exception.h"
 #include "FWCore/Framework/interface/ESHandle.h"
@@ -97,7 +99,7 @@ using namespace edm;
 class GenParticleSelector : public baseTree{
 
  public:
-  GenParticleSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg);
+  GenParticleSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg, edm::ConsumesCollector&& icc);
   ~GenParticleSelector();
   void Fill(const edm::Event& iEvent);
   void SetBranches();
@@ -107,6 +109,7 @@ class GenParticleSelector : public baseTree{
   GenParticleSelector(){};
 
   bool   _is_data;
+  edm::EDGetTokenT<reco::GenParticleCollection> genToken_;
 
  //variables which would become branches
  vector <double> Gen_pt, Gen_eta, Gen_phi, Gen_status, Gen_pdg_id, Gen_motherpdg_id;

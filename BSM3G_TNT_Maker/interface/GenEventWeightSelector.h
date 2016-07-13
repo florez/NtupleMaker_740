@@ -15,6 +15,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "FWCore/Utilities/interface/Exception.h"
 #include "FWCore/Framework/interface/ESHandle.h"
@@ -97,7 +99,7 @@ using namespace edm;
 class GenEventWeightSelector : public baseTree{
 
  public:
-  GenEventWeightSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg);
+  GenEventWeightSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg, edm::ConsumesCollector&& icc);
   ~GenEventWeightSelector();
   void Fill(const edm::Event& iEvent);
   void SetBranches();
@@ -107,6 +109,7 @@ class GenEventWeightSelector : public baseTree{
   GenEventWeightSelector(){};
 
   bool   _is_data;
+  edm::EDGetTokenT<GenEventInfoProduct> generatorToken_;
 
  //variables which would become branches
  double weightevt;

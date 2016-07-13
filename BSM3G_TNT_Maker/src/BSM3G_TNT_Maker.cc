@@ -28,16 +28,16 @@ BSM3G_TNT_Maker::BSM3G_TNT_Maker(const edm::ParameterSet& iConfig):
   tree_ = fs->make<TTree>("BOOM","BOOM");
 
   if( _filltriggerinfo)      trselector        = new TriggerSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
-  if( _fillmuoninfo)         muselector        = new MuonSelector("miniAOD", tree_, debug_, iConfig);
+  if( _fillmuoninfo)         muselector        = new MuonSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
   if( _fillelectronpatinfo)  elpatselector     = new ElectronPatSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
-  if( _filltauinfo)          tauselector       = new TauSelector("miniAOD", tree_, debug_, iConfig);
-  if( _filljetinfo)          jetselector       = new JetSelector("miniAOD", tree_, debug_, iConfig);
-  if( _fillgeninfo)          genselector       = new GenParticleSelector("miniAOD", tree_, debug_, iConfig);
-  if( _fillgenweightinfo)    genweightselector = new GenEventWeightSelector("miniAOD", tree_, debug_, iConfig);
+  if( _filltauinfo)          tauselector       = new TauSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
+  if( _filljetinfo)          jetselector       = new JetSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
+  if( _fillgeninfo)          genselector       = new GenParticleSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
+  if( _fillgenweightinfo)    genweightselector = new GenEventWeightSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
   if( _fillruninfo)          runinfoselector   = new RunInfoSelector("miniAOD", tree_, debug_, iConfig);
-  if( _fillPVinfo)           pvselector        = new PVSelector("miniAOD", tree_, debug_, iConfig);
-  if( _fillMETinfo)          metselector       = new METSelector("miniAOD", tree_, debug_, iConfig);
-  if(_fillphotoninfo)        photonselector    = new PhotonSelector("miniAOD", tree_, debug_, iConfig); 
+  if( _fillPVinfo)           pvselector        = new PVSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
+  if( _fillMETinfo)          metselector       = new METSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
+  if(_fillphotoninfo)        photonselector    = new PhotonSelector("miniAOD", tree_, debug_, iConfig, consumesCollector()); 
 }
 
 

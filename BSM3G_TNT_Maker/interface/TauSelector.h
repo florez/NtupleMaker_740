@@ -31,6 +31,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
@@ -81,7 +83,7 @@ class TauSelector : public baseTree{
 
 public:
 
-  TauSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg);
+  TauSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg, edm::ConsumesCollector&& icc);
   ~TauSelector();
   void Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   void SetBranches();
@@ -119,10 +121,14 @@ private:
   vector<double> Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits;
 
   // config variables
-  edm::InputTag tauToken_;
-  edm::InputTag packedPFCandidateToken_;
-  edm::InputTag _vertexInputTag;
-  edm::InputTag _beamSpot;
+//  edm::InputTag tauToken_;
+//  edm::InputTag packedPFCandidateToken_;
+//  edm::InputTag _vertexInputTag;
+//  edm::InputTag _beamSpot;
+  edm::EDGetTokenT<edm::View<pat::Tau> > tauToken_;
+  edm::EDGetTokenT<pat::PackedCandidateCollection> packedPFCandidateToken_;
+  edm::EDGetTokenT<reco::VertexCollection> _vertexInputTag;
+  edm::EDGetTokenT<reco::BeamSpot> _beamSpot;
 
   double _Tau_pt_min;
   double _Tau_eta_max;

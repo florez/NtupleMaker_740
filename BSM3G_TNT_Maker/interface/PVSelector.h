@@ -14,6 +14,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "Geometry/Records/interface/GlobalTrackingGeometryRecord.h"   
 #include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
@@ -98,7 +100,7 @@ using namespace edm;
 class PVSelector : public baseTree{
 
  public:
-  PVSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg);
+  PVSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg, edm::ConsumesCollector&& icc);
   ~PVSelector();
   void Fill(const edm::Event& iEvent);
   void SetBranches();
@@ -106,9 +108,12 @@ class PVSelector : public baseTree{
 
  private:
   PVSelector(){};
-  edm::InputTag _pileupInfoSrc;
-  edm::InputTag _beamSpot;
-  edm::InputTag _vertexInputTag;
+//  edm::InputTag _pileupInfoSrc;
+//  edm::InputTag _beamSpot;
+//  edm::InputTag _vertexInputTag;
+  edm::EDGetTokenT<reco::VertexCollection> _vertexInputTag;
+  edm::EDGetTokenT<reco::BeamSpot> _beamSpot;
+  edm::EDGetTokenT<std::vector< PileupSummaryInfo > > _pileupInfoSrc;
 
   // variables which will become branches
   int nBestVtx;

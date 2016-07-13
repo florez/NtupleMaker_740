@@ -8,12 +8,16 @@ using namespace edm;
 using namespace std;
 using namespace reco;
 
-TauSelector::TauSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):baseTree(name,tree,debug) {
+TauSelector::TauSelector(std::string name, TTree* tree, bool debug, const pset& iConfig, edm::ConsumesCollector&& iCC):baseTree(name,tree,debug) {
   if(debug) std::cout << "BSM3G TNT Maker: In the TauSelector Constructor --> getting parameters & calling SetBranches()." << std::endl;
-  tauToken_       		= iConfig.getParameter<edm::InputTag>("taus");
-  packedPFCandidateToken_       = iConfig.getParameter<edm::InputTag>("packedPFCandidates");
-  _vertexInputTag 		= iConfig.getParameter<edm::InputTag>("vertices");
-  _beamSpot                	= iConfig.getParameter<edm::InputTag>("beamSpot");
+//  tauToken_       		= iConfig.getParameter<edm::InputTag>("taus");
+  tauToken_                     = iCC.consumes<edm::View<pat::Tau> >(iConfig.getParameter<edm::InputTag>("taus"));
+//  packedPFCandidateToken_       = iConfig.getParameter<edm::InputTag>("packedPFCandidates");
+  packedPFCandidateToken_       = iCC.consumes<pat::PackedCandidateCollection>(iConfig.getParameter<edm::InputTag>("packedPFCandidates"));
+//  _vertexInputTag 		= iConfig.getParameter<edm::InputTag>("vertices");
+//  _beamSpot                	= iConfig.getParameter<edm::InputTag>("beamSpot");
+  _vertexInputTag               = iCC.consumes<reco::VertexCollection >(iConfig.getParameter<edm::InputTag>("vertices"));
+  _beamSpot                     = iCC.consumes<reco::BeamSpot >(iConfig.getParameter<edm::InputTag>("beamSpot"));
   _Tau_pt_min     		= iConfig.getParameter<double>("Tau_pt_min");
   _Tau_eta_max    		= iConfig.getParameter<double>("Tau_eta_max");
   _Tau_vtx_ndof_min       	= iConfig.getParameter<int>("Tau_vtx_ndof_min");
@@ -36,18 +40,21 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
   // grab handle to the tau collection
   edm::Handle<edm::View<pat::Tau> > taus;
-  iEvent.getByLabel(tauToken_, taus);
+//  iEvent.getByLabel(tauToken_, taus);
+  iEvent.getByToken(tauToken_, taus);
 
   if(debug_) std::cout << "     TauSelector: Looping over PVs to extract the position of the best PV." << std::endl;
 
   // grab handle to the packed pf candidate collection
   edm::Handle<pat::PackedCandidateCollection> pfs;
   //iEvent.getByLabel("packedPFCandidates", pfs);
-  iEvent.getByLabel(packedPFCandidateToken_, pfs);
+//  iEvent.getByLabel(packedPFCandidateToken_, pfs);
+  iEvent.getByToken(packedPFCandidateToken_, pfs);
 
   // grab handle to the vertex collection
   edm::Handle<reco::VertexCollection> vtx;
-  iEvent.getByLabel(_vertexInputTag, vtx);
+//  iEvent.getByLabel(_vertexInputTag, vtx);
+  iEvent.getByToken(_vertexInputTag, vtx);
   reco::VertexCollection::const_iterator firstGoodVertex = vtx->end();
   for (reco::VertexCollection::const_iterator it = vtx->begin(); it != vtx->end(); it++) {
     if (isGoodVertex(*it)) {
@@ -63,7 +70,8 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
   // Get BeamSpot Information
   reco::BeamSpot beamSpot;
   edm::Handle<reco::BeamSpot> beamSpotHandle;
-  iEvent.getByLabel(_beamSpot, beamSpotHandle);
+//  iEvent.getByLabel(_beamSpot, beamSpotHandle);
+  iEvent.getByToken(_beamSpot, beamSpotHandle);
   if ( beamSpotHandle.isValid() ) { beamSpot = *beamSpotHandle; }
   else { edm::LogInfo("MyAnalyzer") << "No beam spot available from EventSetup \n"; }
   math::XYZPoint point(beamSpot.x0(),beamSpot.y0(), beamSpot.z0());
@@ -125,7 +133,7 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
     Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits.push_back(tau->tauID("byCombinedIsolationDeltaBetaCorrRaw3Hits"));
 
     // tau id. discriminators
-    Tau_decayModeFinding.push_back(tau->tauID("decayModeFindingOldDMs"));
+    Tau_decayModeFinding.push_back(tau->tauID("decayModeFinding"));
     Tau_decayModeFindingNewDMs.push_back(tau->tauID("decayModeFindingNewDMs"));
     //CombinedIsolationDeltaBetaCorr3Hits
     Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits"));
@@ -133,9 +141,9 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
     Tau_byTightCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byTightCombinedIsolationDeltaBetaCorr3Hits")); 
 
     //CombinedIsolationDeltaBetaCorr3Hits DR = 0.3
-    Tau_byLooseCombinedIsolationDeltaBetaCorr3HitsdR03.push_back(tau->tauID("byLooseCombinedIsolationDeltaBetaCorr3HitsdR03"));
-    Tau_byMediumCombinedIsolationDeltaBetaCorr3HitsdR03.push_back(tau->tauID("byMediumCombinedIsolationDeltaBetaCorr3HitsdR03"));
-    Tau_byTightCombinedIsolationDeltaBetaCorr3HitsdR03.push_back(tau->tauID("byTightCombinedIsolationDeltaBetaCorr3HitsdR03"));
+    //Tau_byLooseCombinedIsolationDeltaBetaCorr3HitsdR03.push_back(tau->tauID("byLooseCombinedIsolationDeltaBetaCorr3HitsdR03"));
+    //Tau_byMediumCombinedIsolationDeltaBetaCorr3HitsdR03.push_back(tau->tauID("byMediumCombinedIsolationDeltaBetaCorr3HitsdR03"));
+    //Tau_byTightCombinedIsolationDeltaBetaCorr3HitsdR03.push_back(tau->tauID("byTightCombinedIsolationDeltaBetaCorr3HitsdR03"));
  
     // Iso wit Old Decay Mode reconstruction:
     Tau_byVLooseIsolationMVArun2v1DBoldDMwLT.push_back(tau->tauID("byVLooseIsolationMVArun2v1DBoldDMwLT"));
@@ -250,9 +258,9 @@ void TauSelector::SetBranches(){
   AddBranch(&Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits,    "Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits");
   AddBranch(&Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits,   "Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits");
   AddBranch(&Tau_byTightCombinedIsolationDeltaBetaCorr3Hits,    "Tau_byTightCombinedIsolationDeltaBetaCorr3Hits");
-  AddBranch(&Tau_byLooseCombinedIsolationDeltaBetaCorr3HitsdR03,"Tau_byLooseCombinedIsolationDeltaBetaCorr3HitsdR03");
-  AddBranch(&Tau_byMediumCombinedIsolationDeltaBetaCorr3HitsdR03,"Tau_byMediumCombinedIsolationDeltaBetaCorr3HitsdR03");
-  AddBranch(&Tau_byTightCombinedIsolationDeltaBetaCorr3HitsdR03, "Tau_byTightCombinedIsolationDeltaBetaCorr3HitsdR03");
+//  AddBranch(&Tau_byLooseCombinedIsolationDeltaBetaCorr3HitsdR03,"Tau_byLooseCombinedIsolationDeltaBetaCorr3HitsdR03");
+//  AddBranch(&Tau_byMediumCombinedIsolationDeltaBetaCorr3HitsdR03,"Tau_byMediumCombinedIsolationDeltaBetaCorr3HitsdR03");
+//  AddBranch(&Tau_byTightCombinedIsolationDeltaBetaCorr3HitsdR03, "Tau_byTightCombinedIsolationDeltaBetaCorr3HitsdR03");
   //Iso with Old Decay Mode reconstruction:
   AddBranch(&Tau_byVLooseIsolationMVArun2v1DBoldDMwLT,          "Tau_byVLooseIsolationMVArun2v1DBoldDMwLT");
   AddBranch(&Tau_byLooseIsolationMVArun2v1DBoldDMwLT,           "Tau_byLooseIsolationMVArun2v1DBoldDMwLT");
@@ -345,9 +353,9 @@ void TauSelector::Clear(){
   Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits.clear(); 
   Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits.clear(); 
   Tau_byTightCombinedIsolationDeltaBetaCorr3Hits.clear(); 
-  Tau_byLooseCombinedIsolationDeltaBetaCorr3HitsdR03.clear();
-  Tau_byMediumCombinedIsolationDeltaBetaCorr3HitsdR03.clear();
-  Tau_byTightCombinedIsolationDeltaBetaCorr3HitsdR03.clear();
+//  Tau_byLooseCombinedIsolationDeltaBetaCorr3HitsdR03.clear();
+//  Tau_byMediumCombinedIsolationDeltaBetaCorr3HitsdR03.clear();
+//  Tau_byTightCombinedIsolationDeltaBetaCorr3HitsdR03.clear();
   // iso with Old Decay Mode Reco
   Tau_byVLooseIsolationMVArun2v1DBoldDMwLT.clear();
   Tau_byLooseIsolationMVArun2v1DBoldDMwLT.clear();

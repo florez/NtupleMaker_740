@@ -4,8 +4,9 @@
 
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/GenParticleSelector.h"
 
-GenParticleSelector::GenParticleSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):baseTree(name,tree,debug){
+GenParticleSelector::GenParticleSelector(std::string name, TTree* tree, bool debug, const pset& iConfig, edm::ConsumesCollector&& iCC):baseTree(name,tree,debug){
   if(debug) std::cout << "BSM3G TNT Maker: In the GenParticleSelector Constructor --> calling SetBranches()." << std::endl;
+  genToken_                     = iCC.consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genparts"));
   _is_data                      = iConfig.getParameter<bool>("is_data");
   SetBranches();
 }
@@ -21,7 +22,8 @@ void GenParticleSelector::Fill(const edm::Event& iEvent){
 
     // grabbing the gen particle handle
     Handle< reco::GenParticleCollection > _Gen_collection;
-    iEvent.getByLabel("prunedGenParticles", _Gen_collection);
+//    iEvent.getByLabel(genToken_, _Gen_collection);
+    iEvent.getByToken(genToken_, _Gen_collection);
 
     if(debug_) std::cout << "     GenParticleSelector: Cleared the vectors, grabbed the vertex collection handle, and looping over gen particles." << std::endl;
 

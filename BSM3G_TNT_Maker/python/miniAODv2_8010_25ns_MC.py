@@ -33,11 +33,12 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(500) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-    '/store/mc/RunIISpring15MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/50000/00759690-D16E-E511-B29E-00261894382D.root'
+    #'/store/mc/RunIISpring16MiniAODv2/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/00000/00A945CC-6236-E611-A06B-0002C94CD11E.root'
+    '/store/mc/RunIISpring16MiniAODv2/ZprimeToTauTau_M-1750_TuneCUETP8M1_13TeV-pythia8-tauola/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/00000/02AA02E0-1843-E611-B889-00266CFEFE08.root'
   )
 )
 
@@ -46,7 +47,8 @@ from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 dataFormat = DataFormat.MiniAOD
 switchOnVIDElectronIdProducer(process, dataFormat)
 my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff',
-                 'RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff']
+                 'RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff',
+                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff']
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
@@ -80,6 +82,8 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     vertices            = cms.InputTag("offlineSlimmedPrimaryVertices"),
     beamSpot            = cms.InputTag("offlineBeamSpot"),
     pileupInfo          = cms.InputTag("slimmedAddPileupInfo"),
+    genparts		= cms.InputTag("prunedGenParticles"),
+    genweights		= cms.InputTag("generator"),
     muons               = cms.InputTag("slimmedMuons"),
     patElectrons        = cms.InputTag("slimmedElectrons"),
     taus                = cms.InputTag("slimmedTaus"),
@@ -89,6 +93,7 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     mets                = cms.InputTag("slimmedMETs"),
     metsPUPPI           = cms.InputTag("slimmedMETsPuppi"),
     metsNoHF            = cms.InputTag("slimmedMETsNoHF"),
+    metsCov             = cms.InputTag("METSignificance","METCovariance"),
     packedPFCandidates  = cms.InputTag("packedPFCandidates"),
     electronVetoIdMap   = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-veto"),
     electronLooseIdMap  = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-loose"),
@@ -133,31 +138,15 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
 
 )
 
-# filter out anomalous MET from detector noise, cosmic rays, and beam halo particles
-process.load("RecoMET.METFilters.metFilters_cff")
+# include bad muon filter
+process.load('RecoMET.METFilters.BadPFMuonFilter_cfi')
+process.BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
+process.BadPFMuonFilter.PFCandidates = cms.InputTag("packedPFCandidates")
 
-process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
-                                           vertexCollection = cms.InputTag('offlineSlimmedPrimaryVertices'),
-                                           minimumNDOF = cms.uint32(4) ,
-                                           maxAbsZ = cms.double(24),
-                                           maxd0 = cms.double(2)
-)
-
-##___________________________HCAL_Noise_Filter________________________________||
-process.load('CommonTools.RecoAlgos.HBHENoiseFilterResultProducer_cfi')
-process.HBHENoiseFilterResultProducer.minZeros = cms.int32(99999)
-process.HBHENoiseFilterResultProducer.IgnoreTS4TS5ifJetInLowBVRegion=cms.bool(False) 
-process.HBHENoiseFilterResultProducer.defaultDecision = cms.string("HBHENoiseFilterResultRun2Loose")
-
-process.ApplyBaselineHBHENoiseFilter = cms.EDFilter('BooleanFlagFilter',
-   inputLabel = cms.InputTag('HBHENoiseFilterResultProducer','HBHENoiseFilterResult'),
-   reverseDecision = cms.bool(False)
-)
-
-process.ApplyBaselineHBHEIsoNoiseFilter = cms.EDFilter('BooleanFlagFilter',
-   inputLabel = cms.InputTag('HBHENoiseFilterResultProducer','HBHEIsoNoiseFilterResult'),
-   reverseDecision = cms.bool(False)
-)
+# include bad charged hadron filter
+process.load('RecoMET.METFilters.BadChargedCandidateFilter_cfi')
+process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
+process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
 
 # met filters using triggerResults
 process.load("NtupleMaker.BSM3G_TNT_Maker.triggerReq_cfi")
@@ -166,13 +155,30 @@ process.load("NtupleMaker.BSM3G_TNT_Maker.triggerReq_cfi")
 process.load("RecoMET/METProducers.METSignificance_cfi")
 process.load("RecoMET/METProducers.METSignificanceParams_cfi")
 
-process.p = cms.Path(process.primaryVertexFilter * 
+#process.p = cms.Path(process.goodVerticesFilterRECO * 
+#                     process.CSCTightHaloFilterRECO *
+#                     process.eeBadScFilterRECO *
+#                     process.EcalDeadCellTriggerPrimitiveFilterRECO *
+#                     process.HBHENoiseFilterRECO * 
+#                     process.HBHENoiseIsoFilterRECO * 
+#		     process.BadPFMuonFilter *
+#		     process.BadChargedCandidateFilter *
+#                     process.egmGsfElectronIDSequence * 
+#                     process.METSignificance * 
+#                     process.TNT
+#)
+
+process.p = cms.Path(process.goodVerticesFilterPAT * 
                      process.CSCTightHaloFilterPAT *
                      process.eeBadScFilterPAT *
-                     process.HBHENoiseFilterResultProducer * 
-                     process.ApplyBaselineHBHENoiseFilter * 
+                     process.EcalDeadCellTriggerPrimitiveFilterPAT *
+                     process.HBHENoiseFilterPAT * 
+                     process.HBHENoiseIsoFilterPAT * 
+		     process.BadPFMuonFilter *
+		     process.BadChargedCandidateFilter *
                      process.egmGsfElectronIDSequence * 
                      process.METSignificance * 
                      process.TNT
 )
+
 #process.p = cms.Path(process.TNT)

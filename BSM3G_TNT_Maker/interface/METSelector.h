@@ -15,6 +15,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "FWCore/Utilities/interface/Exception.h"
 #include "FWCore/Framework/interface/ESHandle.h"
@@ -97,7 +99,7 @@ using namespace edm;
 class METSelector : public baseTree{
 
  public:
-  METSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg);
+  METSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg, edm::ConsumesCollector&& icc);
   ~METSelector();
   void Fill(const edm::Event& iEvent);
   void SetBranches();
@@ -106,9 +108,13 @@ class METSelector : public baseTree{
  private:
   METSelector(){};
 
-  edm::InputTag metToken_;
-  edm::InputTag puppi_metToken_;
-  edm::InputTag metNoHFToken_;
+//  edm::InputTag metToken_;
+//  edm::InputTag puppi_metToken_;
+//  edm::InputTag metNoHFToken_;
+  edm::EDGetTokenT<pat::METCollection> metToken_;
+  edm::EDGetTokenT<pat::METCollection> puppi_metToken_;
+  edm::EDGetTokenT<pat::METCollection> metNoHFToken_;
+  edm::EDGetTokenT<ROOT::Math::SMatrix<double,2,2,ROOT::Math::MatRepSym<double,2> > > metCovToken_;
 
   //variables which would become branches
 

@@ -4,8 +4,9 @@
 
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/GenEventWeightSelector.h"
 
-GenEventWeightSelector::GenEventWeightSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):baseTree(name,tree,debug) {
+GenEventWeightSelector::GenEventWeightSelector(std::string name, TTree* tree, bool debug, const pset& iConfig, edm::ConsumesCollector&& iCC):baseTree(name,tree,debug) {
   if(debug) std::cout << "BSM3G TNT Maker: In the GenEventWeightSelector Constructor --> calling SetBranches()." << std::endl;
+  generatorToken_               = iCC.consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("genweights"));
   _is_data                      = iConfig.getParameter<bool>("is_data");
   SetBranches();
 }
@@ -22,7 +23,8 @@ void GenEventWeightSelector::Fill(const edm::Event& iEvent){
 
     // grabbing the gen event weight info
     edm::Handle<GenEventInfoProduct> genEvt;
-    iEvent.getByLabel("generator",genEvt);
+//    iEvent.getByLabel("generator",genEvt);
+    iEvent.getByToken(generatorToken_,genEvt);
     weightevt = genEvt->weight();
   
     if(debug_) std::cout << "     GenEventWeightSelector: Extracted the event weight." << std::endl;
