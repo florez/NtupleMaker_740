@@ -31,6 +31,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
@@ -70,7 +72,7 @@ class MuonSelector : public  baseTree{
 
 public:
 
-  MuonSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg);
+  MuonSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg, edm::ConsumesCollector&& icc);
   ~MuonSelector();
   void Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   void SetBranches();
@@ -83,8 +85,8 @@ private:
 
   vector <double> Muon_isoSum , Muon_isoCharParPt ;
   vector <double> Muon_pt ,Muon_eta,Muon_phi, Muon_dz_pv, Muon_energy, Muon_iso;
-  vector <double> Muon_isoCharged, Muon_isoNeutralHadron , Muon_isoPhoton, Muon_isoPU;
-  vector <double> Muon_charge, Muon_chi2, Muon_p, Muon_matchedStat, Muon_dxy_pv, Muon_dxy_bs; 
+  vector <double> Muon_isoCharged, Muon_isoNeutralHadron , Muon_isoPhoton, Muon_isoPU, Muon_combinedIso, Muon_trackRe_iso;
+  vector <double> Muon_charge, Muon_chi2, Muon_matchedStat, Muon_dxy_pv, Muon_dxy_bs; 
   vector <double> Muon_dz_bs, Muon_dzError, Muon_dxyError, Muon_ndof, Muon_vtx, Muon_vty, Muon_vtz; 
   vector <double> Muon_track_pt, Muon_track_ptError, Muon_validHits, Muon_validHitsInner, Muon_TLayers; 
   vector <bool> Muon_loose, Muon_medium, Muon_tight, Muon_soft, Muon_isHighPt, Muon_pf, Muon_isGlobal;   
@@ -100,9 +102,13 @@ private:
   bool _super_TNT;
 
   // confit variables
-  edm::InputTag _muonToken;
-  edm::InputTag _vertexInputTag;
-  edm::InputTag _beamSpot; 
+//  edm::InputTag _muonToken;
+  edm::EDGetTokenT<edm::View<pat::Muon> > _muonToken;
+//  edm::InputTag _vertexInputTag;
+//  edm::InputTag _beamSpot; 
+  edm::EDGetTokenT<reco::VertexCollection> _vertexInputTag;
+  edm::EDGetTokenT<reco::BeamSpot> _beamSpot;
+
   double _Muon_pt_min;
   double _Muon_eta_max;
   int _Muon_vtx_ndof_min;

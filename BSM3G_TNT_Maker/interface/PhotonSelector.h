@@ -30,6 +30,8 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/PatCandidates/interface/Photon.h"
@@ -63,7 +65,7 @@ class PhotonSelector : public  baseTree{
 
 public:
 
-  PhotonSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg);
+  PhotonSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg, edm::ConsumesCollector&& icc);
   ~PhotonSelector();
   void Fill(const edm::Event& iEvent);
   void SetBranches();
@@ -79,7 +81,8 @@ public:
   vector<int>   Photon_EleVeto, Photon_hasPixelSeed;
  
   // confit variables
-  edm::InputTag _PhotonToken;
+//  edm::InputTag _PhotonToken;
+  edm::EDGetTokenT<edm::View<pat::Photon> > _PhotonToken;
   double _Photon_pt_min;
   double _Photon_eta_max;
 };

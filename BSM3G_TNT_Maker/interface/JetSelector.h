@@ -30,6 +30,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
@@ -73,7 +75,7 @@ class JetSelector : public  baseTree{
 
 public:
 
-  JetSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg);
+  JetSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg, edm::ConsumesCollector&& icc);
   ~JetSelector();
   void Fill(const edm::Event& iEvent);
   void SetBranches();
@@ -83,7 +85,7 @@ public:
   JetSelector(){};
   
   vector <double> Jet_pt, Jet_eta, Jet_phi,Jet_energy,  Jet_bDiscriminator,  Jet_mass;
-  vector <double> Jet_bDiscriminator_pfCISVV2, Jet_bDiscriminator_CISVV2;
+  vector <double> Jet_bDiscriminator_pfCISVV2, Jet_bDiscriminator_pfCMVAV2, Jet_vtxMass, Jet_decayLength, Jet_decayLengthSignificance;
   vector <double> Jet_pileupId, JetIDPU, Jetpass_pileupJetId, Jet_neutralHadEnergyFraction, Jet_neutralEmEmEnergyFraction; 
   vector <double> Jet_chargedHadronEnergyFraction, Jet_chargedEmEnergyFraction, Jet_muonEnergyFraction; 
   vector <double> Jet_electronEnergy,Jet_photonEnergy, UncorrJet_pt; 
@@ -91,18 +93,26 @@ public:
   vector <int> Jet_chargedMultiplicity, Jet_partonFlavour;
 
   vector <double> Jet_puppi_pt, Jet_puppi_eta, Jet_puppi_phi, Jet_puppi_energy, Jet_puppi_bDiscriminator, Jet_puppi_mass;
-  vector <double> Jet_puppi_bDiscriminator_pfCISVV2, Jet_puppi_bDiscriminator_CISVV2;
+  vector <double> Jet_puppi_bDiscriminator_pfCISVV2, Jet_puppi_bDiscriminator_pfCMVAV2, Jet_puppi_vtxMass, Jet_puppi_decayLength, Jet_puppi_decayLengthSignificance;
   vector <double> Jet_puppi_pileupId, Jet_puppi_neutralHadEnergyFraction, Jet_puppi_neutralEmEmEnergyFraction; 
   vector <double> Jet_puppi_chargedHadronEnergyFraction, Jet_puppi_chargedEmEnergyFraction, Jet_puppi_muonEnergyFraction; 
   vector <double> Jet_puppi_electronEnergy, Jet_puppi_photonEnergy, UncorrJet_puppi_pt; 
   vector <int> Jet_puppi_numberOfConstituents;
   vector <int> Jet_puppi_chargedMultiplicity, Jet_puppi_partonFlavour;
 
+  vector <double> Jet_toptag_pt, Jet_toptag_eta,  Jet_toptag_phi,  Jet_toptag_energy,  Jet_toptag_SoftDropMass,  Jet_toptag_PrunedMass,  Jet_toptag_tau1,  Jet_toptag_tau2,  Jet_toptag_tau3;
+  vector <double> Jet_toptag_puppi_pt, Jet_toptag_puppi_eta,  Jet_toptag_puppi_phi,  Jet_toptag_puppi_mass,  Jet_toptag_puppi_tau1,  Jet_toptag_puppi_tau2,  Jet_toptag_puppi_tau3;
+
   bool _super_TNT;
   // Jet cuts
-  edm::InputTag jetToken_;
-  edm::InputTag puppi_jetToken_;
-  edm::InputTag _vertexInputTag;
+//  edm::InputTag jetToken_;
+//  edm::InputTag puppi_jetToken_;
+//  edm::InputTag _vertexInputTag;
+  edm::EDGetTokenT<pat::JetCollection> jetToken_;
+  edm::EDGetTokenT<pat::JetCollection> puppi_jetToken_;
+  edm::EDGetTokenT<pat::JetCollection> toptag_jetToken_;
+  edm::EDGetTokenT<reco::VertexCollection> _vertexInputTag;
+
   double _Jet_pt_min;
 };
 

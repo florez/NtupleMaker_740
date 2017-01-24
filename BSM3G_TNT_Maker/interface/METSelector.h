@@ -15,6 +15,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "FWCore/Utilities/interface/Exception.h"
 #include "FWCore/Framework/interface/ESHandle.h"
@@ -97,7 +99,7 @@ using namespace edm;
 class METSelector : public baseTree{
 
  public:
-  METSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg);
+  METSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg, edm::ConsumesCollector&& icc);
   ~METSelector();
   void Fill(const edm::Event& iEvent);
   void SetBranches();
@@ -106,13 +108,20 @@ class METSelector : public baseTree{
  private:
   METSelector(){};
 
-  edm::InputTag metToken_;
-  edm::InputTag puppi_metToken_;
+//  edm::InputTag metToken_;
+//  edm::InputTag puppi_metToken_;
+//  edm::InputTag metNoHFToken_;
+  edm::EDGetTokenT<pat::METCollection> metToken_;
+  edm::EDGetTokenT<pat::METCollection> puppi_metToken_;
+  edm::EDGetTokenT<pat::METCollection> metNoHFToken_;
+  edm::EDGetTokenT<ROOT::Math::SMatrix<double,2,2,ROOT::Math::MatRepSym<double,2> > > metCovToken_;
 
   //variables which would become branches
 
   double Met_type1PF_pt, Met_type1PF_px, Met_type1PF_py, Met_type1PF_pz, Met_type1PF_phi, Met_type1PF_sumEt, Gen_Met, Met_type1PF_shiftedPtUp, Met_type1PF_shiftedPtDown;
   double Met_puppi_pt, Met_puppi_px, Met_puppi_py, Met_puppi_pz, Met_puppi_phi, Met_puppi_sumEt, Met_puppi_shiftedPtUp, Met_puppi_shiftedPtDown;
+  double Met_NoHF_pt, Met_NoHF_px, Met_NoHF_py, Met_NoHF_pz, Met_NoHF_phi, Met_NoHF_sumEt;
+  double Met_type1PF_cov00, Met_type1PF_cov01, Met_type1PF_cov10, Met_type1PF_cov11;
   bool _is_data;
   bool _super_TNT; 
 };

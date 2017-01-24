@@ -2,9 +2,9 @@
 // Andres Florez: Universidad de los Andes, Colombia.
 // kaur amandeepkalsi: Panjab University, India.
 
-#ifndef __GEN_PAR_H_ 
+#ifndef __RUN_INFO_H_ 
 
-#define __GEN_PAR_H_
+#define __RUN_INFO_H_
 
 #include <memory>
 
@@ -15,8 +15,6 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "FWCore/Framework/interface/ConsumesCollector.h"
-#include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "FWCore/Utilities/interface/Exception.h"
 #include "FWCore/Framework/interface/ESHandle.h"
@@ -96,26 +94,20 @@ using namespace std;
 using namespace edm;
 
 
-class GenParticleSelector : public baseTree{
+class RunInfoSelector : public baseTree{
 
  public:
-  GenParticleSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg, edm::ConsumesCollector&& icc);
-  ~GenParticleSelector();
+  RunInfoSelector(std::string name, TTree* tree, bool debug, const edm::ParameterSet& cfg);
+  ~RunInfoSelector();
   void Fill(const edm::Event& iEvent);
   void SetBranches();
   void Clear();
 
  private:
-  GenParticleSelector(){};
-
-  bool   _is_data;
-  edm::EDGetTokenT<reco::GenParticleCollection> genToken_;
+  RunInfoSelector(){};
 
  //variables which would become branches
- vector <double> Gen_pt, Gen_eta, Gen_phi, Gen_status, Gen_pdg_id, Gen_motherpdg_id;
- vector <double> Gen_energy, Gen_vx, Gen_vy, Gen_vz; 
- vector <double> Gen_charge, Gen_numDaught, Gen_numMother;
- vector <int> Gen_BmotherIndices, Gen_BdaughtIndices, Gen_BmotherIndex;
+ int runNumber, eventNumber, lumiBlock;
 };
 
 #endif
