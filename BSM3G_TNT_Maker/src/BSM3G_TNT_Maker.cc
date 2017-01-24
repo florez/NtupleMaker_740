@@ -19,21 +19,25 @@ BSM3G_TNT_Maker::BSM3G_TNT_Maker(const edm::ParameterSet& iConfig):
   _filltauinfo             = iConfig.getParameter<bool>("filltauinfo");
   _filljetinfo             = iConfig.getParameter<bool>("filljetinfo"); 
   _fillgeninfo             = iConfig.getParameter<bool>("fillgeninfo"); 
+  _fillgenweightinfo       = iConfig.getParameter<bool>("fillgenweightinfo"); 
+  _fillruninfo             = iConfig.getParameter<bool>("fillruninfo"); 
   _fillPVinfo              = iConfig.getParameter<bool>("fillPVinfo"); 
   _fillMETinfo             = iConfig.getParameter<bool>("fillMETinfo");
   _fillphotoninfo          = iConfig.getParameter<bool>("fillphotoninfo");
   edm::Service<TFileService> fs;
   tree_ = fs->make<TTree>("BOOM","BOOM");
 
-  if( _filltriggerinfo)      trselector     = new TriggerSelector("miniAOD", tree_, debug_, iConfig);
-  if( _fillmuoninfo)         muselector     = new MuonSelector("miniAOD", tree_, debug_, iConfig);
-  if( _fillelectronpatinfo)  elpatselector  = new ElectronPatSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
-  if( _filltauinfo)          tauselector    = new TauSelector("miniAOD", tree_, debug_, iConfig);
-  if( _filljetinfo)          jetselector    = new JetSelector("miniAOD", tree_, debug_, iConfig);
-  if( _fillgeninfo)          genselector    = new GenParticleSelector("miniAOD", tree_, debug_, iConfig);
-  if( _fillPVinfo)           pvselector     = new PVSelector("miniAOD", tree_, debug_, iConfig);
-  if( _fillMETinfo)          metselector    = new METSelector("miniAOD", tree_, debug_, iConfig);
-  if(_fillphotoninfo)        photonselector = new PhotonSelector("miniAOD", tree_, debug_, iConfig); 
+  if( _filltriggerinfo)      trselector        = new TriggerSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
+  if( _fillmuoninfo)         muselector        = new MuonSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
+  if( _fillelectronpatinfo)  elpatselector     = new ElectronPatSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
+  if( _filltauinfo)          tauselector       = new TauSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
+  if( _filljetinfo)          jetselector       = new JetSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
+  if( _fillgeninfo)          genselector       = new GenParticleSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
+  if( _fillgenweightinfo)    genweightselector = new GenEventWeightSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
+  if( _fillruninfo)          runinfoselector   = new RunInfoSelector("miniAOD", tree_, debug_, iConfig);
+  if( _fillPVinfo)           pvselector        = new PVSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
+  if( _fillMETinfo)          metselector       = new METSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
+  if(_fillphotoninfo)        photonselector    = new PhotonSelector("miniAOD", tree_, debug_, iConfig, consumesCollector()); 
 }
 
 
@@ -63,6 +67,8 @@ BSM3G_TNT_Maker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   if( _filltauinfo)          tauselector->Fill(iEvent, iSetup); 
   if( _filljetinfo)          jetselector->Fill(iEvent);
   if( _fillgeninfo)          genselector->Fill(iEvent); 
+  if( _fillgenweightinfo)    genweightselector->Fill(iEvent); 
+  if( _fillruninfo)          runinfoselector->Fill(iEvent); 
   if( _fillPVinfo)           pvselector->Fill(iEvent);
   if( _fillMETinfo)          metselector->Fill(iEvent);
   if( _fillphotoninfo)       photonselector->Fill(iEvent);

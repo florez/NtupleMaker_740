@@ -8,11 +8,11 @@ using namespace edm;
 using namespace std;
 using namespace reco;
 
-MuonSelector::MuonSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):baseTree(name,tree,debug){
-  
-  _muonToken               = iConfig.getParameter<edm::InputTag>("muons");
-  _vertexInputTag          = iConfig.getParameter<edm::InputTag>("vertices");
-  _beamSpot                = iConfig.getParameter<edm::InputTag>("beamSpot");
+MuonSelector::MuonSelector(std::string name, TTree* tree, bool debug, const pset& iConfig, edm::ConsumesCollector&& iCC):baseTree(name,tree,debug){
+  if(debug) std::cout << "BSM3G TNT Maker: In the MuonSelector Constructor --> getting parameters & calling SetBranches()." << std::endl;
+  _muonToken               = iCC.consumes<edm::View<pat::Muon> >(iConfig.getParameter<edm::InputTag>("muons"));
+  _vertexInputTag          = iCC.consumes<reco::VertexCollection >(iConfig.getParameter<edm::InputTag>("vertices"));
+  _beamSpot                = iCC.consumes<reco::BeamSpot >(iConfig.getParameter<edm::InputTag>("beamSpot"));
   _Muon_pt_min             = iConfig.getParameter<double>("Muon_pt_min");
   _Muon_eta_max            = iConfig.getParameter<double>("Muon_eta_max");
   _Muon_vtx_ndof_min       = iConfig.getParameter<int>("Muon_vtx_ndof_min");
@@ -29,15 +29,19 @@ MuonSelector::~MuonSelector(){
 void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
   Clear();
   
+  if(debug_) std::cout << "     MuonSelector: Cleared the vectors, grabbing the muon/PV/BeamSpot collection handles." << std::endl;
+
   int mucoun = 0;
 
   // grab handle to the muon collection  
   edm::Handle<edm::View<pat::Muon> > muon_h;
-  iEvent.getByLabel(_muonToken, muon_h);
+  iEvent.getByToken(_muonToken, muon_h);
+
+  if(debug_) std::cout << "     MuonSelector: Looping over PVs to extract the position of the best PV." << std::endl;
   
   // grab handle to the vertex collection
   edm::Handle<reco::VertexCollection> vtx_h;
-  iEvent.getByLabel(_vertexInputTag, vtx_h);
+  iEvent.getByToken(_vertexInputTag, vtx_h);
   reco::VertexCollection::const_iterator firstGoodVertex = vtx_h->end();
   for (reco::VertexCollection::const_iterator it = vtx_h->begin(); it != vtx_h->end(); it++) {
     if (isGoodVertex(*it)) {
@@ -48,10 +52,12 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   if (firstGoodVertex == vtx_h->end()) return; // skip event if there are no good PVs
   GlobalPoint thepv(firstGoodVertex->position().x(),firstGoodVertex->position().y(),firstGoodVertex->position().z());
 
+  if(debug_) std::cout << "     MuonSelector: Extracting the beamspot position." << std::endl;
+
   // Get BeamSpot information
   reco::BeamSpot beamSpot;
   edm::Handle<reco::BeamSpot> beamSpotHandle;
-  iEvent.getByLabel(_beamSpot, beamSpotHandle);
+  iEvent.getByToken(_beamSpot, beamSpotHandle);
   if ( beamSpotHandle.isValid() ) { beamSpot = *beamSpotHandle; }
   else { edm::LogInfo("MyAnalyzer") << "No beam spot available from EventSetup \n"; }
   math::XYZPoint point(beamSpot.x0(),beamSpot.y0(), beamSpot.z0());
@@ -66,6 +72,8 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::ESHandle<TransientTrackBuilder> theB;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
 
+  if(debug_) std::cout << "     MuonSelector: Looping over muons." << std::endl;
+
   // loop over muons   
   for(edm::View<pat::Muon>::const_iterator mu = muon_h->begin(); mu != muon_h->end(); mu++) {
     if (mu->pt() < _Muon_pt_min) continue;
@@ -79,7 +87,6 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     Muon_pt.push_back(mu->pt());
     Muon_eta.push_back(mu->eta());
     Muon_phi.push_back(mu->phi());
-    Muon_p.push_back(mu->p());
     Muon_energy.push_back(mu->energy());
     Muon_charge.push_back(mu->charge());
     Muon_loose.push_back(mu->isLooseMuon());
@@ -96,6 +103,10 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     Muon_isoNeutralHadron.push_back((mu->pfIsolationR04().sumNeutralHadronEt));
     Muon_isoPhoton.push_back((mu->pfIsolationR04().sumPhotonEt));
     Muon_isoPU.push_back((mu->pfIsolationR04().sumPUPt));
+    // PF combined iso with DeltaBeta corrections
+    double combined_iso = (mu->pfIsolationR04().sumChargedHadronPt + max(0., mu->pfIsolationR04().sumNeutralHadronEt + mu->pfIsolationR04().sumPhotonEt - 0.5*mu->pfIsolationR04().sumPUPt))/mu->pt();
+    Muon_combinedIso.push_back(combined_iso); 
+    Muon_trackRe_iso.push_back(mu->isolationR03().sumPt/mu->pt());
 
     // store additional information such as lifetime variables (needed for tau analyses)
     if (!_super_TNT){
@@ -121,7 +132,7 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       Muon_besttrack_pt.push_back(mu->muonBestTrack()->pt());
       Muon_besttrack_ptError.push_back(mu->muonBestTrack()->ptError());
       reco::TrackRef tunePBestTrack = mu->tunePMuonBestTrack();
-      Muon_tunePBestTrack_pt.push_back(tunePBestTrack->pt());
+      Muon_tunePBestTrack_pt.push_back(tunePBestTrack.isNonnull() ? tunePBestTrack->pt() : -1.);
       reco::Muon::MuonTrackType tunePBestTrackType = mu->tunePMuonBestTrackType();
       Muon_tunePBestTrackType.push_back(tunePBestTrackType);
       Muon_chi2LocalPosition.push_back(mu->combinedQuality().chi2LocalPosition);
@@ -133,7 +144,6 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       // point of closest approach (PCA) to the beamspot and primary vertex
       TransientTrack muonTransTkPtr = theB->build(*(mu->innerTrack()));
-//      TransientTrack muonTransTkPtr(*(mu->innerTrack()), magfield.product(),theTrackingGeometry);
       GlobalPoint mu_pca_bs = muonTransTkPtr.trajectoryStateClosestToPoint(thebs).position();
       GlobalPoint mu_pca_pv = muonTransTkPtr.trajectoryStateClosestToPoint(thepv).position();
       Muon_track_PCAx_bs.push_back(mu_pca_bs.x());
@@ -162,16 +172,14 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     mucoun++;
   }
   
-  
 }
 
 void MuonSelector::SetBranches(){
-  if(debug_)    std::cout<<"setting branches: calling AddBranch of baseTree"<<std::endl;
+  if(debug_) std::cout << "     MuonSelector: Setting branches by calling AddBranch of baseTree." << std::endl;
 
   AddBranch(&Muon_pt                ,"Muon_pt");
   AddBranch(&Muon_eta               ,"Muon_eta");
   AddBranch(&Muon_phi               ,"Muon_phi");
-  AddBranch(&Muon_p                 ,"Muon_p");
   AddBranch(&Muon_energy            ,"Muon_energy");
   AddBranch(&Muon_charge            ,"Muon_charge");
   AddBranch(&Muon_tight             ,"Muon_tight");
@@ -208,6 +216,8 @@ void MuonSelector::SetBranches(){
     AddBranch(&Muon_isoNeutralHadron  ,"Muon_isoNeutralHadron");
     AddBranch(&Muon_isoPhoton         ,"Muon_isoPhoton");
     AddBranch(&Muon_isoPU             ,"Muon_isoPU");
+    AddBranch(&Muon_combinedIso       ,"Muon_combinedIso");
+    AddBranch(&Muon_trackRe_iso       ,"Muon_trackRe_iso");
     AddBranch(&Muon_dB               ,"Muon_dB");
     AddBranch(&Muon_besttrack_pt     ,"Muon_besttrack_pt");
     AddBranch(&Muon_besttrack_ptError ,"Muon_besttrack_ptError");
@@ -232,7 +242,8 @@ void MuonSelector::SetBranches(){
     AddBranch(&Muon_trackFitErrorMatrix_12     ,"Muon_trackFitErrorMatrix_12");
     AddBranch(&Muon_trackFitErrorMatrix_22     ,"Muon_trackFitErrorMatrix_22");
   }
-  if(debug_)    std::cout<<"set branches"<<std::endl;
+
+  if(debug_) std::cout << "     MuonSelector: Finished setting branches." << std::endl;
 }
 
 void MuonSelector::Clear(){
@@ -253,7 +264,8 @@ void MuonSelector::Clear(){
   Muon_isoNeutralHadron.clear();
   Muon_isoPhoton.clear();
   Muon_isoPU.clear();
-  Muon_p.clear(); 
+  Muon_combinedIso.clear();
+  Muon_trackRe_iso.clear();
   Muon_charge.clear(); 
   Muon_chi2.clear(); 
   Muon_validHits.clear();
