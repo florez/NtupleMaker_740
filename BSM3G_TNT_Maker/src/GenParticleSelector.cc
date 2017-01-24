@@ -26,9 +26,27 @@ void GenParticleSelector::Fill(const edm::Event& iEvent){
 
     if(debug_) std::cout << "     GenParticleSelector: Cleared the vectors, grabbed the vertex collection handle, and looping over gen particles." << std::endl;
 
+
+    // for top-pt reweight                                                                                                                                                                 
+    int nLeptons = 0;
+    double topPt = 0, topBarPt = 0;
+    double SF_Top = 1.0, SF_antiTop = 1.0;
+
     // looping over gen particles
     int ng = 0;  
     for(reco::GenParticleCollection::const_iterator genparticles = _Gen_collection->begin(); genparticles !=  _Gen_collection->end(); ++genparticles) {
+
+      if((abs(genparticles->pdgId()) == 24) && (genparticles->numberOfDaughters() == 2)) {
+        for (int j = 0; j < (int)(genparticles->numberOfDaughters()); ++j) {
+          const reco::Candidate * dau = genparticles->daughter(j);
+          if((abs(dau->pdgId()) == 11) || (abs(dau->pdgId()) == 13)) {++nLeptons;}
+        }
+      }
+      if((abs(genparticles->pdgId()) == 6) && (genparticles->numberOfDaughters() == 2)) {
+        if((abs(genparticles->daughter(0)->pdgId()) == 24) && (abs(genparticles->daughter(1)->pdgId()) == 5)) {
+          if(genparticles->pdgId() > 0) {topPt = genparticles->pt();} else {topBarPt = genparticles->pt();}
+        }
+      }
 
       Gen_pt.push_back(genparticles->pt());
       Gen_eta.push_back(genparticles->eta()); 
@@ -84,6 +102,13 @@ void GenParticleSelector::Fill(const edm::Event& iEvent){
         }
       }
     }
+
+    if(topPt > 700) topPt = 700;
+    if(topBarPt > 700) topBarPt = 700;
+    SF_Top = TMath::Exp(0.0615+((-0.0005)*topPt));                                                                                                                              
+    SF_antiTop = TMath::Exp(0.0615+((-0.0005)*topBarPt));                                                                                                                       
+    weighttoppt = sqrt(SF_Top*SF_antiTop);
+
   }
 
 }
@@ -107,6 +132,7 @@ void GenParticleSelector::SetBranches(){
   AddBranch(&Gen_BmotherIndices   ,"Gen_BmotherIndices");
   AddBranch(&Gen_BdaughtIndices   ,"Gen_BdaughtIndices");
   AddBranch(&Gen_BmotherIndex     ,"Gen_BmotherIndex");
+  AddBranch(&weighttoppt          ,"weighttoppt");
 
   if(debug_) std::cout << "     GenParticleSelector: Finished setting branches." << std::endl;
 }
@@ -129,5 +155,5 @@ void GenParticleSelector::Clear(){
   Gen_BmotherIndices.clear();
   Gen_BdaughtIndices.clear();
   Gen_BmotherIndex.clear();
-  
+  weighttoppt = 1;  
 }
