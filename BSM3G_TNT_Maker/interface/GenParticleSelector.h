@@ -116,6 +116,8 @@ class GenParticleSelector : public baseTree{
  vector <double> Gen_energy, Gen_vx, Gen_vy, Gen_vz; 
  vector <double> Gen_charge, Gen_numDaught, Gen_numMother;
  vector <int> Gen_BmotherIndices, Gen_BdaughtIndices, Gen_BmotherIndex;
+ double weighttoppt;
+
 };
 
 #endif
