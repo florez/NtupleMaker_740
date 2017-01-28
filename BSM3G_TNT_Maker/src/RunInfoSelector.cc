@@ -20,11 +20,8 @@ void RunInfoSelector::Fill(const edm::Event& iEvent){
 
   runNumber = iEvent.id().run();
   eventNumber = iEvent.id().event();
-  if( iEvent.isRealData() ) {
-    lumiBlock = iEvent.luminosityBlock();
-  } else {
-    lumiBlock = -1;
-  }
+  lumiBlock = iEvent.luminosityBlock();
+
   
 }
 
