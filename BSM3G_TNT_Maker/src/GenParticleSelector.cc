@@ -3,10 +3,15 @@
 // kaur amandeepkalsi: Panjab University, India.
 
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/GenParticleSelector.h"
+//not everything has to be in the header
+#include "SimDataFormats/GeneratorProducts/interface/LesHouches.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 
 GenParticleSelector::GenParticleSelector(std::string name, TTree* tree, bool debug, const pset& iConfig, edm::ConsumesCollector&& iCC):baseTree(name,tree,debug){
   if(debug) std::cout << "BSM3G TNT Maker: In the GenParticleSelector Constructor --> calling SetBranches()." << std::endl;
   genToken_                     = iCC.consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genparts"));
+  iCC.consumes< LHEEventProduct >(edm::InputTag("externalLHEProducer"));
+
   _is_data                      = iConfig.getParameter<bool>("is_data");
   SetBranches();
 }
@@ -16,9 +21,30 @@ GenParticleSelector::~GenParticleSelector(){
 }
 
 void GenParticleSelector::Fill(const edm::Event& iEvent){
-  Clear(); 
+  Clear();
 
   if(!_is_data) {
+    // LHE INFO for binned samples
+    edm::Handle<LHEEventProduct> lheInfoHandel;
+    iEvent.getByLabel("externalLHEProducer" , lheInfoHandel);
+
+    if (lheInfoHandel.isValid()) {
+        lhef::HEPEUP lheParticleInfo = lheInfoHandel->hepeup();
+        // get the five vector
+        // (Px, Py, Pz, E and M in GeV)
+        std::vector<lhef::HEPEUP::FiveVector> allParticles = lheParticleInfo.PUP;
+        std::vector<int> statusCodes = lheParticleInfo.ISTUP;
+
+        double ht = 0;
+        for (unsigned int i = 0; i < statusCodes.size(); i++) {
+            if (statusCodes[i] == 1) {
+                if (abs(lheParticleInfo.IDUP[i]) < 11 || abs(lheParticleInfo.IDUP[i]) > 16 || abs(lheParticleInfo.IDUP[i]) > 22) {
+                    ht += sqrt(pow(allParticles[i][0], 2) + pow(allParticles[i][1], 2));
+                }
+            }
+        }
+        Gen_HT=ht;
+    }
 
     // grabbing the gen particle handle
     Handle< reco::GenParticleCollection > _Gen_collection;
@@ -27,13 +53,13 @@ void GenParticleSelector::Fill(const edm::Event& iEvent){
     if(debug_) std::cout << "     GenParticleSelector: Cleared the vectors, grabbed the vertex collection handle, and looping over gen particles." << std::endl;
 
 
-    // for top-pt reweight                                                                                                                                                                 
+    // for top-pt reweight
     int nLeptons = 0;
     double topPt = 0, topBarPt = 0;
     double SF_Top = 1.0, SF_antiTop = 1.0;
 
     // looping over gen particles
-    int ng = 0;  
+    int ng = 0;
     for(reco::GenParticleCollection::const_iterator genparticles = _Gen_collection->begin(); genparticles !=  _Gen_collection->end(); ++genparticles) {
 
       if((abs(genparticles->pdgId()) == 24) && (genparticles->numberOfDaughters() == 2)) {
@@ -49,7 +75,7 @@ void GenParticleSelector::Fill(const edm::Event& iEvent){
       }
 
       Gen_pt.push_back(genparticles->pt());
-      Gen_eta.push_back(genparticles->eta()); 
+      Gen_eta.push_back(genparticles->eta());
       Gen_phi.push_back(genparticles->phi());
       Gen_status.push_back(genparticles->status());
       Gen_pdg_id.push_back(genparticles->pdgId());
@@ -61,7 +87,7 @@ void GenParticleSelector::Fill(const edm::Event& iEvent){
       Gen_charge.push_back(genparticles->charge());
       Gen_numDaught.push_back(genparticles->numberOfDaughters());
       Gen_numMother.push_back(genparticles->numberOfMothers());
-    
+
       int idx = -1;
       for(reco::GenParticleCollection::const_iterator mit = _Gen_collection->begin();mit != _Gen_collection->end(); ++mit) {
         if(genparticles->mother() == &(*mit) ) {
@@ -79,34 +105,34 @@ void GenParticleSelector::Fill(const edm::Event& iEvent){
         }
       }
       ng++;
-    
+
       for (size_t j = 0; j < genparticles->numberOfMothers(); ++j) {
         const reco::Candidate* m = genparticles->mother(j);
         for (reco::GenParticleCollection::const_iterator mit = _Gen_collection->begin();  mit != _Gen_collection->end(); ++mit) {
-	  if (m == &(*mit) ) { 
-	    int idx = std::distance(_Gen_collection->begin(), mit);
-	    Gen_BmotherIndices.push_back(idx);
-	    break;
-	  }
+          if (m == &(*mit) ) {
+            int idx = std::distance(_Gen_collection->begin(), mit);
+            Gen_BmotherIndices.push_back(idx);
+            break;
+          }
         }
       }
-    
+
       for (size_t j = 0; j < genparticles->numberOfDaughters(); ++j) {
         const reco::Candidate* d = genparticles->daughter(j);
         for (reco::GenParticleCollection::const_iterator mit = _Gen_collection->begin();  mit != _Gen_collection->end(); ++mit) {
-	  if (d == &(*mit) ) { 
-	    int idx = std::distance(_Gen_collection->begin(), mit);
-	    Gen_BdaughtIndices.push_back(idx);
-	    break;
-	  }
+          if (d == &(*mit) ) {
+            int idx = std::distance(_Gen_collection->begin(), mit);
+            Gen_BdaughtIndices.push_back(idx);
+            break;
+          }
         }
       }
     }
 
     if(topPt > 700) topPt = 700;
     if(topBarPt > 700) topBarPt = 700;
-    SF_Top = TMath::Exp(0.0615+((-0.0005)*topPt));                                                                                                                              
-    SF_antiTop = TMath::Exp(0.0615+((-0.0005)*topBarPt));                                                                                                                       
+    SF_Top = TMath::Exp(0.0615+((-0.0005)*topPt));
+    SF_antiTop = TMath::Exp(0.0615+((-0.0005)*topBarPt));
     weighttoppt = sqrt(SF_Top*SF_antiTop);
 
   }
@@ -133,6 +159,7 @@ void GenParticleSelector::SetBranches(){
   AddBranch(&Gen_BdaughtIndices   ,"Gen_BdaughtIndices");
   AddBranch(&Gen_BmotherIndex     ,"Gen_BmotherIndex");
   AddBranch(&weighttoppt          ,"weighttoppt");
+  AddBranch(&Gen_HT     ,"Gen_genHT");
 
   if(debug_) std::cout << "     GenParticleSelector: Finished setting branches." << std::endl;
 }
@@ -155,5 +182,7 @@ void GenParticleSelector::Clear(){
   Gen_BmotherIndices.clear();
   Gen_BdaughtIndices.clear();
   Gen_BmotherIndex.clear();
-  weighttoppt = 1;  
+  weighttoppt = 1;
+  Gen_HT=0;
+
 }
