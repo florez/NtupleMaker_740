@@ -79,8 +79,6 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     super_TNT  = cms.bool(False),
     # is data or MC?
     is_data     = cms.bool(False),
-    #provide a list of pdf sets in a file
-    PdfSetFileName      = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/pdfsets.txt"),
 
     # input tags
     triggerResults      = cms.InputTag( 'TriggerResults', '', 'HLT' ),
