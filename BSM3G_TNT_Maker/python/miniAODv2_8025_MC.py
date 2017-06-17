@@ -88,8 +88,10 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     vertices            = cms.InputTag("offlineSlimmedPrimaryVertices"),
     beamSpot            = cms.InputTag("offlineBeamSpot"),
     pileupInfo          = cms.InputTag("slimmedAddPileupInfo"),
-    genparts		= cms.InputTag("prunedGenParticles"),
-    genweights		= cms.InputTag("generator"),
+    genparts            = cms.InputTag("prunedGenParticles"),
+    genjets             = cms.InputTag("slimmedGenJets"),
+    genfatjets          = cms.InputTag("slimmedGenJetsAK8"),
+    genweights          = cms.InputTag("generator"),
     muons               = cms.InputTag("slimmedMuons"),
     patElectrons        = cms.InputTag("slimmedElectrons"),
     taus                = cms.InputTag("slimmedTaus"),
@@ -178,8 +180,8 @@ process.p = cms.Path(process.goodVerticesFilter *
                      process.EcalDeadCellTriggerPrimitiveFilter *
                      process.HBHENoiseFilter *
                      process.HBHENoiseIsoFilter *
-		     process.BadPFMuonFilter *
-		     process.BadChargedCandidateFilter *
+                     process.BadPFMuonFilter *
+                     process.BadChargedCandidateFilter *
                      process.egmGsfElectronIDSequence *
                      process.METSignificance *
                      process.TNT

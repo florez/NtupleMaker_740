@@ -10,6 +10,8 @@
 GenParticleSelector::GenParticleSelector(std::string name, TTree* tree, bool debug, const pset& iConfig, edm::ConsumesCollector&& iCC):baseTree(name,tree,debug){
   if(debug) std::cout << "BSM3G TNT Maker: In the GenParticleSelector Constructor --> calling SetBranches()." << std::endl;
   genToken_                     = iCC.consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genparts"));
+  genJetToken_                     = iCC.consumes<reco::GenJetCollection>(iConfig.getParameter<edm::InputTag>("genjets"));
+  genFatJetToken_                     = iCC.consumes<reco::GenJetCollection>(iConfig.getParameter<edm::InputTag>("genfatjets"));
   iCC.consumes< LHEEventProduct >(edm::InputTag("externalLHEProducer"));
 
   _is_data                      = iConfig.getParameter<bool>("is_data");
@@ -135,6 +137,39 @@ void GenParticleSelector::Fill(const edm::Event& iEvent){
     SF_antiTop = TMath::Exp(0.0615+((-0.0005)*topBarPt));
     weighttoppt = sqrt(SF_Top*SF_antiTop);
 
+    // grabbing the gen particle handle
+    Handle< reco::GenJetCollection > _Gen_Jet_collection;
+    iEvent.getByToken(genJetToken_, _Gen_Jet_collection);
+
+    if(debug_) std::cout << "     GenParticleSelector: Cleared the vectors, grabbed the vertex collection handle, and looping over gen particles." << std::endl;
+
+     for(reco::GenJetCollection::const_iterator genjet = _Gen_Jet_collection->begin(); genjet !=  _Gen_Jet_collection->end(); ++genjet) {
+      Gen_Jet_pt.push_back(genjet->pt());
+      Gen_Jet_eta.push_back(genjet->eta());
+      Gen_Jet_phi.push_back(genjet->phi());
+      Gen_Jet_energy.push_back(genjet->energy());
+
+      Gen_Jet_emEnergy.push_back(          genjet->emEnergy());
+      Gen_Jet_hadEnergy.push_back(         genjet->hadEnergy());
+      Gen_Jet_invisibleEnergy.push_back(   genjet->invisibleEnergy());
+      Gen_Jet_auxiliaryEnergy.push_back(   genjet->auxiliaryEnergy());
+      Gen_Jet_nConstituents.push_back(   genjet->nConstituents());
+     }
+
+    // grabbing the gen particle handle
+    Handle< reco::GenJetCollection > _Gen_FatJet_collection;
+    iEvent.getByToken(genFatJetToken_, _Gen_FatJet_collection);
+
+    if(debug_) std::cout << "     GenParticleSelector: Cleared the vectors, grabbed the vertex collection handle, and looping over gen particles." << std::endl;
+
+     for(reco::GenJetCollection::const_iterator genjet = _Gen_FatJet_collection->begin(); genjet !=  _Gen_FatJet_collection->end(); ++genjet) {
+      Gen_FatJet_pt.push_back(genjet->pt());
+      Gen_FatJet_eta.push_back(genjet->eta());
+      Gen_FatJet_phi.push_back(genjet->phi());
+      Gen_FatJet_energy.push_back(genjet->energy());
+      Gen_FatJet_nConstituents.push_back(   genjet->nConstituents());
+     }
+
   }
 
 }
@@ -158,6 +193,20 @@ void GenParticleSelector::SetBranches(){
   AddBranch(&Gen_BmotherIndices   ,"Gen_BmotherIndices");
   AddBranch(&Gen_BdaughtIndices   ,"Gen_BdaughtIndices");
   AddBranch(&Gen_BmotherIndex     ,"Gen_BmotherIndex");
+  AddBranch(&Gen_Jet_pt                ,"Gen_Jet_pt");
+  AddBranch(&Gen_Jet_eta               ,"Gen_Jet_eta");
+  AddBranch(&Gen_Jet_phi               ,"Gen_Jet_phi");
+  AddBranch(&Gen_Jet_energy            ,"Gen_Jet_energy");
+  AddBranch(&Gen_Jet_emEnergy          ,"Gen_Jet_emEnergy");
+  AddBranch(&Gen_Jet_hadEnergy         ,"Gen_Jet_hadEnergy");
+  AddBranch(&Gen_Jet_invisibleEnergy   ,"Gen_Jet_invisibleEnergy");
+  AddBranch(&Gen_Jet_auxiliaryEnergy   ,"Gen_Jet_auxiliaryEnergy");
+  AddBranch(&Gen_Jet_nConstituents     ,"Gen_Jet_nConstituents");
+  AddBranch(&Gen_FatJet_pt             ,"Gen_FatJet_pt");
+  AddBranch(&Gen_FatJet_eta            ,"Gen_FatJet_eta");
+  AddBranch(&Gen_FatJet_phi            ,"Gen_FatJet_phi");
+  AddBranch(&Gen_FatJet_energy         ,"Gen_FatJet_energy");
+  AddBranch(&Gen_FatJet_nConstituents  ,"Gen_FatJet_nConstituents");
   AddBranch(&weighttoppt          ,"weighttoppt");
   AddBranch(&Gen_HT     ,"Gen_genHT");
 
@@ -182,6 +231,20 @@ void GenParticleSelector::Clear(){
   Gen_BmotherIndices.clear();
   Gen_BdaughtIndices.clear();
   Gen_BmotherIndex.clear();
+  Gen_Jet_pt.clear();
+  Gen_Jet_eta.clear();
+  Gen_Jet_phi.clear();
+  Gen_Jet_energy.clear();
+  Gen_Jet_emEnergy.clear();
+  Gen_Jet_hadEnergy.clear();
+  Gen_Jet_invisibleEnergy.clear();
+  Gen_Jet_auxiliaryEnergy.clear();
+  Gen_Jet_nConstituents.clear();
+  Gen_FatJet_pt.clear();
+  Gen_FatJet_eta.clear();
+  Gen_FatJet_phi.clear();
+  Gen_FatJet_energy.clear();
+  Gen_FatJet_nConstituents.clear();
   weighttoppt = 1;
   Gen_HT=0;
 

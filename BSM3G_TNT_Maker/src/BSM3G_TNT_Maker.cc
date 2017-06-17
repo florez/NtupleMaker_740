@@ -31,9 +31,6 @@ BSM3G_TNT_Maker::BSM3G_TNT_Maker(const edm::ParameterSet& iConfig):
 
 
   storetree_->Branch("pdf_name", &pdf_name);
-  storetree_->Branch("pdf_ids", &pdf_ids);
-  storetree_->Branch("pdf_scale_name", &pdf_scale_name);
-  storetree_->Branch("pdf_scael_ids", &pdf_scale_ids);
   storetree_->Branch("triggernames", &triggernames);
 
 
@@ -49,7 +46,7 @@ BSM3G_TNT_Maker::BSM3G_TNT_Maker(const edm::ParameterSet& iConfig):
   if( _fillPVinfo)           pvselector        = new PVSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
   if( _fillMETinfo)          metselector       = new METSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
   if(_fillphotoninfo)        photonselector    = new PhotonSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
-  if(_fillPDFinfo)           pdfselector       = new PDFSelector("miniAOD", tree_, debug_, iConfig, consumesCollector());
+  if(_fillPDFinfo)           pdfselector       = new PDFSelector("miniAOD", tree_, debug_, iConfig, consumesCollector(),pdf_name);
 }
 
 
@@ -119,6 +116,7 @@ void
 BSM3G_TNT_Maker::beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup)
   {
     if( _filltriggerinfo) trselector->startTrigger(iSetup, iRun);
+    if( _fillPDFinfo)     pdfselector->beginRun(iRun, iSetup);
   }
 
 // ------------ method called when ending the processing of a run  ------------

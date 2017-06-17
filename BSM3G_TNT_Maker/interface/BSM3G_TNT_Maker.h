@@ -75,9 +75,6 @@ private:
   TTree* storetree_;
 
   std::vector<string> pdf_name;
-  std::vector<string> pdf_ids;
-  std::vector<string> pdf_scale_name;
-  std::vector<string> pdf_scale_ids;
   std::vector<string> triggernames;
 
   const size_t MaxN;
