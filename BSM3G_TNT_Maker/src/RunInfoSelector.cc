@@ -6,10 +6,6 @@
 
 RunInfoSelector::RunInfoSelector(std::string name, TTree* tree, bool debug, const pset& iConfig, edm::ConsumesCollector&& iCC):baseTree(name,tree,debug) {
   if(debug) std::cout << "BSM3G TNT Maker: In the RunInfoSelector Constructor --> calling SetBranches()." << std::endl;
-  rhos_                    = iConfig.getParameter<std::vector< edm::InputTag >>("rhos");
-  for (std::vector< edm::InputTag >::const_iterator rhos_label = rhos_.begin(); rhos_label != rhos_.end(); ++rhos_label) {
-        iCC.consumes<double>( *rhos_label);
-  }
 
   SetBranches();
 }
@@ -31,11 +27,7 @@ void RunInfoSelector::Fill(const edm::Event& iEvent){
     lumiBlock = -1;
   }
 
-  for (std::vector< edm::InputTag >::const_iterator rho_label = rhos_.begin(); rho_label != rhos_.end(); ++rho_label) {
-      edm::Handle< double > _rho;
-      iEvent.getByLabel(*rho_label, _rho);
-      rho.push_back(*_rho);
-  }
+
 }
 
 void RunInfoSelector::SetBranches(){
@@ -44,7 +36,7 @@ void RunInfoSelector::SetBranches(){
   AddBranch(&runNumber            ,"runNumber");
   AddBranch(&eventNumber          ,"eventNumber");
   AddBranch(&lumiBlock            ,"lumiBlock");
-  AddBranch(&rho            ,"rho");
+
 
   if(debug_) std::cout << "     RunInfoSelector: Finished setting branches." << std::endl;
 }
@@ -53,5 +45,5 @@ void RunInfoSelector::Clear(){
   runNumber = -1;
   eventNumber = -1;
   lumiBlock = -1;
-  rho.clear();
+
 }

@@ -119,6 +119,17 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
                            cms.InputTag( 'fixedGridRhoFastjetCentralNeutral' )
                            ),
 
+    #jet correction stuff:
+    JetAk8PDF_L2_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Summer16_23Sep2016V4_MC_L2Relative_AK8PFchs.txt"),
+    JetAk8PDF_L3_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Summer16_23Sep2016V4_MC_L3Absolute_AK8PFchs.txt"),
+    #several for data choose the right one:
+    JetAk8PDF_L2L3_residual_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Summer16_23Sep2016V4_MC_L2L3Residual_AK8PFchs.txt"),
+    #JetAk8PDF_L2L3_residual_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Summer16_23Sep2016BCDV4_DATA_L2L3Residual_AK8PFchs.txt"),
+    #JetAk8PDF_L2L3_residual_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Spring16_23Sep2016EFV2_DATA_L2L3Residual_AK8PFchs.txt"),
+    #JetAk8PDF_L2L3_residual_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Spring16_23Sep2016GHV1_DATA_L2L3Residual_AK8PFchs.txt"),
+    JetAk8PDF_puppymc = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/puppiCorr.root"),
+
+
 
     # muon cuts
     Muon_pt_min              = cms.double(5.0),

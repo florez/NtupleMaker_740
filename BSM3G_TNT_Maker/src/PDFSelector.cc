@@ -72,9 +72,10 @@ void PDFSelector::beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup)
   edm::Handle<LHERunInfoProduct> run;
   typedef std::vector<LHERunInfoProduct::Header>::const_iterator headers_const_iterator;
 
+
+  //this will produce a warning but I found no other way to make it work!
   iRun.getByLabel("externalLHEProducer", run );
   //iRun.getByToken(lheProducerToken, run );
-  cout<<run.isValid()<<endl;
 
   if (run.isValid()) {//Begin of LHE PDF stuff preparing
     LHERunInfoProduct myLHERunInfoProduct = *(run.product());
