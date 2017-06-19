@@ -34,11 +34,9 @@ class RunInfoSelector : public baseTree{
  private:
   RunInfoSelector(){};
 
-  std::vector< edm::InputTag > rhos_;
-
  //variables which would become branches
  int runNumber, eventNumber, lumiBlock;
- vector <double> rho;
+
 };
 
 #endif
