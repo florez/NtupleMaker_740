@@ -2,7 +2,7 @@
 // Andres Florez: Universidad de los Andes, Colombia.
 // kaur amandeepkalsi: Panjab University, India.
 
-#ifndef __ELECTRON_PAT_H_                                                                                                                                  
+#ifndef __ELECTRON_PAT_H_
 #define __ELECTRON_PAT_H_
 
 
@@ -21,47 +21,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <TRandom3.h>
-#include <TBranch.h>                                                                    
+#include <TBranch.h>
 #include <TClonesArray.h>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/EventSetup.h"
-#include "FWCore/Framework/interface/EDAnalyzer.h"
-#include "FWCore/Framework/interface/EDFilter.h"
 #include "FWCore/Framework/interface/Event.h"
-#include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/Framework/interface/ConsumesCollector.h"
 #include "FWCore/Framework/interface/EDConsumerBase.h"
-#include "FWCore/ServiceRegistry/interface/Service.h"
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "DataFormats/VertexReco/interface/VertexFwd.h"
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/PatCandidates/interface/Photon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
-#include "DataFormats/Common/interface/View.h"
-#include "DataFormats/Common/interface/ValueMap.h"
 #include "DataFormats/Math/interface/deltaR.h"
-#include "CommonTools/UtilAlgos/interface/TFileService.h"
-#include "CommonTools/Utils/interface/TFileDirectory.h"
-#include "JetMETCorrections/Objects/interface/JetCorrector.h"
-#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
-//#include "MagneticField/Engine/interface/MagneticField.h"
-//#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
-#include "Geometry/DTGeometry/interface/DTGeometry.h"
-#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
-#include "Geometry/Records/interface/CaloGeometryRecord.h"
-#include "Geometry/CommonDetUnit/interface/GlobalTrackingGeometry.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "RecoVertex/KinematicFitPrimitives/interface/KinematicParticleFactoryFromTransientTrack.h"
-#include "Math/VectorUtil.h"
 #include "baseTree.h"
 
 using namespace std;
@@ -83,18 +62,18 @@ public:
   bool isGoodVertex(const reco::Vertex& vtxx);
  private:
   ElectronPatSelector(){};
-  
+
   edm::EDGetTokenT<edm::ValueMap<bool> > electronVetoIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > electronLooseIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > electronMediumIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > electronTightIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleHEEPIdMapToken_;
-  edm::EDGetTokenT<edm::ValueMap<bool> > electronMVAwp1Token_;  
+  edm::EDGetTokenT<edm::ValueMap<bool> > electronMVAwp1Token_;
   edm::EDGetTokenT<edm::ValueMap<bool> > electronMVAwp2Token_;
   // ----------member data ---------------------------
-  
+
   vector<double> patElectron_pt , patElectron_eta, patElectron_phi, patElectron_energy, patElectron_charge;
-  vector<double> patElectron_gsfTrack_ndof, patElectron_gsfTrack_dxy_pv, patElectron_dxyError, patElectron_gsfTrack_normChi2, patElectron_gsfTrack_dz_pv, patElectron_gsfTrack_dz_bs; 
+  vector<double> patElectron_gsfTrack_ndof, patElectron_gsfTrack_dxy_pv, patElectron_dxyError, patElectron_gsfTrack_normChi2, patElectron_gsfTrack_dz_pv, patElectron_gsfTrack_dz_bs;
   vector<double> patElectron_gsfTrack_vtx, patElectron_gsfTrack_vty, patElectron_gsfTrack_vtz;
   vector<double> patElectron_gsfTrack_dxy_bs, isoChargedHadrons_, isoNeutralHadrons_, isoPhotons_, isoPU_;
   vector<double> patElectron_gsfTrack_PCAx_bs, patElectron_gsfTrack_PCAy_bs, patElectron_gsfTrack_PCAz_bs;
@@ -104,7 +83,7 @@ public:
 
   // super tiny ntuple?
   bool _super_TNT;
- 
+
   // confit variables
 //  edm::InputTag _patElectronToken;
   edm::EDGetTokenT<edm::View<pat::Electron> > _patElectronToken;

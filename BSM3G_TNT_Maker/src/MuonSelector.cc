@@ -28,17 +28,17 @@ MuonSelector::~MuonSelector(){
 
 void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
   Clear();
-  
+
   if(debug_) std::cout << "     MuonSelector: Cleared the vectors, grabbing the muon/PV/BeamSpot collection handles." << std::endl;
 
   int mucoun = 0;
 
-  // grab handle to the muon collection  
+  // grab handle to the muon collection
   edm::Handle<edm::View<pat::Muon> > muon_h;
   iEvent.getByToken(_muonToken, muon_h);
 
   if(debug_) std::cout << "     MuonSelector: Looping over PVs to extract the position of the best PV." << std::endl;
-  
+
   // grab handle to the vertex collection
   edm::Handle<reco::VertexCollection> vtx_h;
   iEvent.getByToken(_vertexInputTag, vtx_h);
@@ -74,16 +74,16 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   if(debug_) std::cout << "     MuonSelector: Looping over muons." << std::endl;
 
-  // loop over muons   
+  // loop over muons
   for(edm::View<pat::Muon>::const_iterator mu = muon_h->begin(); mu != muon_h->end(); mu++) {
     if (mu->pt() < _Muon_pt_min) continue;
-    if (fabs(mu->eta()) > _Muon_eta_max) continue;  
+    if (fabs(mu->eta()) > _Muon_eta_max) continue;
     if (!(mu->innerTrack().isNonnull())) continue;
     if (!(mu->globalTrack().isNonnull())) continue;
 
     reco::TrackRef gtk = mu->globalTrack();
 
-    // fill root tree with "necessary" information:  kinematics, ID, isolation    
+    // fill root tree with "necessary" information:  kinematics, ID, isolation
     Muon_pt.push_back(mu->pt());
     Muon_eta.push_back(mu->eta());
     Muon_phi.push_back(mu->phi());
@@ -94,7 +94,7 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     Muon_tight.push_back(mu->isTightMuon(*firstGoodVertex));
     Muon_soft.push_back(mu->isSoftMuon(*firstGoodVertex));
     Muon_isHighPt.push_back(mu->isHighPtMuon(*firstGoodVertex));
-    Muon_pf.push_back(mu->isPFMuon());   
+    Muon_pf.push_back(mu->isPFMuon());
     Muon_isTrackerMuon.push_back(mu->isTrackerMuon());
     Muon_POGisGood.push_back(muon::isGoodMuon(*mu, muon::TMOneStationTight));
     Muon_isoSum.push_back((mu->trackIso() + mu->ecalIso() + mu->hcalIso()));
@@ -105,13 +105,13 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     Muon_isoPU.push_back((mu->pfIsolationR04().sumPUPt));
     // PF combined iso with DeltaBeta corrections
     double combined_iso = (mu->pfIsolationR04().sumChargedHadronPt + max(0., mu->pfIsolationR04().sumNeutralHadronEt + mu->pfIsolationR04().sumPhotonEt - 0.5*mu->pfIsolationR04().sumPUPt))/mu->pt();
-    Muon_combinedIso.push_back(combined_iso); 
+    Muon_combinedIso.push_back(combined_iso);
     Muon_trackRe_iso.push_back(mu->isolationR03().sumPt/mu->pt());
 
     // store additional information such as lifetime variables (needed for tau analyses)
     if (!_super_TNT){
       Muon_chi2.push_back(gtk->normalizedChi2());
-      Muon_validHits.push_back(gtk->hitPattern().numberOfValidMuonHits()); 
+      Muon_validHits.push_back(gtk->hitPattern().numberOfValidMuonHits());
       Muon_matchedStat.push_back(mu->numberOfMatchedStations());
       Muon_isGlobal.push_back(mu->isGlobalMuon());
       Muon_validHitsInner.push_back(mu->innerTrack()->hitPattern().numberOfValidPixelHits());
@@ -153,7 +153,7 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       Muon_track_PCAy_pv.push_back(mu_pca_pv.y());
       Muon_track_PCAz_pv.push_back(mu_pca_pv.z());
 
-      // extract track fit errors 
+      // extract track fit errors
       const float muonMass = 0.1056583715;
       float muonSigma = muonMass*1e-6;
       float chi2 = 0.0;
@@ -166,12 +166,11 @@ void MuonSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       Muon_trackFitErrorMatrix_11.push_back(muonParticle->stateAtPoint(mu_pca_bs).kinematicParametersError().matrix()(1,1));
       Muon_trackFitErrorMatrix_12.push_back(muonParticle->stateAtPoint(mu_pca_bs).kinematicParametersError().matrix()(1,2));
       Muon_trackFitErrorMatrix_22.push_back(muonParticle->stateAtPoint(mu_pca_bs).kinematicParametersError().matrix()(2,2));
-
     }
-    
+
     mucoun++;
   }
-  
+
 }
 
 void MuonSelector::SetBranches(){
@@ -194,7 +193,7 @@ void MuonSelector::SetBranches(){
   AddBranch(&Muon_isTrackerMuon    ,"Muon_isTrackerMuon");
   AddBranch(&Muon_POGisGood        ,"Muon_POGisGood");
 
-  if (!_super_TNT){  
+  if (!_super_TNT){
     AddBranch(&Muon_chi2              ,"Muon_chi2");
     AddBranch(&Muon_validHits         ,"Muon_validHits");
     AddBranch(&Muon_validHitsInner    ,"Muon_validHitsInner");
@@ -228,7 +227,7 @@ void MuonSelector::SetBranches(){
     AddBranch(&Muon_segmentCompatibility       ,"Muon_segmentCompatibility");
     AddBranch(&Muon_validFraction              ,"Muon_validFraction");
     AddBranch(&Muon_pixelLayersWithMeasurement ,"Muon_pixelLayersWithMeasurement");
-    AddBranch(&Muon_qualityhighPurity          ,"Muon_qualityhighPurity"); 
+    AddBranch(&Muon_qualityhighPurity          ,"Muon_qualityhighPurity");
     AddBranch(&Muon_track_PCAx_bs              ,"Muon_track_PCAx_bs");
     AddBranch(&Muon_track_PCAy_bs              ,"Muon_track_PCAy_bs");
     AddBranch(&Muon_track_PCAz_bs              ,"Muon_track_PCAz_bs");
@@ -247,7 +246,7 @@ void MuonSelector::SetBranches(){
 }
 
 void MuonSelector::Clear(){
-  
+
   Muon_pt.clear();
   Muon_eta.clear();
   Muon_phi.clear();
@@ -256,7 +255,7 @@ void MuonSelector::Clear(){
   Muon_loose.clear();
   Muon_medium.clear();
   Muon_soft.clear();
-  Muon_pf.clear();   
+  Muon_pf.clear();
   Muon_isHighPt.clear();
   Muon_isoCharged.clear();
   Muon_isoSum.clear();
@@ -266,12 +265,12 @@ void MuonSelector::Clear(){
   Muon_isoPU.clear();
   Muon_combinedIso.clear();
   Muon_trackRe_iso.clear();
-  Muon_charge.clear(); 
-  Muon_chi2.clear(); 
+  Muon_charge.clear();
+  Muon_chi2.clear();
   Muon_validHits.clear();
-  Muon_validHitsInner.clear(); 
-  Muon_matchedStat.clear(); 
-  Muon_dxy_pv.clear(); 
+  Muon_validHitsInner.clear();
+  Muon_matchedStat.clear();
+  Muon_dxy_pv.clear();
   Muon_dxy_bs.clear();
   Muon_dz_pv.clear();
   Muon_dz_bs.clear();
@@ -284,7 +283,7 @@ void MuonSelector::Clear(){
   Muon_isGlobal.clear();
   Muon_track_pt.clear();
   Muon_track_ptError.clear();
-  Muon_TLayers.clear(); 
+  Muon_TLayers.clear();
   Muon_dB.clear();
   Muon_besttrack_pt.clear();
   Muon_besttrack_ptError.clear();
@@ -297,7 +296,7 @@ void MuonSelector::Clear(){
   Muon_validFraction.clear();
   Muon_pixelLayersWithMeasurement.clear();
   Muon_qualityhighPurity.clear();
-  Muon_tunePBestTrackType.clear();  
+  Muon_tunePBestTrackType.clear();
   Muon_track_PCAx_bs.clear();
   Muon_track_PCAy_bs.clear();
   Muon_track_PCAz_bs.clear();

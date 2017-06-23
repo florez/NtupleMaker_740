@@ -40,7 +40,8 @@ process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
     #'/store/mc/RunIISpring16MiniAODv2/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/00000/00A945CC-6236-E611-A06B-0002C94CD11E.root'
     #'/store/mc/RunIISpring16MiniAODv2/ZprimeToTauTau_M-1750_TuneCUETP8M1_13TeV-pythia8-tauola/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/00000/02AA02E0-1843-E611-B889-00266CFEFE08.root'
-    '/store/mc/RunIISummer16MiniAODv2/TprimeTprimeToTHTH_HToGammaGamma_M-1000_TuneCUETP8M2T4_13TeV-madgraph-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/60000/12064ECE-DFDA-E611-935B-0025905B85A0.root'
+    #'/store/mc/RunIISummer16MiniAODv2/TprimeTprimeToTHTH_HToGammaGamma_M-1000_TuneCUETP8M2T4_13TeV-madgraph-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/60000/12064ECE-DFDA-E611-935B-0025905B85A0.root'
+    'file:/scratch/padekeko/Zprime_tau_tau_M_1000p0_gl_0_gh_1_kv_0p3/MNIAODSIM/Zprime_tau_tau_M_1000p0_gl_0_gh_1_kv_0p3_AODSIM_JOBNUMBER.root',
   )
 )
 
@@ -71,21 +72,24 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     fillPVinfo          = cms.bool(True),
     filljetinfo         = cms.bool(True),
     fillMETinfo         = cms.bool(True),
-    fillphotoninfo      = cms.bool(True),   
+    fillphotoninfo      = cms.bool(True),
+    fillPDFinfo         = cms.bool(True),
 
     # make a super tiny ntuple, only with a few branches?
     super_TNT  = cms.bool(False),
     # is data or MC?
     is_data     = cms.bool(False),
- 
-    # input tags 
+
+    # input tags
     triggerResults      = cms.InputTag( 'TriggerResults', '', 'HLT' ),
     triggerPrescales    = cms.InputTag("patTrigger"),
     vertices            = cms.InputTag("offlineSlimmedPrimaryVertices"),
     beamSpot            = cms.InputTag("offlineBeamSpot"),
     pileupInfo          = cms.InputTag("slimmedAddPileupInfo"),
-    genparts		= cms.InputTag("prunedGenParticles"),
-    genweights		= cms.InputTag("generator"),
+    genparts            = cms.InputTag("prunedGenParticles"),
+    genjets             = cms.InputTag("slimmedGenJets"),
+    genfatjets          = cms.InputTag("slimmedGenJetsAK8"),
+    genweights          = cms.InputTag("generator"),
     muons               = cms.InputTag("slimmedMuons"),
     patElectrons        = cms.InputTag("slimmedElectrons"),
     taus                = cms.InputTag("slimmedTaus"),
@@ -107,6 +111,25 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     eleHEEPIdMap        = cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV70"),
     electronMVA_wp1     = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp90"),
     electronMVA_wp2     = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80"),
+    rhos                = cms.VInputTag( cms.InputTag( 'fixedGridRhoAll' ),
+                           cms.InputTag( 'fixedGridRhoFastjetAll' ),
+                           cms.InputTag( 'fixedGridRhoFastjetAllCalo' ),
+                           cms.InputTag( 'fixedGridRhoFastjetCentralCalo' ),
+                           cms.InputTag( 'fixedGridRhoFastjetCentralChargedPileUp' ),
+                           cms.InputTag( 'fixedGridRhoFastjetCentralNeutral' )
+                           ),
+
+    #jet correction stuff:
+    JetAk8PDF_L2_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Summer16_23Sep2016V4_MC_L2Relative_AK8PFchs.txt"),
+    JetAk8PDF_L3_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Summer16_23Sep2016V4_MC_L3Absolute_AK8PFchs.txt"),
+    #several for data choose the right one:
+    JetAk8PDF_L2L3_residual_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Summer16_23Sep2016V4_MC_L2L3Residual_AK8PFchs.txt"),
+    #JetAk8PDF_L2L3_residual_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Summer16_23Sep2016BCDV4_DATA_L2L3Residual_AK8PFchs.txt"),
+    #JetAk8PDF_L2L3_residual_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Spring16_23Sep2016EFV2_DATA_L2L3Residual_AK8PFchs.txt"),
+    #JetAk8PDF_L2L3_residual_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Spring16_23Sep2016GHV1_DATA_L2L3Residual_AK8PFchs.txt"),
+    JetAk8PDF_puppymc = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/puppiCorr.root"),
+
+
 
     # muon cuts
     Muon_pt_min              = cms.double(5.0),
@@ -132,9 +155,9 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     # jet cuts
     Jet_pt_min   = cms.double(30.),
 
-    # photon cuts 
+    # photon cuts
     Photon_pt_min   = cms.double(10.0),
-    Photon_eta_max  = cms.double(5.0),    
+    Photon_eta_max  = cms.double(5.0),
 
     # primary vertex cuts
     Pvtx_ndof_min   = cms.double(4.),
@@ -160,16 +183,16 @@ process.load("NtupleMaker.BSM3G_TNT_Maker.triggerReq_cfi")
 process.load("RecoMET/METProducers.METSignificance_cfi")
 process.load("RecoMET/METProducers.METSignificanceParams_cfi")
 
-process.p = cms.Path(process.goodVerticesFilter * 
+process.p = cms.Path(process.goodVerticesFilter *
                      process.CSCTightHaloFilter *
                      process.eeBadScFilter *
                      process.EcalDeadCellTriggerPrimitiveFilter *
-                     process.HBHENoiseFilter * 
-                     process.HBHENoiseIsoFilter * 
-		     process.BadPFMuonFilter *
-		     process.BadChargedCandidateFilter *
-                     process.egmGsfElectronIDSequence * 
-                     process.METSignificance * 
+                     process.HBHENoiseFilter *
+                     process.HBHENoiseIsoFilter *
+                     process.BadPFMuonFilter *
+                     process.BadChargedCandidateFilter *
+                     process.egmGsfElectronIDSequence *
+                     process.METSignificance *
                      process.TNT
 )
 

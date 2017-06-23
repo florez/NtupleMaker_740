@@ -21,7 +21,7 @@ METSelector::~METSelector(){
 
 void METSelector::Fill(const edm::Event& iEvent){
   Clear();
-  
+
   // grab handle to the met collections
   edm::Handle<pat::METCollection> mets;
   iEvent.getByToken(metToken_, mets);
@@ -37,23 +37,23 @@ void METSelector::Fill(const edm::Event& iEvent){
   AlgebraicSymMatrix22 metCovMatrix = *(metCov.product());
 
   if(debug_) std::cout << "     METSelector: Cleared the vectors, grabbed the met collection handles, and extracting met values." << std::endl;
- 
-  // type-1 PF Met:  propagation of the jet energy corrections to MET. 
+
+  // type-1 PF Met:  propagation of the jet energy corrections to MET.
   // The jet collection is AK4 CHS jets (non-CHS ak4PFJets) with Pt>10 GeV/c using the L1L2L3-L1 scheme.
   Met_type1PF_pt = met.pt();
   Met_type1PF_px = met.px();
   Met_type1PF_py = met.py();
   Met_type1PF_pz = met.pz();
   Met_type1PF_phi = met.phi();
-  Met_type1PF_sumEt = met.sumEt();  
-  //Met_type1PF_cov00 = met.getSignificanceMatrix()(0,0);  
-  //Met_type1PF_cov01 = met.getSignificanceMatrix()(0,1);  
-  //Met_type1PF_cov10 = met.getSignificanceMatrix()(1,0);  
-  //Met_type1PF_cov11 = met.getSignificanceMatrix()(1,1);  
-  Met_type1PF_cov00 = metCovMatrix[0][0];  
-  Met_type1PF_cov01 = metCovMatrix[0][1];  
-  Met_type1PF_cov10 = metCovMatrix[1][0];  
-  Met_type1PF_cov11 = metCovMatrix[1][1];  
+  Met_type1PF_sumEt = met.sumEt();
+  //Met_type1PF_cov00 = met.getSignificanceMatrix()(0,0);
+  //Met_type1PF_cov01 = met.getSignificanceMatrix()(0,1);
+  //Met_type1PF_cov10 = met.getSignificanceMatrix()(1,0);
+  //Met_type1PF_cov11 = met.getSignificanceMatrix()(1,1);
+  Met_type1PF_cov00 = metCovMatrix[0][0];
+  Met_type1PF_cov01 = metCovMatrix[0][1];
+  Met_type1PF_cov10 = metCovMatrix[1][0];
+  Met_type1PF_cov11 = metCovMatrix[1][1];
 
   // PUPPI Met:  Met reconstructed with the PUPPI pileup mitigation algorithm.
   Met_puppi_pt = puppimet.pt();
@@ -76,6 +76,10 @@ void METSelector::Fill(const edm::Event& iEvent){
     if (!_is_data) Gen_Met = met.genMET()->pt();
     Met_type1PF_shiftedPtUp = met.shiftedPt(pat::MET::JetEnUp);
     Met_type1PF_shiftedPtDown  = met.shiftedPt(pat::MET::JetEnDown);
+    Met_type1PF_UnclEnshiftedPtUp = met.shiftedPt(pat::MET::UnclusteredEnUp);
+    Met_type1PF_UnclEnshiftedPtDown  = met.shiftedPt(pat::MET::UnclusteredEnDown);
+    Met_type1PF_UnclEnshiftedPhiUp = met.shiftedPhi(pat::MET::UnclusteredEnUp);
+    Met_type1PF_UnclEnshiftedPhiDown  = met.shiftedPhi(pat::MET::UnclusteredEnDown);
 //    Met_puppi_shiftedPtUp = puppimet.shiftedPt(pat::MET::JetEnUp);
 //    Met_puppi_shiftedPtDown  = puppimet.shiftedPt(pat::MET::JetEnDown);
   }
@@ -84,7 +88,7 @@ void METSelector::Fill(const edm::Event& iEvent){
 
 void METSelector::SetBranches(){
   if(debug_) std::cout << "     METSelector: Setting branches by calling AddBranch of baseTree." << std::endl;
-  
+
   AddBranch(&Met_type1PF_pt,            "Met_type1PF_pt");
   AddBranch(&Met_type1PF_px,            "Met_type1PF_px");
   AddBranch(&Met_type1PF_py,            "Met_type1PF_py");
@@ -111,6 +115,10 @@ void METSelector::SetBranches(){
     AddBranch(&Gen_Met,           "Gen_Met");
     AddBranch(&Met_type1PF_shiftedPtUp,   "Met_type1PF_shiftedPtUp");
     AddBranch(&Met_type1PF_shiftedPtDown, "Met_type1PF_shiftedPtDown");
+    AddBranch(&Met_type1PF_UnclEnshiftedPtUp,   "Met_type1PF_UnclEnshiftedPtUp");
+    AddBranch(&Met_type1PF_UnclEnshiftedPtDown, "Met_type1PF_UnclEnshiftedPtDown");
+    AddBranch(&Met_type1PF_UnclEnshiftedPhiUp,   "Met_type1PF_UnclEnshiftedPhiUp");
+    AddBranch(&Met_type1PF_UnclEnshiftedPhiDown, "Met_type1PF_UnclEnshiftedPhiDown");
 //    AddBranch(&Met_puppi_shiftedPtUp,     "Met_puppi_shiftedPtUp");
 //    AddBranch(&Met_puppi_shiftedPtDown,   "Met_puppi_shiftedPtDown");
   }
@@ -120,7 +128,7 @@ void METSelector::SetBranches(){
 
 
 void METSelector::Clear(){
-  Met_type1PF_pt = -9999999999;                                                                                                                                    
+  Met_type1PF_pt = -9999999999;
   Met_type1PF_px = -9999999999;
   Met_type1PF_py = -9999999999;
   Met_type1PF_pz = -9999999999;
@@ -128,17 +136,19 @@ void METSelector::Clear(){
   Met_type1PF_sumEt  = -9999999999 ;
   Met_type1PF_shiftedPtUp  = -9999999999;
   Met_type1PF_shiftedPtDown   = -9999999999;
+  Met_type1PF_UnclEnshiftedPtUp= -9999999999;
+  Met_type1PF_UnclEnshiftedPtDown= -9999999999;
   Met_type1PF_cov00  = -9999999999;
   Met_type1PF_cov01  = -9999999999;
   Met_type1PF_cov10  = -9999999999;
   Met_type1PF_cov11  = -9999999999;
-  Met_puppi_pt = -9999999999;                                                                                                                                    
+  Met_puppi_pt = -9999999999;
   Met_puppi_px = -9999999999;
   Met_puppi_py = -9999999999;
   Met_puppi_pz = -9999999999;
   Met_puppi_phi  = -9999999999;
   Met_puppi_sumEt  = -9999999999 ;
-  Met_NoHF_pt = -9999999999;                                                                                                                                    
+  Met_NoHF_pt = -9999999999;
   Met_NoHF_px = -9999999999;
   Met_NoHF_py = -9999999999;
   Met_NoHF_pz = -9999999999;

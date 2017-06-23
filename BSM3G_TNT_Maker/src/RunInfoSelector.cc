@@ -4,8 +4,9 @@
 
 #include "NtupleMaker/BSM3G_TNT_Maker/interface/RunInfoSelector.h"
 
-RunInfoSelector::RunInfoSelector(std::string name, TTree* tree, bool debug, const pset& iConfig):baseTree(name,tree,debug) {
+RunInfoSelector::RunInfoSelector(std::string name, TTree* tree, bool debug, const pset& iConfig, edm::ConsumesCollector&& iCC):baseTree(name,tree,debug) {
   if(debug) std::cout << "BSM3G TNT Maker: In the RunInfoSelector Constructor --> calling SetBranches()." << std::endl;
+
   SetBranches();
 }
 
@@ -14,7 +15,7 @@ RunInfoSelector::~RunInfoSelector(){
 }
 
 void RunInfoSelector::Fill(const edm::Event& iEvent){
-  Clear(); 
+  Clear();
 
   if(debug_) std::cout << "     RunInfoSelector: Re-initialized the variables and extracting the run number, event number, and lumi block." << std::endl;
 
@@ -25,7 +26,8 @@ void RunInfoSelector::Fill(const edm::Event& iEvent){
   } else {
     lumiBlock = -1;
   }
-  
+
+
 }
 
 void RunInfoSelector::SetBranches(){
@@ -35,6 +37,7 @@ void RunInfoSelector::SetBranches(){
   AddBranch(&eventNumber          ,"eventNumber");
   AddBranch(&lumiBlock            ,"lumiBlock");
 
+
   if(debug_) std::cout << "     RunInfoSelector: Finished setting branches." << std::endl;
 }
 
@@ -42,4 +45,5 @@ void RunInfoSelector::Clear(){
   runNumber = -1;
   eventNumber = -1;
   lumiBlock = -1;
+
 }
