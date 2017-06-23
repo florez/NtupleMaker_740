@@ -86,6 +86,11 @@ private:
   vector <int> Tau_decayMode;
   vector<double> Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits;
 
+  vector< vector< float > > Tau_signal_cand_chargedHadr_pt,  Tau_signal_cand_chargedHadr_eta,  Tau_signal_cand_chargedHadr_phi,  Tau_signal_cand_chargedHadr_energy;
+  vector< vector< float > > Tau_signal_cand_neutGam_pt,  Tau_signal_cand_neutGam_eta,  Tau_signal_cand_neutGam_phi,  Tau_signal_cand_neutGam_energy;
+  vector< vector< float > > Tau_signal_cand_neutHadr_pt,  Tau_signal_cand_neutHadr_eta,  Tau_signal_cand_neutHadr_phi,  Tau_signal_cand_neutHadr_energy;
+
+
   // config variables
 //  edm::InputTag tauToken_;
 //  edm::InputTag packedPFCandidateToken_;

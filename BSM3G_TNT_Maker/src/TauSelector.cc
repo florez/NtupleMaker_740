@@ -87,7 +87,7 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
     if(debug_) std::cout << "          Tau info: Tau #" << nTau << " passed kinematic cuts & lead charged hadron IsNonNull cut" << std::endl;
 
     // get the embedded packed candidate of the leading PF charged hadron
-    const reco::CandidatePtr hadTauLeadChargedCand = tau->leadChargedHadrCand();                                                                   
+    const reco::CandidatePtr hadTauLeadChargedCand = tau->leadChargedHadrCand();
 
     if(debug_) std::cout << "          Tau info: Tau #" << nTau << " --> Tau lead charged hadron: pt = " << hadTauLeadChargedCand->pt() << ", eta = " << hadTauLeadChargedCand->eta() << ", phi = " << hadTauLeadChargedCand->phi() << std::endl;
 
@@ -97,7 +97,7 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
     bool leadPackedCandidateExists = false;
     for(unsigned int iPF = 0, nPF = pfs->size(); iPF < nPF; ++iPF) {
       const pat::PackedCandidate &pfCandidate = (*pfs)[iPF];
-      if( (hadTauLeadChargedCand->pt() == pfCandidate.pt()) && (hadTauLeadChargedCand->eta() == pfCandidate.eta()) && 
+      if( (hadTauLeadChargedCand->pt() == pfCandidate.pt()) && (hadTauLeadChargedCand->eta() == pfCandidate.eta()) &&
           (hadTauLeadChargedCand->phi() == pfCandidate.phi()) ) { // the packed PF candidate and embedded lead candidate within the pat::Tau should be the same
         if(debug_) std::cout << "               PF Candidate info: PF Candidate #" << iPF << ": pt = " << pfCandidate.pt() << ", eta = " << pfCandidate.eta() << ", phi = " << pfCandidate.phi();
         leadPackedCandidateExists = true; // if there is a match between the packed PF candidate and embedded lead candidate within the pat::Tau
@@ -130,13 +130,13 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
     //CombinedIsolationDeltaBetaCorr3Hits
     Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits"));
     Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits"));
-    Tau_byTightCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byTightCombinedIsolationDeltaBetaCorr3Hits")); 
+    Tau_byTightCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byTightCombinedIsolationDeltaBetaCorr3Hits"));
 
     //CombinedIsolationDeltaBetaCorr3Hits DR = 0.3
     //Tau_byLooseCombinedIsolationDeltaBetaCorr3HitsdR03.push_back(tau->tauID("byLooseCombinedIsolationDeltaBetaCorr3HitsdR03"));
     //Tau_byMediumCombinedIsolationDeltaBetaCorr3HitsdR03.push_back(tau->tauID("byMediumCombinedIsolationDeltaBetaCorr3HitsdR03"));
     //Tau_byTightCombinedIsolationDeltaBetaCorr3HitsdR03.push_back(tau->tauID("byTightCombinedIsolationDeltaBetaCorr3HitsdR03"));
- 
+
     // MVA ID using iso with old Decay Mode reconstruction:
     Tau_byVLooseIsolationMVArun2v1DBoldDMwLT.push_back(tau->tauID("byVLooseIsolationMVArun2v1DBoldDMwLT"));
     Tau_byLooseIsolationMVArun2v1DBoldDMwLT.push_back(tau->tauID("byLooseIsolationMVArun2v1DBoldDMwLT"));
@@ -168,11 +168,11 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
     // store additional information such as lifetime variables
     if(!_super_TNT){
-    
-      Tau_leadChargedCandPt.push_back(hadTauLeadChargedCand.isNonnull() ? hadTauLeadChargedCand->pt() : -1.);      
+
+      Tau_leadChargedCandPt.push_back(hadTauLeadChargedCand.isNonnull() ? hadTauLeadChargedCand->pt() : -1.);
       Tau_leadChargedCandEta.push_back(hadTauLeadChargedCand.isNonnull() ? hadTauLeadChargedCand->eta() : -999);
       Tau_leadChargedCandPhi.push_back(hadTauLeadChargedCand.isNonnull() ? hadTauLeadChargedCand->phi() : -999);
-      Tau_leadChargedCandCharge.push_back(hadTauLeadChargedCand.isNonnull() ? hadTauLeadChargedCand->charge() : -2);   
+      Tau_leadChargedCandCharge.push_back(hadTauLeadChargedCand.isNonnull() ? hadTauLeadChargedCand->charge() : -2);
       Tau_leadChargedCandChi2.push_back(leadTrack->chi2());
       Tau_leadChargedCandValidHits.push_back(leadTrack->numberOfValidHits());
       Tau_leadChargedCandDxy_pv.push_back(leadTrack->dxy(firstGoodVertex->position()));
@@ -224,10 +224,43 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
       Tau_leadChargedCandTrackFitErrorMatrix_11.push_back(tauParticle->stateAtPoint(tauLeadTrack_pca_bs).kinematicParametersError().matrix()(1,1));
       Tau_leadChargedCandTrackFitErrorMatrix_12.push_back(tauParticle->stateAtPoint(tauLeadTrack_pca_bs).kinematicParametersError().matrix()(1,2));
       Tau_leadChargedCandTrackFitErrorMatrix_22.push_back(tauParticle->stateAtPoint(tauLeadTrack_pca_bs).kinematicParametersError().matrix()(2,2));
+
+      Tau_signal_cand_chargedHadr_pt.push_back(vector< float >());
+      Tau_signal_cand_chargedHadr_eta.push_back(vector< float >());
+      Tau_signal_cand_chargedHadr_phi.push_back(vector< float >());
+      Tau_signal_cand_chargedHadr_energy.push_back(vector< float >());
+      for(unsigned int i=1; i<tau->signalChargedHadrCands().size(); i++){
+        Tau_signal_cand_chargedHadr_pt.back().push_back( tau->signalChargedHadrCands()[i]->pt());
+        Tau_signal_cand_chargedHadr_eta.back().push_back( tau->signalChargedHadrCands()[i]->eta());
+        Tau_signal_cand_chargedHadr_phi.back().push_back( tau->signalChargedHadrCands()[i]->phi());
+        Tau_signal_cand_chargedHadr_energy.back().push_back( tau->signalChargedHadrCands()[i]->energy());
+      }
+
+      Tau_signal_cand_neutHadr_pt.push_back(vector< float >());
+      Tau_signal_cand_neutHadr_eta.push_back(vector< float >());
+      Tau_signal_cand_neutHadr_phi.push_back(vector< float >());
+      Tau_signal_cand_neutHadr_energy.push_back(vector< float >());
+      for(unsigned int i=1; i<tau->signalNeutrHadrCands().size(); i++){
+        Tau_signal_cand_neutHadr_pt.back().push_back( tau->signalNeutrHadrCands()[i]->pt());
+        Tau_signal_cand_neutHadr_eta.back().push_back( tau->signalNeutrHadrCands()[i]->eta());
+        Tau_signal_cand_neutHadr_phi.back().push_back( tau->signalNeutrHadrCands()[i]->phi());
+        Tau_signal_cand_neutHadr_energy.back().push_back( tau->signalNeutrHadrCands()[i]->energy());
+      }
+
+      Tau_signal_cand_neutGam_pt.push_back(vector< float >());
+      Tau_signal_cand_neutGam_eta.push_back(vector< float >());
+      Tau_signal_cand_neutGam_phi.push_back(vector< float >());
+      Tau_signal_cand_neutGam_energy.push_back(vector< float >());
+      for(unsigned int i=1; i<tau->signalGammaCands().size(); i++){
+        Tau_signal_cand_neutGam_pt.back().push_back(        tau->signalGammaCands()[i]->pt());
+        Tau_signal_cand_neutGam_eta.back().push_back(       tau->signalGammaCands()[i]->eta());
+        Tau_signal_cand_neutGam_phi.back().push_back(       tau->signalGammaCands()[i]->phi());
+        Tau_signal_cand_neutGam_energy.back().push_back(    tau->signalGammaCands()[i]->energy());
+      }
     }
     taucoun++;
   }
-  
+
 }
 
 void TauSelector::SetBranches(){
@@ -275,12 +308,12 @@ void TauSelector::SetBranches(){
 
 
   AddBranch(&Tau_againstMuonLoose3,                             "Tau_againstMuonLoose3");
-  AddBranch(&Tau_againstMuonTight3,                             "Tau_againstMuonTight3"); 
+  AddBranch(&Tau_againstMuonTight3,                             "Tau_againstMuonTight3");
   AddBranch(&Tau_againstElectronMVAVLooseMVA6,                  "Tau_againstElectronMVAVLooseMVA6");
   AddBranch(&Tau_againstElectronMVALooseMVA6,                   "Tau_againstElectronMVALooseMVA6");
   AddBranch(&Tau_againstElectronMVAMediumMVA6,                  "Tau_againstElectronMVAMediumMVA6");
   AddBranch(&Tau_againstElectronMVATightMVA6,                   "Tau_againstElectronMVATightMVA6");
-  if(!_super_TNT){ 
+  if(!_super_TNT){
     AddBranch(&Tau_leadChargedCandPt,                           "Tau_leadChargedCandPt");
     AddBranch(&Tau_leadChargedCandEta,                          "Tau_leadChargedCandEta");
     AddBranch(&Tau_leadChargedCandPhi,                          "Tau_leadChargedCandPhi");
@@ -321,29 +354,38 @@ void TauSelector::SetBranches(){
     AddBranch(&Tau_default_PCAx_pv                           ,"Tau_default_PCAx_pv");
     AddBranch(&Tau_default_PCAy_pv                           ,"Tau_default_PCAy_pv");
     AddBranch(&Tau_default_PCAz_pv                           ,"Tau_default_PCAz_pv");
+    AddBranch(&Tau_signal_cand_chargedHadr_pt,"Tau_signal_cand_chargedHadr_pt");
+    AddBranch(&Tau_signal_cand_chargedHadr_eta,"Tau_signal_cand_chargedHadr_eta");
+    AddBranch(&Tau_signal_cand_chargedHadr_phi,"Tau_signal_cand_chargedHadr_phi");
+    AddBranch(&Tau_signal_cand_chargedHadr_energy,"Tau_signal_cand_chargedHadr_energy");
+    AddBranch(&Tau_signal_cand_neutHadr_pt,     "Tau_signal_cand_neutHadr_pt");
+    AddBranch(&Tau_signal_cand_neutHadr_eta,    "Tau_signal_cand_neutHadr_eta");
+    AddBranch(&Tau_signal_cand_neutHadr_phi,    "Tau_signal_cand_neutHadr_phi");
+    AddBranch(&Tau_signal_cand_neutHadr_energy, "Tau_signal_cand_neutHadr_energy");
+
   }
 
   if(debug_) std::cout << "     TauSelector: Finished setting branches." << std::endl;
 }
 
 void TauSelector::Clear(){
-  
-  Tau_eta.clear(); 
-  Tau_phi.clear(); 
-  Tau_pt.clear(); 
-  Tau_energy.clear(); 
-  Tau_charge.clear(); 
+
+  Tau_eta.clear();
+  Tau_phi.clear();
+  Tau_pt.clear();
+  Tau_energy.clear();
+  Tau_charge.clear();
   Tau_nProngs.clear();
   Tau_decayMode.clear();
-  Tau_chargedIsoPtSum.clear(); 
-  Tau_neutralIsoPtSum.clear(); 
-  Tau_puCorrPtSum.clear(); 
+  Tau_chargedIsoPtSum.clear();
+  Tau_neutralIsoPtSum.clear();
+  Tau_puCorrPtSum.clear();
   Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits.clear();
-  Tau_decayModeFinding.clear(); 
-  Tau_decayModeFindingNewDMs.clear(); 
-  Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits.clear(); 
-  Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits.clear(); 
-  Tau_byTightCombinedIsolationDeltaBetaCorr3Hits.clear(); 
+  Tau_decayModeFinding.clear();
+  Tau_decayModeFindingNewDMs.clear();
+  Tau_byLooseCombinedIsolationDeltaBetaCorr3Hits.clear();
+  Tau_byMediumCombinedIsolationDeltaBetaCorr3Hits.clear();
+  Tau_byTightCombinedIsolationDeltaBetaCorr3Hits.clear();
 //  Tau_byLooseCombinedIsolationDeltaBetaCorr3HitsdR03.clear();
 //  Tau_byMediumCombinedIsolationDeltaBetaCorr3HitsdR03.clear();
 //  Tau_byTightCombinedIsolationDeltaBetaCorr3HitsdR03.clear();
