@@ -457,6 +457,14 @@ void TauSelector::Clear(){
   Tau_default_PCAx_pv.clear();
   Tau_default_PCAy_pv.clear();
   Tau_default_PCAz_pv.clear();
+  Tau_signal_cand_chargedHadr_pt.clear();
+  Tau_signal_cand_chargedHadr_eta.clear();
+  Tau_signal_cand_chargedHadr_phi.clear();
+  Tau_signal_cand_chargedHadr_energy.clear();
+  Tau_signal_cand_neutHadr_pt.clear();
+  Tau_signal_cand_neutHadr_eta.clear();
+  Tau_signal_cand_neutHadr_phi.clear();
+  Tau_signal_cand_neutHadr_energy.clear();
 }
 
 bool TauSelector::isGoodVertex(const reco::Vertex& vtxxx) {
