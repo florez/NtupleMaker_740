@@ -71,7 +71,8 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     fillPVinfo          = cms.bool(True),
     filljetinfo         = cms.bool(True),
     fillMETinfo         = cms.bool(True),
-    fillphotoninfo      = cms.bool(True),   
+    fillphotoninfo      = cms.bool(True),
+    fillPDFinfo         = cms.bool(True),
 
     # make a super tiny ntuple, only with a few branches?
     super_TNT  = cms.bool(False),
@@ -84,8 +85,10 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     vertices            = cms.InputTag("offlineSlimmedPrimaryVertices"),
     beamSpot            = cms.InputTag("offlineBeamSpot"),
     pileupInfo          = cms.InputTag("slimmedAddPileupInfo"),
-    genparts		= cms.InputTag("prunedGenParticles"),
-    genweights		= cms.InputTag("generator"),
+    genparts            = cms.InputTag("prunedGenParticles"),
+    genjets             = cms.InputTag("slimmedGenJets"),
+    genfatjets          = cms.InputTag("slimmedGenJetsAK8"),
+    genweights          = cms.InputTag("generator"),
     muons               = cms.InputTag("slimmedMuons"),
     patElectrons        = cms.InputTag("slimmedElectrons"),
     taus                = cms.InputTag("slimmedTaus"),
@@ -107,6 +110,25 @@ process.TNT = cms.EDAnalyzer("BSM3G_TNT_Maker",
     eleHEEPIdMap        = cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV70"),
     electronMVA_wp1     = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp90"),
     electronMVA_wp2     = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80"),
+    rhos                = cms.VInputTag( cms.InputTag( 'fixedGridRhoAll' ),
+                           cms.InputTag( 'fixedGridRhoFastjetAll' ),
+                           cms.InputTag( 'fixedGridRhoFastjetAllCalo' ),
+                           cms.InputTag( 'fixedGridRhoFastjetCentralCalo' ),
+                           cms.InputTag( 'fixedGridRhoFastjetCentralChargedPileUp' ),
+                           cms.InputTag( 'fixedGridRhoFastjetCentralNeutral' )
+                           ),
+
+    #jet correction stuff:
+    JetAk8PDF_L2_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Summer16_23Sep2016V4_MC_L2Relative_AK8PFchs.txt"),
+    JetAk8PDF_L3_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Summer16_23Sep2016V4_MC_L3Absolute_AK8PFchs.txt"),
+    #several for data choose the right one:
+    JetAk8PDF_L2L3_residual_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Summer16_23Sep2016V4_MC_L2L3Residual_AK8PFchs.txt"),
+    #JetAk8PDF_L2L3_residual_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Summer16_23Sep2016BCDV4_DATA_L2L3Residual_AK8PFchs.txt"),
+    #JetAk8PDF_L2L3_residual_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Spring16_23Sep2016EFV2_DATA_L2L3Residual_AK8PFchs.txt"),
+    #JetAk8PDF_L2L3_residual_correction = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/Spring16_23Sep2016GHV1_DATA_L2L3Residual_AK8PFchs.txt"),
+    JetAk8PDF_puppymc = cms.FileInPath("NtupleMaker/BSM3G_TNT_Maker/data/puppiCorr.root"),
+
+
 
     # muon cuts
     Muon_pt_min              = cms.double(5.0),
@@ -164,12 +186,12 @@ process.p = cms.Path(process.goodVerticesFilter *
                      process.CSCTightHaloFilter *
                      process.eeBadScFilter *
                      process.EcalDeadCellTriggerPrimitiveFilter *
-                     process.HBHENoiseFilter * 
-                     process.HBHENoiseIsoFilter * 
-		     process.BadPFMuonFilter *
-		     process.BadChargedCandidateFilter *
-                     process.egmGsfElectronIDSequence * 
-                     process.METSignificance * 
+                     process.HBHENoiseFilter *
+                     process.HBHENoiseIsoFilter *
+                     process.BadPFMuonFilter *
+                     process.BadChargedCandidateFilter *
+                     process.egmGsfElectronIDSequence *
+                     process.METSignificance *
                      process.TNT
 )
 

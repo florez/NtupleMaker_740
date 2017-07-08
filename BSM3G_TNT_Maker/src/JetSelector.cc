@@ -340,6 +340,7 @@ void JetSelector::Clear(){
   Jet_toptag_puppi_tau2.clear();
   Jet_toptag_puppi_tau3.clear();
   Jet_toptag_puppi_mass_corr.clear();
+  Jet_toptag_UncorrJet.clear();
   //Jet_toptag_puppy_correction.clear();
 
   rho.clear();
