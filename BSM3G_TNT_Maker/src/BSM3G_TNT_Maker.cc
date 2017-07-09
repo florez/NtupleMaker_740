@@ -26,6 +26,7 @@ BSM3G_TNT_Maker::BSM3G_TNT_Maker(const edm::ParameterSet& iConfig):
   _fillphotoninfo          = iConfig.getParameter<bool>("fillphotoninfo");
   _fillPDFinfo             = iConfig.getParameter<bool>("fillPDFinfo");
   edm::Service<TFileService> fs;
+  fs->file().SetCompressionLevel(9);
   tree_ = fs->make<TTree>("BOOM","BOOM");
   storetree_ = fs->make<TTree>("BAAM","BAAM");
 
