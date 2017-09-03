@@ -31,25 +31,14 @@ void TriggerSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSet
     for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
       //std::cout << "Trigger " << names.triggerName(i) << ", prescale " << triggerPrescales->getPrescaleForIndex(i) << ": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)") << std::endl;
       if(names.triggerName(i).find("HLT_") != string::npos) {
-        vector<string>::iterator nameit= std::find(triggernames->begin(), triggernames->end(), names.triggerName(i));
-        if(nameit == triggernames->end()){
-          triggernames->push_back(names.triggerName(i));
-          //this will be the last element
-          if(triggerBits->accept(i)) {
-            Trigger_decision.push_back(triggernames->size()-1);
-            Trigger_prescale.push_back(triggerPrescales->getPrescaleForIndex(i));
-          }
-        }else{
-          ptrdiff_t pos=nameit-triggernames->begin();
-          if(triggerBits->accept(i)) {
-            Trigger_decision.push_back(int(pos));
-            Trigger_prescale.push_back(triggerPrescales->getPrescaleForIndex(i));
-          }
-        }
-
+      //Trigger_names.push_back(names.triggerName(i));
+        if(triggerBits->accept(i)) { Trigger_decision.push_back(1); }
+        else { Trigger_decision.push_back(0); }
+        Trigger_prescale.push_back(triggerPrescales->getPrescaleForIndex(i));
       }
     }
   }
+
 
 }
 
