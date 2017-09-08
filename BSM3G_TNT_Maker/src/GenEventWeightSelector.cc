@@ -8,7 +8,9 @@ GenEventWeightSelector::GenEventWeightSelector(std::string name, TTree* tree, bo
   if(debug) std::cout << "BSM3G TNT Maker: In the GenEventWeightSelector Constructor --> calling SetBranches()." << std::endl;
   generatorToken_               = iCC.consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("genweights"));
   _is_data                      = iConfig.getParameter<bool>("is_data");
-  SetBranches();
+  if(!_is_data){
+    SetBranches();
+  }
 }
 
 GenEventWeightSelector::~GenEventWeightSelector(){

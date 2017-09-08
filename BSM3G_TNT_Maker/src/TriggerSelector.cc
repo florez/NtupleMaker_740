@@ -46,10 +46,10 @@ void TriggerSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSet
             Trigger_prescale.push_back(triggerPrescales->getPrescaleForIndex(i));
           }
         }
-
       }
     }
   }
+
 
 }
 
