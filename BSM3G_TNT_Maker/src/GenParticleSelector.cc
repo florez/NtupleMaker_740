@@ -15,7 +15,9 @@ GenParticleSelector::GenParticleSelector(std::string name, TTree* tree, bool deb
   iCC.consumes< LHEEventProduct >(edm::InputTag("externalLHEProducer"));
 
   _is_data                      = iConfig.getParameter<bool>("is_data");
-  SetBranches();
+  if(!_is_data){
+    SetBranches();
+  }
 }
 
 GenParticleSelector::~GenParticleSelector(){

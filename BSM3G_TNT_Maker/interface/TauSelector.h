@@ -85,7 +85,11 @@ private:
   vector <int> Tau_byVLooseCombinedIsolationDeltaBetaCorr, Tau_byVLooseIsolationMVA3newDMwLT, Tau_byVLooseIsolationMva3oldDMwLT;
   vector <int> Tau_decayMode;
   vector<double> Tau_byCombinedIsolationDeltaBetaCorrRaw3Hits;
-
+  vector<double> Tau_byIsolationMVArun2v1DBdR03oldDMwLTraw;
+  vector<double> Tau_byIsolationMVArun2v1DBnewDMwLTraw;
+  vector<double> Tau_byIsolationMVArun2v1DBoldDMwLTraw;
+  vector<double> Tau_byIsolationMVArun2v1PWdR03oldDMwLTraw;
+  
   vector< vector< float > > Tau_signal_cand_chargedHadr_pt,  Tau_signal_cand_chargedHadr_eta,  Tau_signal_cand_chargedHadr_phi,  Tau_signal_cand_chargedHadr_energy;
   vector< vector< float > > Tau_signal_cand_neutGam_pt,  Tau_signal_cand_neutGam_eta,  Tau_signal_cand_neutGam_phi,  Tau_signal_cand_neutGam_energy;
   vector< vector< float > > Tau_signal_cand_neutHadr_pt,  Tau_signal_cand_neutHadr_eta,  Tau_signal_cand_neutHadr_phi,  Tau_signal_cand_neutHadr_energy;

@@ -118,6 +118,12 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
     Tau_charge.push_back(tau->charge());
     Tau_decayMode.push_back(tau->decayMode());
     Tau_nProngs.push_back(tau->signalChargedHadrCands().size());
+    //just to keep this for the next change in names
+    //cout<<"-----------"<<endl;
+    //for(size_t i=0;i< tau->tauIDs().size();i++){
+      //cout<<tau->tauIDs()[i].first<<endl;
+    //}
+    
     Tau_chargedIsoPtSum.push_back(tau->tauID("chargedIsoPtSum"));
     Tau_neutralIsoPtSum.push_back(tau->tauID("neutralIsoPtSum"));
     Tau_puCorrPtSum.push_back(tau->tauID("puCorrPtSum"));
@@ -157,6 +163,14 @@ void TauSelector::Fill(const edm::Event& iEvent, const edm::EventSetup& iSetup){
     Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT.push_back(tau->tauID("byMediumIsolationMVArun2v1DBdR03oldDMwLT"));
     Tau_byTightIsolationMVArun2v1DBdR03oldDMwLT.push_back(tau->tauID("byTightIsolationMVArun2v1DBdR03oldDMwLT"));
     Tau_byVTightIsolationMVArun2v1DBdR03oldDMwLT.push_back(tau->tauID("byVTightIsolationMVArun2v1DBdR03oldDMwLT"));
+    
+    //get the raw mva output:
+    Tau_byIsolationMVArun2v1DBdR03oldDMwLTraw.push_back(tau->tauID("byIsolationMVArun2v1DBdR03oldDMwLTraw"));
+    Tau_byIsolationMVArun2v1DBnewDMwLTraw.push_back(tau->tauID("byIsolationMVArun2v1DBnewDMwLTraw"));
+    Tau_byIsolationMVArun2v1DBoldDMwLTraw.push_back(tau->tauID("byIsolationMVArun2v1DBoldDMwLTraw"));
+    Tau_byIsolationMVArun2v1PWdR03oldDMwLTraw.push_back(tau->tauID("byIsolationMVArun2v1PWdR03oldDMwLTraw"));
+    
+    
 
     // discriminators against electrons/muons
     Tau_againstMuonLoose3.push_back(tau->tauID("againstMuonLoose3"));
@@ -305,7 +319,13 @@ void TauSelector::SetBranches(){
   AddBranch(&Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT,      "Tau_byTightIsolationMVArun2v1DBdR03oldDMwLT");
   AddBranch(&Tau_byTightIsolationMVArun2v1DBdR03oldDMwLT,       "Tau_byTightIsolationMVArun2v1DBdR03oldDMwLT");
   AddBranch(&Tau_byVTightIsolationMVArun2v1DBdR03oldDMwLT,      "Tau_byVTightIsolationMVArun2v1DBdR03oldDMwLT");
-
+  
+  
+  AddBranch(&Tau_byIsolationMVArun2v1DBdR03oldDMwLTraw,         "Tau_byIsolationMVArun2v1DBdR03oldDMwLTraw");
+  AddBranch(&Tau_byIsolationMVArun2v1DBnewDMwLTraw,             "Tau_byIsolationMVArun2v1DBnewDMwLTraw");
+  AddBranch(&Tau_byIsolationMVArun2v1DBoldDMwLTraw,             "Tau_byIsolationMVArun2v1DBoldDMwLTraw");
+  AddBranch(&Tau_byIsolationMVArun2v1PWdR03oldDMwLTraw,         "Tau_byIsolationMVArun2v1PWdR03oldDMwLTraw");
+  
 
   AddBranch(&Tau_againstMuonLoose3,                             "Tau_againstMuonLoose3");
   AddBranch(&Tau_againstMuonTight3,                             "Tau_againstMuonTight3");
@@ -409,7 +429,11 @@ void TauSelector::Clear(){
   Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT.clear();
   Tau_byTightIsolationMVArun2v1DBdR03oldDMwLT.clear();
   Tau_byVTightIsolationMVArun2v1DBdR03oldDMwLT.clear();
-
+  
+  Tau_byIsolationMVArun2v1DBdR03oldDMwLTraw.clear();   
+  Tau_byIsolationMVArun2v1DBnewDMwLTraw.clear();       
+  Tau_byIsolationMVArun2v1DBoldDMwLTraw.clear();       
+  Tau_byIsolationMVArun2v1PWdR03oldDMwLTraw.clear();   
 
   Tau_againstMuonLoose3.clear();
   Tau_againstMuonTight3.clear();
