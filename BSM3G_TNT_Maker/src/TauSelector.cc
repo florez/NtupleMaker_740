@@ -316,7 +316,7 @@ void TauSelector::SetBranches(){
   // Iso MVA with Delta Beta correction DR = 0.3
   AddBranch(&Tau_byVLooseIsolationMVArun2v1DBdR03oldDMwLT,      "Tau_byVLooseIsolationMVArun2v1DBdR03oldDMwLT");
   AddBranch(&Tau_byLooseIsolationMVArun2v1DBdR03oldDMwLT,       "Tau_byLooseIsolationMVArun2v1DBdR03oldDMwLT");
-  AddBranch(&Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT,      "Tau_byTightIsolationMVArun2v1DBdR03oldDMwLT");
+  AddBranch(&Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT,      "Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT");
   AddBranch(&Tau_byTightIsolationMVArun2v1DBdR03oldDMwLT,       "Tau_byTightIsolationMVArun2v1DBdR03oldDMwLT");
   AddBranch(&Tau_byVTightIsolationMVArun2v1DBdR03oldDMwLT,      "Tau_byVTightIsolationMVArun2v1DBdR03oldDMwLT");
   
